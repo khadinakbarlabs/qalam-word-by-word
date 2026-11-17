@@ -1,0 +1,429 @@
+<meta charset="utf-8">
+<title>Qalam Scholar Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap">
+<style>
+/* Layout: a checking ledger — sticky progress bar, section tabs, then one row per item with its decision on the right. */
+:root {
+  --bg: #eef1ed; --surface: #fbfcfa; --sunk: #e3e8e2; --ink: #1b2522; --muted: #5d6a65; --line: #cfd7d0;
+  --accent: #1f6f68; --accent-soft: #d6ebe7; --ok: #2c7a4b; --ok-soft: #dcefe2; --fix: #a8323f; --fix-soft: #f6dfe2;
+  --gold: #8a6410; --medal: #f3e6c4;
+  --font-ui: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-ar: "Amiri Quran", "Amiri", "Noto Naskh Arabic", "Geeza Pro", serif;
+  --font-ur: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Noto Naskh Arabic", serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111816; --surface: #18211e; --sunk: #202b27; --ink: #e5ece8; --muted: #9aaaa3; --line: #2e3b36;
+  --accent: #62b8ad; --accent-soft: #1d3632; --ok: #6cc08b; --ok-soft: #1c3326; --fix: #e88591; --fix-soft: #3a1f24;
+  --gold: #d9b45a; --medal: #3a3220; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --sunk: #202b27; --ink: #e5ece8; --muted: #9aaaa3; --line: #2e3b36;
+  --accent: #62b8ad; --accent-soft: #1d3632; --ok: #6cc08b; --ok-soft: #1c3326; --fix: #e88591; --fix-soft: #3a1f24;
+  --gold: #d9b45a; --medal: #3a3220; color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-ui); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+.wrap { max-width: 1060px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+header.top .wrap { padding-block: 12px 0; display: grid; gap: 10px; }
+.title-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; justify-content: space-between; }
+h1 { margin: 0; font-size: 1.25rem; text-wrap: balance; }
+h1 span { color: var(--muted); font-weight: 400; font-size: .9rem; }
+.meter { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.meter b { color: var(--ink); }
+.meter .okn b { color: var(--ok); } .meter .fixn b { color: var(--fix); }
+.bar { height: 6px; border-radius: 3px; background: var(--sunk); overflow: hidden; display: flex; }
+.bar i { display: block; height: 100%; }
+.bar .ok { background: var(--ok); } .bar .fix { background: var(--fix); }
+nav.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+nav.tabs a { flex: none; padding: 8px 12px; border-bottom: 3px solid transparent; color: var(--muted); text-decoration: none; font-weight: 700; font-size: .9rem; white-space: nowrap; }
+nav.tabs a[aria-current="page"] { color: var(--accent); border-color: var(--accent); }
+nav.tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+nav.tabs .n { font-weight: 400; font-variant-numeric: tabular-nums; margin-left: 4px; }
+.notice { margin: 0; padding: 10px 14px; border-radius: var(--r); background: var(--accent-soft); font-size: .9rem; }
+.notice.warn { background: var(--fix-soft); }
+main.wrap { padding-block: 18px 80px; display: grid; gap: 14px; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tools input[type=search] { flex: 1 1 220px; min-width: 0; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font: inherit; }
+.chip { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: .85rem; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.chip:focus-visible, button:focus-visible, textarea:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.intro { max-width: 68ch; color: var(--muted); margin: 0; }
+.intro b { color: var(--ink); }
+a { color: var(--accent); }
+details.group { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+details.group > summary { cursor: pointer; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; list-style: none; }
+details.group > summary::-webkit-details-marker { display: none; }
+details.group > summary::before { content: "▸"; color: var(--muted); transition: transform .15s; }
+details.group[open] > summary::before { transform: rotate(90deg); }
+summary .g-title { font-weight: 700; } summary .g-ur { font-family: var(--font-ur); font-size: .85rem; line-height: 2; }
+summary .g-count { margin-left: auto; color: var(--muted); font-size: .8rem; font-variant-numeric: tabular-nums; }
+.rows { display: grid; gap: 10px; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 12px 18px; padding: 14px; border-top: 1px solid var(--line); }
+.item.is-ok { box-shadow: inset 4px 0 0 var(--ok); } .item.is-fix { box-shadow: inset 4px 0 0 var(--fix); }
+.flag-card { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); overflow: hidden; }
+.flag-q { padding: 12px 14px; background: var(--medal); border-bottom: 1px solid var(--line); font-size: .92rem; }
+.flag-q b { color: var(--gold); text-transform: uppercase; letter-spacing: .06em; font-size: .72rem; display: block; }
+.flag-card .item { border-top: 0; }
+.body { display: flex; gap: 14px; min-width: 0; }
+.pic { flex: none; width: 76px; height: 76px; border-radius: 8px; background: var(--sunk); display: grid; place-items: center; overflow: hidden; position: relative; }
+.pic img { width: 100%; height: 100%; object-fit: contain; }
+.pic .badge { position: absolute; right: 4px; bottom: 2px; font-size: .8rem; color: var(--accent); }
+.pic.medal { background: radial-gradient(circle at 50% 40%, var(--surface), var(--medal)); border: 2px solid var(--gold); border-radius: 50%; }
+.pic.scroll { background: var(--medal); border-radius: 4px 14px; }
+.pic.plain { background: transparent; border: 1px dashed var(--line); }
+.pic .cal { font-family: var(--font-ar); font-size: 1.05rem; line-height: 1.6; text-align: center; padding: 4px; direction: rtl; }
+.pic .emoji { font-size: 1.8rem; }
+.text { min-width: 0; display: grid; gap: 3px; align-content: start; }
+.ar { font-family: var(--font-ar); font-size: 1.7rem; line-height: 2.1; direction: rtl; text-align: right; }
+.line1 { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; }
+.en { font-weight: 700; }
+.ur, .ur-s { font-family: var(--font-ur); direction: rtl; text-align: right; line-height: 2.2; }
+.ur-s { font-size: .9rem; color: var(--muted); }
+.why { font-size: .86rem; color: var(--muted); }
+.why em { font-style: normal; color: var(--ink); }
+.meta { font-size: .78rem; color: var(--muted); }
+.kind { display: inline-block; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; padding: 1px 6px; border-radius: 4px; background: var(--sunk); color: var(--muted); margin-right: 6px; }
+.decide { display: grid; gap: 8px; align-content: start; }
+.btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.btns button { font: inherit; font-size: .85rem; font-weight: 700; padding: 8px 6px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.btns button.okb[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.btns button.fixb[aria-pressed="true"] { background: var(--fix); border-color: var(--fix); color: var(--surface); }
+.btns button:disabled { opacity: .5; cursor: not-allowed; }
+.decide textarea { font: inherit; font-size: .88rem; width: 100%; min-height: 58px; resize: vertical; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); box-sizing: border-box; }
+.who { font-size: .76rem; color: var(--muted); min-height: 1.1em; }
+.who.saving { color: var(--accent); } .who.err { color: var(--fix); }
+.ayah-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.ref { font-weight: 700; font-variant-numeric: tabular-nums; }
+.tiles { display: flex; flex-wrap: wrap; flex-direction: row-reverse; gap: 6px; margin-top: 6px; }
+.tile { border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px 6px; background: var(--bg); display: grid; justify-items: center; align-content: start; min-width: 64px; max-width: 170px; }
+.tile .ar { font-size: 1.35rem; line-height: 2; text-align: center; }
+.tile .en { font-size: .8rem; text-align: center; font-weight: 400; }
+.tile .ur-s { font-size: .78rem; text-align: center; line-height: 2; }
+.tile.given { border-style: dashed; }
+.tile .tag { font-size: .65rem; text-transform: uppercase; letter-spacing: .06em; color: var(--gold); }
+.pieces { display: flex; flex-wrap: wrap; flex-direction: row-reverse; gap: 4px; justify-content: center; margin-top: 2px; }
+.piece { font-size: .7rem; color: var(--muted); text-align: center; border-top: 1px dotted var(--line); padding-top: 2px; max-width: 150px; }
+.piece span[lang=ar] { font-family: var(--font-ar); font-size: .95rem; display: block; line-height: 1.8; }
+.say { font-size: .95rem; } .say-ur { font-family: var(--font-ur); direction: rtl; text-align: right; line-height: 2.2; }
+.rules { display: grid; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.rules .item:first-child { border-top: 0; }
+.empty { color: var(--muted); padding: 24px; text-align: center; border: 1px dashed var(--line); border-radius: var(--r); margin: 0; }
+@media (max-width: 720px) {
+  .item { grid-template-columns: minmax(0, 1fr); }
+  .ar { font-size: 1.45rem; }
+  .pic { width: 64px; height: 64px; }
+}
+@media (prefers-reduced-motion: reduce) { details.group > summary::before { transition: none; } }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="title-row">
+      <h1>Qalam Scholar Review <span id="built"></span></h1>
+      <div class="meter" id="meter" aria-live="polite"></div>
+    </div>
+    <div class="bar" aria-hidden="true"><i class="ok" id="bar-ok"></i><i class="fix" id="bar-fix"></i></div>
+    <nav class="tabs" aria-label="Review sections" id="tabs"></nav>
+  </div>
+</header>
+<main class="wrap" id="main">
+  <p class="notice" id="status">Loading saved marks…</p>
+  <div id="view"></div>
+</main>
+
+<script type="application/json" id="data">/*__DATA__*/</script>
+<script type="application/json" id="thumbs">/*__THUMBS__*/</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const THUMBS = JSON.parse(document.getElementById("thumbs").textContent);
+  const $ = (sel) => document.querySelector(sel);
+  const el = (tag, attrs = {}, ...kids) => {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === "class") e.className = v; else if (k === "text") e.textContent = v;
+      else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? "" : v);
+    }
+    for (const kid of kids.flat()) if (kid != null && kid !== false) e.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+    return e;
+  };
+  const roomById = new Map(D.rooms.map((r) => [r.id, r]));
+  const roomName = (id) => roomById.get(id)?.title.en ?? id;
+  $("#built").textContent = `· content of ${D.built}`;
+
+  // ---------- every reviewable thing has an id; its mark is stored under that id ----------
+  const SECTIONS = [
+    { id: "start", label: "Start here" },
+    { id: "words", label: "Word cards", items: D.words.map((w) => w.id) },
+    { id: "ayat", label: "Ayat", items: D.ayat.map((a) => a.id) },
+    { id: "partners", label: "Verb partners", items: D.partners.map((p) => p.id) },
+    { id: "reading", label: "Reading Room lines", items: D.reading.map((r) => r.id) },
+    { id: "rules", label: "Picture rules", items: D.rules.map((_, k) => `rule:${k + 1}`) },
+  ];
+  const ALL = SECTIONS.flatMap((s) => s.items ?? []);
+  const byId = new Map([...D.words.map((w) => [w.id, { type: "word", v: w }]), ...D.ayat.map((a) => [a.id, { type: "ayah", v: a }]),
+    ...D.partners.map((p) => [p.id, { type: "partner", v: p }]), ...D.reading.map((r) => [r.id, { type: "reading", v: r }]),
+    ...D.rules.map((t, k) => [`rule:${k + 1}`, { type: "rule", v: { text: t, n: k + 1 } }])]);
+
+  // ---------- marks, kept in the page's shared store ----------
+  const marks = new Map();       // id -> {status, note, by, at}
+  const rowsById = new Map();    // id -> row elements on screen
+  let db = null, user = null, canWrite = null, myId = null, ready = false;
+  const names = {};
+  const setStatus = (text, warn) => { const s = $("#status"); s.textContent = text; s.className = "notice" + (warn ? " warn" : ""); s.hidden = !text; };
+  const writable = () => ready && db && canWrite !== false;
+
+  const resolveNames = async (ids) => {
+    if (!user || !ids.length) return;
+    try { const ps = await user.profiles(ids); for (const id of ids) names[id] = ps?.[id]?.name || "Someone"; }
+    catch { for (const id of ids) names[id] = names[id] || "Someone"; }
+  };
+  const when = (iso) => { try { return new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }); } catch { return ""; } };
+
+  function paintMeter() {
+    let ok = 0, fix = 0;
+    for (const id of ALL) { const m = marks.get(id); if (m?.status === "ok") ok++; else if (m?.status === "fix") fix++; }
+    const total = ALL.length;
+    $("#meter").replaceChildren(
+      el("span", {}, el("b", { text: (ok + fix).toLocaleString() }), ` of ${total.toLocaleString()} checked`),
+      el("span", { class: "okn" }, el("b", { text: ok.toLocaleString() }), " look right"),
+      el("span", { class: "fixn" }, el("b", { text: fix.toLocaleString() }), " need a fix"));
+    $("#bar-ok").style.width = `${(ok / total) * 100}%`;
+    $("#bar-fix").style.width = `${(fix / total) * 100}%`;
+    for (const s of SECTIONS) {
+      const n = document.querySelector(`#tab-${s.id} .n`);
+      if (n && s.items) n.textContent = `${s.items.filter((id) => marks.get(id)?.status).length}/${s.items.length}`;
+    }
+  }
+  function paintRow(row, id) {
+    const m = marks.get(id) ?? {};
+    row.classList.toggle("is-ok", m.status === "ok");
+    row.classList.toggle("is-fix", m.status === "fix");
+    row.querySelector(".okb").setAttribute("aria-pressed", String(m.status === "ok"));
+    row.querySelector(".fixb").setAttribute("aria-pressed", String(m.status === "fix"));
+    row.querySelectorAll(".decide button, .decide textarea").forEach((x) => (x.disabled = !writable()));
+    const ta = row.querySelector("textarea");
+    if (document.activeElement !== ta) ta.value = m.note ?? "";
+    const who = row.querySelector(".who");
+    if (who.classList.contains("saving") || who.classList.contains("err")) return;
+    who.textContent = m.by ? `${m.status === "fix" ? "Marked for a fix" : m.status === "ok" ? "Checked" : "Note"} by ${names[m.by] ?? "…"}${m.at ? `, ${when(m.at)}` : ""}` : "";
+  }
+  const paintId = (id) => (rowsById.get(id) ?? []).forEach((r) => r.isConnected && paintRow(r, id));
+  const paintAll = () => { for (const id of rowsById.keys()) paintId(id); paintMeter(); };
+
+  async function save(id, patch, who) {
+    if (!writable()) return;
+    const prev = marks.get(id) ?? {};
+    const next = { ...prev, ...patch, by: myId ?? prev.by ?? null, at: new Date().toISOString() };
+    if ((next.status ?? null) === (prev.status ?? null) && (next.note ?? "") === (prev.note ?? "")) return;
+    marks.set(id, next); paintId(id); paintMeter();
+    who.classList.add("saving"); who.textContent = "Saving…";
+    try {
+      const body = { by: next.by, at: next.at, note: next.note ?? "" };
+      if (next.status) body.status = next.status;
+      await db.collection("marks").doc(id).set(body);
+      who.classList.remove("saving");
+      if (myId && !names[myId]) await resolveNames([myId]);
+      paintId(id);
+    } catch (e) {
+      who.classList.remove("saving"); who.classList.add("err");
+      if (e?.code === "invalid_argument") { canWrite = false; who.textContent = "You can read the marks but not add them. Ask the owner for edit access."; }
+      else if (e?.code === "quota_exceeded") who.textContent = "The review store is full. Tell the owner.";
+      else who.textContent = "Not saved. Check your connection and try again.";
+      marks.set(id, prev); paintMeter();
+      setTimeout(() => { who.classList.remove("err"); paintAll(); }, 5000);
+    }
+  }
+
+  // ---------- the decision panel on each item ----------
+  function decide(id) {
+    const who = el("div", { class: "who" });
+    const ta = el("textarea", { id: `note-${id}`, placeholder: "What should change? (optional note)", "aria-label": "Note for this item" });
+    let timer;
+    ta.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => save(id, { note: ta.value.trim() }, who), 900); });
+    ta.addEventListener("blur", () => { clearTimeout(timer); save(id, { note: ta.value.trim() }, who); });
+    const ok = el("button", { type: "button", class: "okb", "aria-pressed": "false", onclick: () => save(id, { status: marks.get(id)?.status === "ok" ? null : "ok" }, who) }, "✓ Looks right");
+    const fix = el("button", { type: "button", class: "fixb", "aria-pressed": "false", onclick: () => { save(id, { status: marks.get(id)?.status === "fix" ? null : "fix" }, who); ta.focus(); } }, "✎ Needs a fix");
+    return el("div", { class: "decide" }, el("div", { class: "btns" }, ok, fix), ta, who);
+  }
+  function row(id, body) {
+    const r = el("article", { class: "item", "data-id": id }, body, decide(id));
+    if (!rowsById.has(id)) rowsById.set(id, []);
+    rowsById.get(id).push(r);
+    paintRow(r, id);
+    return r;
+  }
+
+  // ---------- what each kind of item shows ----------
+  function picture(look) {
+    if (!look) return el("div", { class: "pic plain" });
+    if (look.kind === "art" && THUMBS[look.art]) return el("div", { class: "pic" }, el("img", { src: THUMBS[look.art], alt: "", width: 76, height: 76, loading: "lazy" }), look.badge ? el("span", { class: "badge", text: look.badge }) : null);
+    if (look.kind === "medal" || look.kind === "scroll" || look.kind === "plain")
+      return el("div", { class: `pic ${look.kind}`, title: { medal: "Calligraphy medallion (name of Allah or abstract word)", scroll: "Name scroll (prophet, angel or book)", plain: "Plain ink (no picture allowed)" }[look.kind] }, el("span", { class: "cal", lang: "ar", text: look.text }));
+    return el("div", { class: "pic" }, el("span", { class: "emoji", text: look.text || "·" }));
+  }
+  const KIND = { art: "Painting", medal: "Medallion", scroll: "Name scroll", plain: "Plain ink", emoji: "Symbol" };
+  function wordBody(w) {
+    return el("div", { class: "body" }, picture(w.look), el("div", { class: "text" },
+      el("div", { class: "line1" }, el("span", { class: "en", text: w.g.en }), el("span", { class: "ar", lang: "ar", text: w.ar })),
+      el("div", { class: "ur", lang: "ur", text: w.g.ur }),
+      w.more ? el("div", { class: "why" }, el("em", { text: "Note: " }), w.more.en) : null,
+      w.why ? el("div", { class: "why" }, el("em", { text: "Picture: " }), w.why.en) : null,
+      w.why?.ur ? el("div", { class: "ur-s", lang: "ur", text: w.why.ur }) : null,
+      el("div", { class: "meta" }, el("span", { class: "kind", text: KIND[w.look.kind] }), `Qur'an forms: ${w.units.join("، ") || "—"} · first taught in ${roomName(w.room)}`)));
+  }
+  function tile(t) {
+    return el("div", { class: `tile${t.given ? " given" : ""}` },
+      t.given ? el("span", { class: "tag", text: "helper" }) : null,
+      el("span", { class: "ar", lang: "ar", text: t.ar + (t.mark ? ` ${t.mark}` : "") }),
+      el("span", { class: "en", text: t.g.en }), el("span", { class: "ur-s", lang: "ur", text: t.g.ur }),
+      t.pieces.length ? el("div", { class: "pieces" }, t.pieces.map((p) => el("div", { class: "piece" }, el("span", { lang: "ar", text: p.ar }), p.g.en, el("span", { class: "ur-s", lang: "ur", text: p.g.ur })))) : null);
+  }
+  function ayahBody(a) {
+    return el("div", { class: "text" },
+      el("div", { class: "ayah-head" }, el("span", { class: "ref", text: a.ref + (a.part ? ` · words ${a.part[0]}–${a.part[1]}` : "") }),
+        el("span", { class: "meta", text: `${a.reading ? "Reading Room gloss set · " : ""}in ${a.rooms.map(roomName).join(", ")}` })),
+      el("div", { class: "tiles" }, a.words.map(tile)),
+      a.words.some((t) => t.given) ? el("div", { class: "meta", text: "Dashed tiles are helper words: shown with their meaning because the player has not learnt them yet." }) : null);
+  }
+  function partnerBody(p) {
+    return el("div", { class: "body" }, picture(p.look), el("div", { class: "text" },
+      el("div", { class: "line1" }, el("span", { class: "en", text: p.g.en }), el("span", { class: "ar", lang: "ar", text: p.ar })),
+      el("div", { class: "ur", lang: "ur", text: p.g.ur }),
+      el("div", { class: "why" }, el("em", { text: "Verb alone: " }), `${p.verb.ar} — ${p.verb.g.en}`),
+      p.why ? el("div", { class: "why" }, el("em", { text: "Picture: " }), p.why.en) : null,
+      el("div", { class: "meta", text: `in ${roomName(p.room)}` })));
+  }
+  function readingBody(r) {
+    return el("div", { class: "text" },
+      el("div", { class: "ayah-head" }, el("span", { class: "ref", text: r.ref + (r.part ? ` · words ${r.part[0]}–${r.part[1]}` : "") }), el("span", { class: "meta", text: r.title.en })),
+      el("div", { class: "ar", lang: "ar", text: r.ar }),
+      el("div", { class: "say", text: r.say.en }), el("div", { class: "say-ur", lang: "ur", text: r.say.ur }));
+  }
+  const bodyFor = (id) => {
+    const it = byId.get(id);
+    if (!it) return el("div", { class: "text", text: id });
+    return { word: wordBody, ayah: ayahBody, partner: partnerBody, reading: readingBody,
+      rule: (v) => el("div", { class: "text" }, el("span", { class: "en", text: `Rule ${v.n}` }), v.text) }[it.type](it.v);
+  };
+  const textOf = (id) => {
+    const it = byId.get(id); if (!it) return "";
+    const v = it.v;
+    if (it.type === "word") return [v.ar, v.g.en, v.g.ur, v.why?.en, v.units.join(" ")].join(" ");
+    if (it.type === "ayah") return [v.ref, ...v.words.flatMap((t) => [t.ar, t.g.en, t.g.ur])].join(" ");
+    if (it.type === "partner") return [v.ar, v.g.en, v.g.ur, v.verb.ar].join(" ");
+    if (it.type === "reading") return [v.ref, v.ar, v.say.en, v.say.ur].join(" ");
+    return v.text;
+  };
+  // compare Arabic without vowel marks, so a search for كتاب finds كِتَاب
+  const fold = (s) => (s || "").normalize("NFC").replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, "").replace(/[\u0623\u0625\u0622\u0671]/g, "\u0627").toLowerCase();
+
+  // ---------- views ----------
+  const state = { q: "", show: "all" };
+  const passes = (id) => {
+    const m = marks.get(id)?.status;
+    if (state.show === "todo" && m) return false;
+    if (state.show === "fix" && m !== "fix") return false;
+    if (state.show === "ok" && m !== "ok") return false;
+    return !state.q || fold(textOf(id)).includes(fold(state.q));
+  };
+  function toolbar(onChange) {
+    const q = el("input", { type: "search", id: "q", placeholder: "Search Arabic, English or Urdu", value: state.q, "aria-label": "Search" });
+    let t; q.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => { state.q = q.value; onChange(); }, 200); });
+    const chips = [["all", "All"], ["todo", "Not checked"], ["fix", "Needs a fix"], ["ok", "Looks right"]].map(([k, label]) =>
+      el("button", { type: "button", class: "chip", "aria-pressed": String(state.show === k), onclick: (e) => {
+        state.show = k; e.currentTarget.parentNode.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c === e.currentTarget))); onChange(); } }, label));
+    return el("div", { class: "tools" }, q, ...chips);
+  }
+  // grouped by room; a group's rows are built only when it is opened (or a filter is on)
+  function groupedView(section, groupOf, intro) {
+    const host = el("div", { class: "rows" });
+    const draw = () => {
+      rowsById.clear();
+      const groups = new Map();
+      for (const id of section.items) if (passes(id)) { const g = groupOf(id); if (!groups.has(g)) groups.set(g, []); groups.get(g).push(id); }
+      if (!groups.size) { host.replaceChildren(el("p", { class: "empty", text: "Nothing matches this filter." })); return; }
+      const filtering = Boolean(state.q) || state.show !== "all";
+      let first = true;
+      host.replaceChildren(...[...groups].map(([g, ids]) => {
+        const r = roomById.get(g);
+        const d = el("details", { class: "group", open: filtering || first },
+          el("summary", {}, el("span", { class: "g-title", text: r ? r.title.en : "Not yet in a room" }), r ? el("span", { class: "g-ur", lang: "ur", text: r.title.ur }) : null,
+            el("span", { class: "g-count", text: `${ids.filter((id) => marks.get(id)?.status).length}/${ids.length} checked${r ? ` · Wing ${r.wing}` : ""}` })));
+        first = false;
+        const fill = () => { if (d.dataset.filled) return; d.dataset.filled = "1"; d.append(...ids.map((id) => row(id, bodyFor(id)))); };
+        if (d.open) fill();
+        d.addEventListener("toggle", () => d.open && fill());
+        return d;
+      }));
+    };
+    draw();
+    return el("div", { style: "display:grid;gap:12px" }, intro ? el("p", { class: "intro", text: intro }) : null, toolbar(draw), host);
+  }
+  function flatView(section, intro) {
+    const host = el("div", { class: "rules" });
+    const draw = () => { rowsById.clear(); const ids = section.items.filter(passes); host.replaceChildren(...(ids.length ? ids.map((id) => row(id, bodyFor(id))) : [el("p", { class: "empty", text: "Nothing matches this filter." })])); };
+    draw();
+    return el("div", { style: "display:grid;gap:12px" }, el("p", { class: "intro", text: intro }), toolbar(draw), host);
+  }
+  function startView() {
+    rowsById.clear();
+    const cards = D.flags.map((f) => {
+      const card = el("section", { class: "flag-card" }, el("div", { class: "flag-q" }, el("b", { text: "Please check" }), f.why));
+      if (f.item === "reading") card.append(el("div", { class: "item" }, el("div", { class: "text" }, el("span", { class: "en", text: "Reading Room lines" }), el("a", { href: "#reading", text: `Open the ${D.reading.length} lines →` }))));
+      else card.append(row(f.item, bodyFor(f.item)));
+      return card;
+    });
+    return el("div", { style: "display:grid;gap:14px" },
+      el("p", { class: "intro" }, "Qalam: Word by Word teaches the Qur'an's most frequent words with pictures, in English and Urdu. Every meaning, picture and translation here is a draft made for the game. Start with these ", el("b", { text: `${D.flags.length} decisions` }), " we were least sure of, then work through the tabs. Mark each item ✓ if it is right, or ✎ and write what should change. Marks save for everyone who can open this page."),
+      ...cards);
+  }
+  const VIEWS = {
+    start: startView,
+    words: () => groupedView(SECTIONS[1], (id) => byId.get(id).v.room ?? "unplaced", "Each card shows its picture (or calligraphy), the Arabic, the English and Urdu meaning, and what the picture shows. Grouped by the room where the game first teaches it."),
+    ayat: () => groupedView(SECTIONS[2], (id) => byId.get(id).v.rooms[0], "Word-by-word meanings for every ayah in the game, read right to left. Small text under a word explains its pieces. One mark per ayah: say in the note which word needs a fix."),
+    partners: () => groupedView(SECTIONS[3], (id) => byId.get(id).v.room, "A verb the player knows, joined with a small partner word, takes a new meaning (booklet page 38)."),
+    reading: () => groupedView(SECTIONS[4], (id) => byId.get(id).v.room, "Each wing ends by reading a whole passage. These sentence translations are our own plain drafts."),
+    rules: () => flatView(SECTIONS[5], "The rules every picture in the game follows. Mark a rule if it should change."),
+  };
+  function tabs(current) {
+    $("#tabs").replaceChildren(...SECTIONS.map((s) => el("a", { href: `#${s.id}`, id: `tab-${s.id}`, "aria-current": s.id === current ? "page" : null }, s.label, s.items ? el("span", { class: "n" }) : null)));
+  }
+  function route() {
+    const id = (location.hash || "#start").slice(1);
+    const cur = VIEWS[id] ? id : "start";
+    tabs(cur);
+    $("#view").replaceChildren(VIEWS[cur]());
+    paintMeter();
+  }
+  window.addEventListener("hashchange", () => { route(); window.scrollTo(0, 0); });
+  route();
+
+  // ---------- connect the shared store ----------
+  (async () => {
+    const slow = setTimeout(() => setStatus("Saved marks are taking long to load. You can keep reading; marks appear when they arrive.", true), 10000);
+    try { [db, user] = await Promise.all([window.claude?.use?.("db") ?? null, window.claude?.use?.("user") ?? null]); } catch { db = null; }
+    if (!db) { clearTimeout(slow); setStatus("Marks cannot be saved in this view. Open the page on claude.ai while signed in to mark items.", true); return; }
+    try { myId = user ? await user.id() : null; } catch { myId = null; }
+    try { canWrite = user ? await user.can("data.write") : null; } catch { canWrite = null; }
+    db.collection("marks").onSnapshot(async (snap) => {
+      clearTimeout(slow);
+      for (const d of snap.docs) {
+        const v = d.data() ?? {};
+        marks.set(d.id, { status: v.status ?? null, note: v.note ?? "", by: v.by ?? null, at: v.at ?? null });
+      }
+      for (const ch of snap.docChanges()) if (ch.type === "removed") marks.delete(ch.doc.id);
+      await resolveNames([...new Set([...marks.values()].map((m) => m.by).filter((b) => b && !names[b]))]);
+      ready = true;
+      setStatus(canWrite === false ? "You can read the marks here but not add them. Ask the owner for edit access." : "", canWrite === false);
+      paintAll();
+    }, (e) => {
+      clearTimeout(slow);
+      setStatus(e?.code === "revoked" ? "Access to this page changed. Reload to continue." : "Saved marks could not be loaded. Reload the page to try again.", true);
+    });
+  })();
+})();
+</script>

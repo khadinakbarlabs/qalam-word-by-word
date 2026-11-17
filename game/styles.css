@@ -1,0 +1,685 @@
+/* Qalam: Word by Word — parchment, ink and lamp-gold (docs/VISUAL_GAMES.md §5). Fonts are bundled (no third-party calls). */
+@font-face { font-family: "Amiri Quran"; src: url("fonts/AmiriQuran.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Noto Nastaliq Urdu"; src: url("fonts/NotoNastaliqUrdu.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+
+:root {
+  --paper: #f4ecdc; --card: #fffaf0; --ink: #2b2118; --ink-soft: #6f5e4b; --line: #e3d5bb;
+  --lamp: #c8902e; --lamp-ink: #8a5f12; --lamp-glow: #f6d98f; --gold: #f2b84b; --teal: #1f7a74; --rose: #b4466a; --ok: #2f7d4f; --blue: #3c6fa8;
+  --quran: "Amiri Quran", "Noto Naskh Arabic", serif; --urdu: "Noto Nastaliq Urdu", serif; --ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --word: clamp(2rem, 1.4rem + 3.2vmin, 3.2rem);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --touch: 48px;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; } /* the hidden attribute always wins over a class display */
+html, body { margin: 0; height: 100%; }
+body { background: radial-gradient(circle at 50% -10%, #fff6dd 0, var(--paper) 60%); color: var(--ink); font-family: var(--ui); overflow: hidden; -webkit-tap-highlight-color: transparent; }
+[dir="rtl"] body { font-family: var(--urdu); }
+#app { height: 100dvh; display: flex; flex-direction: column; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+[lang="ar"] { font-family: var(--quran); }
+.cap { display: block; font-size: .8rem; color: var(--ink-soft); line-height: 1.6; }
+[lang="ur"].cap, [dir="rtl"] .cap { font-family: var(--urdu); line-height: 2.2; font-size: .82rem; }
+body.nocap .cap:not(.title-cap):not(.sign-text):not(.room-name):not(.tr-text) { visibility: hidden; }
+.wrong .cap, .reveal .cap { visibility: visible !important; }
+.pic { font-size: 2.2rem; line-height: 1.2; position: relative; display: inline-block; }
+/* painted pictures scale with the same font-size the emoji used, a little larger since they carry detail */
+.pic-img { display: block; width: 1.9em; height: 1.9em; object-fit: contain; filter: drop-shadow(0 2px 3px #2b211822); }
+.pic.has-img .badge { position: absolute; right: -4px; bottom: 0; }
+.scene-spot .pic.has-img { font-size: inherit; display: grid; place-items: center; width: 100%; height: 100%; }
+.scene-spot .pic-img { width: 100%; height: 100%; }
+.arch .pic.has-img { font-size: 2rem; }
+.meet-card .back .pic-img { width: 3em; height: 3em; }
+.meet-card .back .cap { line-height: 1.3; padding: 0 8px; text-align: center; }
+.dict-card .pic.has-img { font-size: 2.2rem; }
+.badge { font-size: .8rem; font-weight: 800; position: absolute; right: -10px; bottom: -2px; font-family: var(--ui); }
+.badge.m { color: var(--teal); } .badge.f { color: var(--rose); }
+.medal { display: inline-grid; place-items: center; min-width: 56px; height: 56px; padding: 0 8px; border-radius: 50%; border: 2px solid var(--lamp);
+  background: radial-gradient(circle, #fffbea, #f6e2a8); font-size: 1.15rem; line-height: 1; box-shadow: 0 0 12px var(--lamp-glow); }
+.medal.scroll { border-radius: 6px; border-color: #b08550; background: linear-gradient(#fdf3dc, #efdcb0); box-shadow: inset 0 3px 0 #e0c48f, inset 0 -3px 0 #e0c48f; }
+.medal.plain { border: 2px dashed var(--ink-soft); background: #f3efe6; box-shadow: none; border-radius: 10px; color: var(--ink-soft); }
+.icon-btn { min-width: var(--touch); min-height: var(--touch); border-radius: 14px; border: 1px solid var(--line); background: var(--card); font-size: 1.15rem; }
+.loading { flex: 1; display: grid; place-content: center; justify-items: center; gap: 6px; padding: 16px; text-align: center; }
+.loading-lamp { font-size: 3rem; animation: breathe 1.6s infinite; }
+.loading-lamp.still { animation: none; filter: grayscale(.6); }
+.loading-text { margin: 0; color: var(--ink-soft); font-size: 1rem; max-width: 34ch; }
+.loading-text[lang="ur"] { font-family: var(--urdu); line-height: 2.1; }
+.boot-error .loading-text { color: var(--ink); }
+.retry-btn { margin-top: 10px; min-height: var(--touch); padding-inline: 18px; }
+.toast { position: fixed; inset: auto 12px 12px; padding: 10px 14px; border-radius: 12px; background: var(--ink); color: var(--paper); font-size: .85rem; z-index: 50; }
+
+/* ---------- hall map ---------- */
+.hall { flex: 1; display: flex; flex-direction: column; min-height: 0; position: relative; }
+.hall-top, .room-top { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 92%, transparent); }
+.brand { font-size: 1.6rem; }
+.game-title { font-weight: 700; flex: 1; font-size: 1rem; }
+[dir="rtl"] .game-title { font-size: 1.05rem; line-height: 2; }
+.meter { display: flex; align-items: center; gap: 4px; font-size: 1rem; }
+.meter svg { width: 26px; height: 36px; }
+.hall-scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
+.hall-map { position: relative; max-width: 560px; margin: 0 auto 140px; } /* room below the last door for the Relight button */
+.hall-banner { position: sticky; top: 0; z-index: 2; display: flex; justify-content: center; gap: 8px; align-items: center; padding: 6px; font-weight: 700;
+  background: linear-gradient(var(--paper), transparent); }
+.wing-gate { position: absolute; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: flex; gap: 8px; align-items: center; white-space: nowrap;
+  padding: 6px 16px; border-radius: 20px; font-weight: 700; background: #e3f0dc; border: 2px solid #9cc79a; color: #2f5d34; }
+.hall-path { position: absolute; inset: 0; pointer-events: none; }
+.door { position: absolute; transform: translate(-50%, -50%); background: none; border: 0; display: flex; flex-direction: column; align-items: center; width: 120px; padding: 0; }
+.arch { width: 76px; height: 86px; border-radius: 40px 40px 10px 10px; display: grid; place-items: center; background: #e9dcc0; border: 3px solid #b8955f;
+  box-shadow: inset 0 -10px 0 #d8c59c; transition: transform .2s var(--ease); }
+.door-icon { font-size: 2rem; }
+.door-lamp { position: absolute; top: -10px; right: 18px; font-size: 1.2rem; }
+.door-cap { margin-top: 4px; font-weight: 600; text-align: center; }
+.door.done .arch { background: #fff3cf; border-color: var(--lamp); box-shadow: 0 0 18px var(--lamp-glow), inset 0 -10px 0 #f3dfa6; }
+.door.next .arch { background: #fffaf0; border-color: var(--lamp); animation: pulse 1.4s infinite; }
+.door.next:hover .arch, .door.done:hover .arch { transform: translateY(-3px); }
+.door.locked, .door.soon { opacity: .55; filter: grayscale(.7); cursor: default; }
+.door.soon .arch { border-style: dashed; }
+.qalam-say { display: flex; align-items: center; gap: 8px; padding: 8px 14px; margin: 6px 12px; border-radius: 16px; background: var(--card); border: 1px solid var(--line);
+  box-shadow: 0 6px 18px -12px #6b4b1a; font-weight: 600; }
+.room .qalam-say { position: absolute; inset: auto 12px 12px; z-index: 5; animation: fade .4s; }
+.qalam-mini { font-size: 1.6rem; display: inline-block; animation: nod 1.6s infinite; }
+.qalam-say .pic { font-size: 1.5rem; }
+.map-foot { position: relative; }
+.relight-btn { position: absolute; inset-inline-end: 14px; bottom: calc(100% + 8px); z-index: 3; display: flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 18px;
+  border: 2px solid var(--line); background: var(--card); min-height: var(--touch); }
+.relight-btn .pic { font-size: 1.4rem; }
+.relight-btn.due { border-color: var(--lamp); box-shadow: 0 0 14px var(--lamp-glow); }
+.due-count { font-weight: 800; }
+.relight-btn .cap { visibility: visible; }
+/* bottom dock: Qalam's line, then Guide and Settings with labels (kept out of the top corners, Playables DES-20) */
+.map-dock { display: flex; align-items: stretch; gap: 8px; margin: 6px 12px; }
+.map-dock .qalam-say { flex: 1; min-width: 0; margin: 0; }
+.dock-btn { display: grid; justify-items: center; align-content: center; gap: 2px; min-width: 60px; min-height: var(--touch); padding: 4px 8px;
+  border-radius: 14px; border: 1px solid var(--line); background: var(--card); }
+.dock-btn:active, .icon-btn:active { transform: translateY(1px); }
+.dock-icon { font-size: 1.25rem; line-height: 1; }
+.dock-label, .btn-label { font-size: .74rem; font-weight: 600; color: var(--ink-soft); white-space: nowrap; }
+[dir="rtl"] .dock-label, [dir="rtl"] .btn-label { font-family: var(--urdu); font-size: .8rem; line-height: 1.8; }
+.icon-btn.labeled { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding-inline: 10px; }
+/* the end of the path once every room is lit (Playables DES-16) */
+.all-done-say { font-size: .85rem; line-height: 1.4; }
+[dir="rtl"] .all-done-say { line-height: 2; }
+.hall-end { position: absolute; left: 50%; transform: translateX(-50%); width: min(88%, 380px); display: grid; justify-items: center; gap: 6px;
+  padding: 14px 18px; text-align: center; border-radius: 18px; background: #fff3cf; border: 2px solid var(--lamp); box-shadow: 0 0 22px var(--lamp-glow);
+  font-weight: 600; line-height: 1.5; }
+[dir="rtl"] .hall-end { line-height: 2.1; }
+.hall-end-lamp { font-size: 2rem; }
+.hall-end-lamp .pic-img { width: 44px; height: 44px; }
+@media (max-width: 420px) { .room-top .step-dots { display: none; } }
+
+/* ---------- room ---------- */
+.room { flex: 1; display: flex; flex-direction: column; min-height: 0; position: relative; }
+.room-title { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.room-icon { font-size: 1.4rem; }
+.title-cap { font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.step-dots { display: flex; gap: 4px; list-style: none; margin: 0; padding: 0; }
+.step-dots li { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.step-dots li.now { background: var(--lamp); box-shadow: 0 0 6px var(--lamp-glow); }
+.step-dots li.done { background: var(--ok); }
+/* --fz: the zoom ui/fit.js applied: rows that wrap get wider by the same factor, so smaller cards spread out */
+.stage { flex: 1; overflow-y: auto; position: relative; padding: 12px 14px 24px; max-width: calc(760px / var(--fz, 1)); width: 100%; margin: 0 auto; }
+.prompt { display: flex; justify-content: center; align-items: center; min-height: 104px; margin-bottom: 10px; }
+.word { font-size: var(--word); line-height: 2.3; padding: 0 20px; border-radius: 16px; background: #fff; border: 2px solid var(--lamp); box-shadow: 0 0 0 6px var(--lamp-glow); }
+.dots { display: flex; gap: 6px; justify-content: center; margin-top: 14px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.dots i.on { background: var(--lamp); }
+.row-end { display: flex; justify-content: center; margin-top: 14px; }
+.next-btn { min-width: 76px; min-height: 56px; border-radius: 18px; border: 2px solid var(--lamp); background: #fff8e6; font-size: 1.5rem; box-shadow: 0 6px 16px -10px #6b4b1a; }
+.next-btn.big { min-width: 110px; min-height: 68px; font-size: 1.9rem; }
+.grid4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 520px; margin: 0 auto; }
+.choice { border: 2px solid var(--line); background: #fff; border-radius: 16px; padding: 10px 6px; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.choice.small { min-height: 84px; min-width: 104px; padding: 6px 10px; }
+.opt-ar { font-size: 1.9rem; line-height: 2.2; }
+.right { border-color: var(--ok) !important; box-shadow: 0 0 0 5px #cfe9d8 !important; animation: pop .45s var(--ease); }
+.wrong { animation: wobble .45s; }
+.reveal { box-shadow: 0 0 0 6px var(--lamp-glow) !important; border-color: var(--lamp) !important; }
+
+/* meet */
+.meet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; max-width: calc(640px / var(--fz, 1)); margin: 0 auto; }
+.meet-card { min-height: 176px; border: 2px solid var(--lamp); background: #fff; border-radius: 16px; position: relative; perspective: 600px; padding: 0; }
+.meet-card .front, .meet-card .back { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; backface-visibility: hidden; transition: transform .45s var(--ease); border-radius: 14px; }
+.meet-card .back { transform: rotateY(180deg); background: #fff8e6; }
+.meet-card.open .front { transform: rotateY(180deg); }
+.meet-card.open .back { transform: rotateY(0); }
+.meet-card:not(.open) { box-shadow: 0 0 0 4px var(--lamp-glow); }
+.meet-ar { font-size: 2.2rem; line-height: 2.3; }
+.meet-ar.small { font-size: 1.3rem; line-height: 1.9; }
+
+/* point */
+.point-scene { position: relative; max-width: 540px; margin: 0 auto; border-radius: 16px; border: 1px solid var(--line); padding: 12px 10px 50px;
+  background: linear-gradient(#fdf5e4, #efdfbf); }
+.point-scene.depth { background: linear-gradient(#f9efda 0 38%, #e8d6b0 38% 100%); }
+.spot-row { display: flex; justify-content: center; gap: 10px; margin: 8px 0; }
+.spot { border: 2px solid var(--line); background: #fffaf0; border-radius: 16px; display: grid; place-items: center; }
+.spot.near { width: 96px; height: 96px; } .spot.near .pic { font-size: 2.8rem; }
+.spot.far { width: 62px; height: 62px; opacity: .9; } .spot.far .pic { font-size: 1.5rem; }
+.spot.mid { width: 92px; height: 92px; } .spot.mid .pic { font-size: 2.6rem; }
+.spot-row.far { margin-bottom: 28px; }
+.spot .pic.has-img { font-size: inherit; display: grid; place-items: center; width: 100%; height: 100%; }  /* a painting fills its spot */
+.spot .pic-img { width: 84%; height: 84%; }
+.pointer { position: absolute; inset-inline-start: 10px; bottom: 6px; font-size: 1.6rem; }
+.pointer .pic { font-size: 1.4rem; } .pointer .pic-img { width: 40px; height: 40px; }
+
+/* wheel */
+.circle { position: relative; width: min(340px, 88vw, 52vh); aspect-ratio: 1; margin: 0 auto; }
+.wheel-center { position: absolute; inset: 30%; border-radius: 50%; background: #fff; border: 3px solid var(--ink); display: grid; place-items: center; }
+.word-mid { font-size: 1.9rem; line-height: 2.2; }
+.person { position: absolute; width: 78px; height: 78px; margin: -39px; border-radius: 50%; border: 2px solid var(--line); background: #fff; display: grid; place-items: center; }
+.person .pic { font-size: 1.8rem; }
+
+/* snap */
+.target { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 16px; background: #fff; border: 2px dashed var(--lamp); }
+.build { display: flex; justify-content: center; align-items: center; gap: 6px; direction: rtl; margin: 10px 0; min-height: 96px; }
+.slot { min-width: 54px; min-height: 76px; border: 2px dashed var(--line); border-radius: 12px; display: grid; place-items: center; font-size: 1.8rem; line-height: 2.3; }
+.slot.filled { border-style: solid; border-color: var(--lamp); background: #fff8e6; }
+.base { padding: 0 14px; border-radius: 14px; background: #fff; border: 2px solid var(--ink); display: flex; flex-direction: column; align-items: center; }
+.base-ar { font-size: 1.9rem; line-height: 2.2; }
+.base .pic, .base .medal { font-size: 1.3rem; margin-bottom: 4px; }
+.base .medal { min-width: 40px; height: 40px; font-size: .9rem; }
+.result { text-align: center; font-size: var(--word); line-height: 2.2; min-height: 1.4em; border-radius: 16px; font-family: var(--quran); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; direction: rtl; }
+.chip { border: 2px solid var(--line); background: #fff; border-radius: 14px; padding: 2px 10px 4px; min-width: 72px; min-height: 76px; display: flex; flex-direction: column; align-items: center; }
+.chip .pic { font-size: 1.2rem; }
+.chip-ar { font-size: 1.6rem; line-height: 2.1; }
+.chip.front { border-top: 5px solid var(--teal); }
+.chip.end { border-top: 5px solid var(--rose); }
+.chip:disabled { opacity: .35; }
+
+/* place */
+.place-scene { position: relative; width: 100%; max-width: 480px; aspect-ratio: 4 / 3; margin: 0 auto; border-radius: 16px; border: 1px solid var(--line);
+  background: linear-gradient(#fdf5e4, #f1e2c5); overflow: hidden; }
+.crate { position: absolute; z-index: 2; border: 3px solid #8a6236; border-radius: 6px; background: repeating-linear-gradient(90deg, #d9a96a 0 12px, #cf9d5e 12px 24px); }
+.crate.main::before { content: ""; position: absolute; inset: -3px -3px auto; height: 10px; background: #8a6236; border-radius: 4px; }
+.table { position: absolute; left: 49%; width: 35%; top: 66%; height: 4%; background: #8a6236; border-radius: 3px; z-index: 1; }
+.leg { position: absolute; top: 70%; width: 3%; height: 26%; background: #8a6236; z-index: 1; }
+.lamp-obj { position: absolute; z-index: 4; font-size: clamp(2rem, 7vmin, 2.8rem); transform: translate(-50%, -50%) scale(var(--s, 1));
+  transition: left .6s var(--ease), top .6s var(--ease), transform .6s var(--ease); filter: drop-shadow(0 0 10px var(--lamp-glow)); pointer-events: none; }
+.lamp-obj.back { z-index: 1; }
+.lamp-obj.front { z-index: 4; }
+.lamp-obj.orbiting { animation: orbit 2.4s linear infinite; }
+.ghost { position: absolute; z-index: 5; width: 48px; height: 48px; margin: -24px; border-radius: 50%; border: 2px dashed var(--lamp); background: #fffaf099; }
+.ghost:hover { background: var(--lamp-glow); }
+.orbit { position: absolute; left: 45%; top: 30%; width: 43%; height: 46%; border: 2px dashed #b8955f; border-radius: 50%; z-index: 0; }
+.arrow { position: absolute; height: 0; border-top: 3px dotted var(--ink-soft); z-index: 3; width: 18%; }
+.arrow.out { left: 77%; top: 32%; transform: rotate(-28deg); transform-origin: left; }
+.arrow.out::after { content: "➤"; position: absolute; right: -8px; top: -13px; color: var(--ink-soft); }
+.arrow.in { left: 78%; top: 60%; transform: rotate(28deg); transform-origin: left; }
+.arrow.in::before { content: "➤"; position: absolute; left: -10px; top: -13px; color: var(--ink-soft); transform: rotate(180deg); }
+
+/* timeline */
+.timeline { position: relative; display: flex; gap: 8px; max-width: 520px; margin: 0 auto; padding-bottom: 26px; }
+.seg { flex: 1; position: relative; min-height: 104px; border: 2px solid var(--line); border-radius: 14px; background: #fff; display: grid; place-items: center; }
+.seg .pic { font-size: 2.2rem; }
+.seg-past, .seg-done { background: repeating-linear-gradient(135deg, #efe3cc 0 8px, #fff 8px 16px); }
+.time-arrow { position: absolute; left: 6px; right: 6px; bottom: 6px; height: 3px; background: var(--ink-soft); border-radius: 2px; }
+.time-arrow::after { content: ""; position: absolute; left: -2px; top: -6px; border: 7px solid transparent; border-right: 10px solid var(--ink-soft); border-left: 0; }
+.timeline.bins { padding-bottom: 0; gap: 14px; } .bins .seg { min-height: 132px; } .bins .seg .pic { font-size: 3rem; }
+.stamp { position: absolute; inset: 0; display: grid; place-items: center; font-size: 3.4rem; color: #a3302f; animation: pop .35s var(--ease); }
+
+/* root garden (E4): one pot per root, leaves grow as its words are found */
+.garden { display: flex; justify-content: center; gap: 10px; max-width: 540px; margin: 0 auto; flex-wrap: wrap; }
+.pot { flex: 1 1 140px; max-width: 170px; min-height: 170px; border: 2px solid var(--line); border-radius: 18px; background: linear-gradient(#fffaf0 60%, #efe1c2);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; padding: 8px 6px; }
+.leaves { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 30px; }
+.leaf { font-size: 1.05rem; padding: 0 8px; border-radius: 12px 2px 12px 2px; background: #dcefd8; border: 1px solid #9cc79a; line-height: 1.9; animation: pop .4s var(--ease); }
+.sprout { font-size: 1.6rem; line-height: 1; }
+.seeds { display: flex; gap: 4px; }
+.seed { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: #8a6236; color: #fffaf0; font-size: 1.15rem; line-height: 1; }
+.pot-base { font-size: 1.8rem; line-height: 1; }
+
+/* size ladder: the high rung carries the -er / -est word, drawn larger */
+.ladder { position: relative; display: grid; gap: 14px; max-width: 280px; margin: 0 auto; padding: 6px 26px; }
+.rails { position: absolute; inset: 0 8px; border-left: 6px solid #b08550; border-right: 6px solid #b08550; border-radius: 4px; }
+.rung { position: relative; min-height: 96px; border: 2px solid var(--line); border-radius: 14px; background: var(--card); display: flex; align-items: center; justify-content: center; gap: 6px; }
+.rung-base .pic { font-size: 1.7rem; } .rung-base .medal { transform: scale(.85); }
+.rung-more { min-height: 128px; background: #fff3cf; border-color: var(--lamp); }
+.rung-more .pic { font-size: 3.4rem; } .rung-more .medal { transform: scale(1.3); }
+.rung .up { font-size: 1.4rem; color: var(--lamp); font-weight: 700; }
+
+/* scene hunt: day | night under one sky, earth and sea below */
+.sign-scene { position: relative; container-type: inline-size; max-width: 540px; margin: 0 auto; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
+.layer-sky-day, .layer-sky-night { position: absolute; top: 0; bottom: 18%; width: 50%; }
+.layer-sky-day { left: 0; background: linear-gradient(#bfe0f7, #eaf5fc); }
+.layer-sky-night { right: 0; background: linear-gradient(#1d2a4d, #3b4a78); }
+.layer-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 30%; background: linear-gradient(#b9c98a, #a07c4f); }
+.layer-water { position: absolute; right: 0; bottom: 0; width: 34%; height: 30%; background: linear-gradient(#5aa3c9, #2f6f96); border-top-left-radius: 40% 30%; }
+.scene-spot { position: absolute; transform: translate(-50%, -50%); width: clamp(34px, 17cqw, 72px); height: clamp(34px, 17cqw, 72px); border-radius: 50%; border: 2px dashed rgba(255, 255, 255, .8);
+  background: rgba(255, 250, 240, .35); display: grid; place-items: center; }
+.scene-spot .pic { font-size: clamp(1rem, 9cqw, 1.8rem); }
+.scene-spot.big { width: clamp(42px, 20cqw, 68px); height: clamp(42px, 20cqw, 68px); }
+.scene-spot.multi .pic { font-size: clamp(.7rem, 5.5cqw, 1.15rem); white-space: nowrap; }
+.scene-family .scene-spot, .scene-body .scene-spot, .scene-town .scene-spot { background: #fffaf0; border: 2px solid #c9a678; box-shadow: 0 2px 6px #0002; }
+.scene-mark { position: absolute; transform: translate(-50%, -50%); width: clamp(38px, 18cqw, 64px); height: clamp(38px, 18cqw, 64px); border-radius: 50%; display: grid; place-items: center;
+  background: var(--lamp-glow); border: 3px solid var(--lamp); z-index: 1; } .scene-mark .pic { font-size: clamp(1.1rem, 10cqw, 2rem); }
+.scene-family { background: linear-gradient(#fbf3e2, #f1e3c4); }
+.layer-tree-v, .layer-tree-top, .layer-tree-mid, .layer-tree-low { position: absolute; background: #b08550; border-radius: 3px; }
+.layer-tree-v { left: calc(50% - 3px); width: 6px; top: 15%; height: 70%; }
+.layer-tree-top { top: calc(15% - 3px); height: 6px; left: 28%; width: 44%; }
+.layer-tree-mid { top: calc(50% - 3px); height: 6px; left: 13%; width: 74%; }
+.layer-tree-low { top: calc(85% - 3px); height: 6px; left: 28%; width: 58%; }
+.scene-body { max-width: 340px; background: linear-gradient(#eef4f8, #dfe9ef); }
+[class^="layer-b-"] { position: absolute; background: #e7cfa8; border: 2px solid #c9a678; }
+.layer-b-head { left: 39%; top: 3%; width: 22%; height: 17%; border-radius: 50%; }
+.layer-b-torso { left: 33%; top: 21%; width: 34%; height: 37%; border-radius: 34px 34px 18px 18px; }
+.layer-b-arm-l, .layer-b-arm-r { top: 23%; width: 11%; height: 34%; border-radius: 20px; }
+.layer-b-arm-l { left: 20%; transform: rotate(12deg); } .layer-b-arm-r { right: 20%; transform: rotate(-12deg); }
+.layer-b-leg-l, .layer-b-leg-r { top: 57%; width: 13%; height: 37%; border-radius: 16px; }
+.layer-b-leg-l { left: 36%; } .layer-b-leg-r { right: 36%; }
+.scene-sides { background: radial-gradient(circle at 50% 55%, #fffaf0 0 30%, #efe1c2 70%); }
+.layer-sides-floor { position: absolute; left: 10%; right: 10%; top: 62%; height: 32%; border-radius: 50%; background: #e3d2ad; }
+.layer-sides-far { position: absolute; left: 66%; right: 4%; top: 4%; height: 22%; border-radius: 50% 50% 0 0; background: #d9e3c4; }
+.scene-sides .scene-spot { background: #fffaf0; border: 2px solid #c9a678; }
+.layer-town-sky { position: absolute; inset: 0 0 40% 0; background: linear-gradient(#bfe0f7, #f4ead2); }
+.layer-town-hills { position: absolute; left: -10%; right: -10%; top: 30%; height: 22%; background: #c9d6a0; border-radius: 50% 50% 0 0; }
+.layer-town-ground { position: absolute; inset: 46% 0 0 0; background: linear-gradient(#d9c99a, #c4ad7c); }
+.layer-town-road { position: absolute; left: 40%; width: 20%; top: 60%; bottom: 0; background: #a8916a; clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); }
+
+/* six petals: the root in the middle, six forms around it */
+.flower { position: relative; width: min(340px, 86vw); aspect-ratio: 1; margin: 0 auto; container-type: inline-size; }
+.stem { position: absolute; left: calc(50% - 4px); top: 50%; width: 8px; height: 50%; background: #6f9a5a; border-radius: 4px; z-index: 0; }
+.flower-heart { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 34cqw; height: 34cqw; border-radius: 50%;
+  background: radial-gradient(circle, #fff3cf, #f2b84b); border: 3px solid var(--lamp); display: grid; place-items: center; z-index: 2; box-shadow: 0 0 18px var(--lamp-glow); }
+.petal { position: absolute; transform: translate(-50%, -50%); width: 27cqw; height: 27cqw; border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%;
+  background: #fffaf0; border: 2px solid #e2b9c8; box-shadow: 0 3px 8px #2b211818; display: grid; place-items: center; z-index: 1; }
+.petal .pic { font-size: clamp(1.2rem, 9cqw, 2.4rem); }
+.petal .pic-img { width: 23cqw; height: 23cqw; }  /* a painting fills its petal; emoji stay text-sized */
+.petal-past { background: #f3ead8; } .petal-present { background: #e6f2ee; } .petal-command { background: #fde9d4; }
+.petal-doer { background: #e9eef8; } .petal-done { background: #f6e6ee; } .petal-action { background: #eef4e0; }
+@media (max-height: 520px) and (min-aspect-ratio: 3/2) { .stage:has(.flower) { display: grid; grid-template-columns: auto 1fr; align-items: center; } .flower { width: min(300px, 70vh); } .stage:has(.flower) .dots { grid-column: 1 / -1; } }
+
+/* ayah */
+.ayah-ref { text-align: center; color: var(--ink-soft); font-size: .8rem; }
+.ayah { display: flex; flex-wrap: wrap; direction: rtl; justify-content: center; gap: 8px; margin: 8px 0; }
+.tile { border: 2px solid var(--line); background: #fff; border-radius: 14px; padding: 0 10px 8px; min-width: 72px; display: flex; flex-direction: column; align-items: center; }
+.ar-line { font-family: var(--quran); font-size: var(--word); line-height: 2.5; margin-bottom: -.2em; white-space: nowrap; }
+.mark, .num { color: var(--lamp-ink); } /* gold text uses the darker lamp ink: AA on parchment */
+.gl { min-height: 2rem; display: flex; flex-direction: column; align-items: center; }
+.gl-pic .pic { font-size: 1.4rem; }
+.gl-pic .pic-img { width: 60px; height: 60px; }
+.gl-pic .medal { min-width: 40px; height: 40px; font-size: .9rem; }
+.tile.glow-new { border-color: var(--lamp); animation: pulse 1.4s infinite; }
+.tile.glow-known { border-color: var(--blue); box-shadow: 0 0 0 4px #cfdcf0; }
+.tile.lit { border-color: var(--ok); }
+.tile.given { background: #f3efe6; border-style: dashed; }
+.tile.given .gl { opacity: .75; }
+.pieces { display: flex; gap: 4px; direction: rtl; margin-top: 2px; }
+.piece { display: flex; flex-direction: column; align-items: center; padding: 0 4px; border-radius: 8px; background: var(--ink); color: var(--paper); }
+.piece [lang="ar"] { font-size: 1rem; line-height: 1.9; }
+.piece .cap { color: var(--lamp-glow); font-size: .6rem; }
+.ayah.lit .tile { background: #fff3cf; border-color: var(--lamp); box-shadow: 0 0 20px var(--lamp-glow); }
+.opts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 8px; }
+.line { text-align: center; margin-top: 10px; }
+.line-label { display: block; font-weight: 700; font-size: .8rem; }
+.line-text { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 8px; } /* reads in the interface direction: LTR English, RTL Urdu */
+.line-word { visibility: visible !important; color: var(--ink); }
+/* small screens: the "word by word" recap repeats the meanings already on the cards, so only the translation shows
+   (fit to screen). With captions off the cards show no meanings, so the recap stays. */
+@media (max-width: 520px), (max-height: 520px) {
+  body:not(.nocap) .line > .line-label, body:not(.nocap) .line > .line-text { display: none; }
+  /* smaller word cards: tighter Arabic lines, smaller pictures */
+  .ar-line { line-height: 2; }
+  .gl-pic .pic-img { width: 44px; height: 44px; }
+  .tile { padding-bottom: 4px; }
+  .meet-card { min-height: 150px; }
+  .stage { padding-bottom: 10px; }
+}
+
+/* room done + relight */
+.room-done { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 28px 0; text-align: center; }
+.big-lamp { font-size: 4rem; filter: drop-shadow(0 0 20px var(--lamp-glow)); animation: pop .8s var(--ease); }
+.done-label { font-weight: 700; font-size: 1.1rem; }
+.done-meter { display: flex; flex-direction: column; align-items: center; }
+.done-pct { font-size: 2.6rem; color: var(--lamp); transition: transform .4s; }
+.done-pct.rise { animation: pop .6s var(--ease); }
+.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; padding: 8px; margin: 8px 12px 0; border-radius: 14px;
+  background: linear-gradient(#f8eedb, #efe0c3); border-bottom: 6px solid #8a6236; max-height: 30vh; overflow-y: auto; }
+.lampcard { border: 2px solid transparent; border-radius: 12px; padding: 2px; display: flex; flex-direction: column; align-items: center; background: #fffaf0aa; }
+.lampicon { font-size: 1.3rem; transition: filter .4s, opacity .4s; }
+.lampcard.dim .lampicon { filter: grayscale(.9); opacity: .35; }
+.lampcard.gold { border-color: var(--lamp); background: #fff3cf; }
+.lw { font-size: .95rem; line-height: 1.9; }
+.flames { display: flex; gap: 2px; }
+.flames i { width: 5px; height: 8px; border-radius: 50% 50% 40% 40%; background: var(--line); }
+.flames i.on { background: var(--gold); }
+.when { font-size: .65rem; color: var(--ink-soft); min-height: 1em; }
+.big-pic { display: flex; flex-direction: column; align-items: center; }
+.big-pic .pic { font-size: 3.4rem; }
+.big-pic .cap { visibility: visible; }
+
+/* intro + settings */
+.intro { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; justify-content: safe center; gap: 18px; padding: 16px; }
+.panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; max-width: 720px; }
+.panel { margin: 0; border-radius: 16px; border: 2px solid #8a6236; background: #fffaf0; padding: 10px 6px; text-align: center; animation: fade .6s both; animation-delay: var(--d); }
+.panel.dim { background: #3b2d22; color: #f4ecdc; }
+.panel.dim .cap { color: #e9dcc0; }
+.panel-scene { display: flex; flex-direction: column; align-items: center; }
+.scene-main { font-size: 3rem; }
+.scene-props { font-size: 1.3rem; letter-spacing: 4px; }
+.sheet-wrap { position: fixed; inset: 0; background: #2b211899; display: grid; place-items: center; z-index: 40; padding: 16px; }
+.sheet { background: var(--card); border-radius: 18px; padding: 16px 18px; max-width: 420px; width: 100%; display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.sheet h2, .sheet h3 { margin: 0; }
+.set-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.set-row > span { flex: 1; font-weight: 600; }
+.pill { min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; }
+.pill[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.credits, .draft { font-size: .78rem; color: var(--ink-soft); margin: 0; line-height: 1.6; }
+ul.credits { padding-inline-start: 1.1em; display: grid; gap: .3em; }
+.draft { color: var(--rose); }
+[dir="rtl"] .draft { line-height: 2.2; }
+
+/* hand + motion */
+.hand { position: fixed; left: 0; top: 0; z-index: 30; font-size: 2.2rem; pointer-events: none; opacity: 0; transition: transform .9s var(--ease), opacity .3s; filter: drop-shadow(0 4px 6px #0004); }
+.hand.tap { animation: tap .5s 2; }
+@keyframes tap { 50% { transform: var(--at) scale(.8); } }
+@keyframes pop { 50% { transform: scale(1.07); } }
+@keyframes wobble { 20% { transform: translateX(-6px) rotate(-2deg); } 40% { transform: translateX(6px) rotate(2deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(3px); } }
+@keyframes pulse { 50% { box-shadow: 0 0 0 8px var(--lamp-glow); } }
+@keyframes breathe { 50% { opacity: .5; } }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } }
+@keyframes nod { 50% { transform: rotate(-8deg); } }
+@keyframes orbit { from { transform: translate(-50%, -50%) rotate(0) translateX(70px) rotate(0); } to { transform: translate(-50%, -50%) rotate(360deg) translateX(70px) rotate(-360deg); } }
+body.paused *, body.paused *::before, body.paused *::after { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* narrow phones and short-wide screens */
+@media (max-width: 380px) { .meet-grid { grid-template-columns: repeat(2, 1fr); } .choice { min-height: 88px; } .game-title { font-size: .85rem; } }
+/* a lone card sits in the middle, not at the reading-side edge (in Urdu it hugged the right) */
+.meet-grid.one { grid-template-columns: min(220px, 100%); justify-content: center; }
+@media (max-height: 520px) and (min-aspect-ratio: 3/2) {
+  .prompt { min-height: 64px; } .word { line-height: 1.9; } .stage { padding-top: 6px; }
+  .panels { grid-template-columns: repeat(3, 1fr); } .scene-main { font-size: 2rem; }
+  .grid4 { grid-template-columns: repeat(4, 1fr); max-width: 760px; } .choice { min-height: 74px; }
+  .place-scene { max-width: 360px; } .circle { width: min(240px, 52vh); }
+  .stage:has(.sign-scene), .stage:has(.ladder) { display: grid; grid-template-columns: auto 1fr; column-gap: 16px; align-items: center; }
+  .stage:has(.sign-scene) .dots, .stage:has(.ladder) .dots { grid-column: 1 / -1; }
+  .sign-scene { width: min(100%, (100vh - 120px) * 4 / 3); } .scene-body { width: min(100%, (100vh - 120px) * 3 / 4); } .ladder { grid-template-columns: 1fr 1fr; max-width: 420px; } .rung-more { order: 2; }
+  .pot { min-height: 130px; }
+}
+
+/* tooltips: one bubble, placed above (or below) whatever is hovered or long-pressed */
+.tip-bubble { position: fixed; z-index: 60; max-width: min(280px, calc(100vw - 16px)); padding: 8px 12px; border-radius: 12px; background: var(--ink); color: var(--paper);
+  font-size: .85rem; line-height: 1.5; box-shadow: 0 6px 18px #0004; pointer-events: none; animation: pop .2s var(--ease); }
+.tip-bubble[lang="ur"] { font-family: var(--urdu); line-height: 2.1; }
+[data-tip], [data-tip-en] { -webkit-touch-callout: none; }
+
+/* Picture Guide: the explained library of visuals + the player's picture dictionary */
+.guide { display: flex; flex-direction: column; height: 100%; }
+.guide-tabs { display: flex; gap: 8px; justify-content: center; padding: 10px; }
+.guide-tabs .pill[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.guide-body { flex: 1; overflow-y: auto; padding: 0 14px 40px; max-width: 760px; width: 100%; margin: 0 auto; }
+.guide-group h3 { margin: 18px 0 8px; font-size: 1rem; display: flex; align-items: center; gap: 4px; }
+.sign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.sign { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 10px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); text-align: center; }
+.sign-pic { min-height: 64px; display: grid; place-items: center; font-size: 2rem; }
+.sign-pic .pic { font-size: 2.2rem; }
+.sign-text { visibility: visible; color: var(--ink); font-size: .8rem; }
+.tile.demo { padding: 0 10px; min-width: 0; }
+.chip.demo { display: inline-flex; padding: 4px 12px; border-radius: 12px; border: 2px solid var(--line); background: #fff; }
+.big-demo { font-size: 3rem; } .small-demo { font-size: 1.3rem; }
+.stamp-demo { font-size: 2.6rem; color: #a3302f; } .arrow-demo { font-size: 2.4rem; color: var(--ink-soft); }
+.ghost-demo { width: 56px; height: 56px; border-radius: 50%; border: 2px dashed var(--lamp); display: grid; place-items: center; }
+.pot-demo { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.flames { font-size: .8rem; letter-spacing: -2px; } .flames.gold { filter: drop-shadow(0 0 4px var(--gold)); }
+.dict-count { text-align: center; margin: 4px 0 0; }
+.dict-count strong { font-size: 1.4rem; color: var(--lamp-ink); }
+.dict-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.dict-card { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border-radius: 14px; background: var(--card); border: 1px solid var(--line); text-align: center; }
+.dict-card .pic { font-size: 1.8rem; } .dict-card .medal { transform: scale(.85); }
+.dict-ar { font-size: 1.5rem; line-height: 2; }
+.dict-card.dim .pic { opacity: .5; filter: grayscale(.6); } /* a fading lamp dims the picture, never the text */
+.dict-card.locked { opacity: .35; min-height: 92px; justify-content: center; border-style: dashed; }
+.room-name { display: inline; font-size: 1rem; color: var(--ink); visibility: visible; }
+
+/* stakes card: the room's new words and how often the Qur'an uses them (before the first step) */
+.stakes { display: grid; justify-items: center; gap: 10px; max-width: 360px; margin: 6vh auto 0; padding: 22px 18px; background: #fffaf0; border: 2px solid var(--lamp); border-radius: 22px; box-shadow: 0 8px 24px #2b211814; text-align: center; animation: rise .5s var(--ease); }
+.stakes-art .pic { font-size: 3rem; } .stakes-art .pic-img { width: 112px; height: 112px; }
+.stakes-row { display: grid; justify-items: center; }
+.stakes-num { font-size: 2.6rem; line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.stakes-num.gold { color: var(--lamp-ink); }
+@keyframes rise { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* story strip: wordless panels, one tap each */
+.story-strip { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; max-width: calc(760px / var(--fz, 1)); margin: 0 auto; }
+.story-panel { position: relative; display: grid; justify-items: center; gap: 2px; width: 132px; padding: 10px 8px 8px; background: #fff; border: 2px solid var(--line); border-radius: 16px; opacity: .45; filter: saturate(.4); transition: opacity .3s, filter .3s, transform .3s var(--ease); }
+.story-panel .pic-img { width: 84px; height: 84px; }
+.story-panel .story-cap { visibility: hidden; text-align: center; line-height: 1.3; }
+.story-panel.now { opacity: 1; filter: none; border-color: var(--lamp); box-shadow: 0 0 0 4px var(--lamp-glow); transform: scale(1.04); }
+.story-panel.lit { opacity: 1; filter: none; background: #fff8e6; }
+.story-panel.lit .story-cap { visibility: visible; }
+.story-num { position: absolute; top: 4px; inset-inline-start: 8px; font-size: .7rem; color: var(--ink-soft); }
+.story-ar { font-size: 1.4rem; line-height: 1.9; }
+.story-arrow { color: #c9a678; font-size: 1.2rem; }
+.story-demo { display: inline-flex; align-items: center; gap: 2px; }
+.cap.more { font-size: .7rem; line-height: 1.3; padding: 0 6px; text-align: center; }
+@media (max-width: 380px) { .story-panel { width: 104px; } .story-panel .pic-img { width: 64px; height: 64px; } .story-arrow { display: none; } }
+
+/* mastery check: each new word right twice in a row, no hints */
+.m-head { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 2px auto 6px; max-width: 560px; text-align: center; }
+.m-badge { font-weight: 800; color: var(--ok); }
+.m-shelf { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; max-width: calc(620px / var(--fz, 1)); margin: 0 auto 8px; }
+.m-lamp { display: inline-flex; gap: 2px; padding: 3px 5px; border-radius: 10px; background: #fff; border: 1px solid var(--line); }
+.m-lamp i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.m-lamp i.on { background: var(--gold); }
+.m-lamp.lit { border-color: var(--ok); background: #eef7ef; } .m-lamp.lit i { background: var(--ok); }
+.m-done { font-size: 1.2rem; font-weight: 700; color: var(--ok); }
+.step-dots li.m { border-radius: 2px; }
+
+/* "what the picture shows": a short line under a word's meaning (meet card back, dictionary) */
+.cap.why { font-size: .66rem; font-style: italic; line-height: 1.3; padding: 0 8px; text-align: center; }
+.meet-card .back .cap.why { max-height: 2.7em; overflow: hidden; }
+
+/* painted game signs in small places */
+.door-lamp .pic { font-size: 1rem; } .door-lamp .pic-img { width: 22px; height: 22px; }
+.qalam-mini .pic-img, .brand .pic-img { width: 28px; height: 28px; }
+.lampicon .pic-img { width: 26px; height: 26px; }
+.big-lamp .pic-img { width: 96px; height: 96px; margin: 0 auto; }
+.room-icon .pic-img { width: 24px; height: 24px; }
+.sprout .pic-img { width: 40px; height: 40px; }
+.scene-art .pic-img { width: min(100%, 220px); height: auto; aspect-ratio: 1; }
+.relight-btn .pic-img { width: 26px; height: 26px; }
+
+.why-demo { display: inline-flex; align-items: center; gap: 4px; } .why-demo em { font-size: .8rem; color: var(--ink-soft); }
+.big-demo .pic-img { width: 54px; height: 54px; } .small-demo .pic-img { width: 26px; height: 26px; }
+.sign-pic .pic-img { width: 52px; height: 52px; }
+
+/* mould press: known word → pattern mould → grown word */
+.press-row { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; max-width: calc(640px / var(--fz, 1)); margin: 4px auto 10px; }
+.press-base, .press-out, .press-mould { display: grid; justify-items: center; gap: 2px; min-width: 104px; padding: 8px 10px; border-radius: 16px; background: #fff; border: 2px solid var(--line); text-align: center; }
+.press-base .pic-img, .press-out .pic-img { width: 64px; height: 64px; }
+.press-mould { background: #fbf1df; border-color: #c9a678; border-style: dashed; max-width: 150px; }
+.press-mould .pic-img { width: 48px; height: 48px; }
+.m-pattern { font-size: 2.3rem; line-height: 1.7; }
+.press-out .word { border: 0; background: none; padding: 0 4px; box-shadow: none; }
+.m-pattern .m-add { color: var(--rose); text-shadow: 0 0 10px #b4466a44; }
+.press-mould .cap { font-size: .68rem; line-height: 1.35; }
+.press-out { border-color: var(--lamp); box-shadow: 0 0 0 4px var(--lamp-glow); }
+.press-out.grown { animation: rise .45s var(--ease); background: #fff8e6; }
+.press-q { font-size: 1.6rem; color: var(--lamp); font-weight: 800; }
+.press-arrow { color: #c9a678; font-size: 1.3rem; }
+.press-shift { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 14px auto; animation: rise .45s var(--ease); }
+.shift-side { display: grid; justify-items: center; gap: 0; }
+.shift-side .pic-img { width: 54px; height: 54px; }
+.press-shift .cap { visibility: visible !important; }
+@media (max-width: 420px) { .press-arrow { display: none; } .press-base, .press-out, .press-mould { min-width: 92px; padding: 6px; } }
+/* E8 Reading Room: the whole passage on one page, read line by line */
+.read-head { display: grid; justify-items: center; gap: 2px; margin-bottom: 8px; }
+.read-label { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--lamp); }
+.read-title { font-family: var(--quran-font, inherit); font-size: 1.7rem; line-height: 2.2; }
+.read-page { max-width: calc(640px / var(--fz, 1)); margin: 0 auto; padding: 10px 12px; background: var(--card); border: 2px solid var(--line); border-radius: 18px;
+  box-shadow: inset 0 0 0 6px #fbf3e2; display: grid; gap: 6px; }
+.read-line { all: unset; cursor: pointer; display: block; border-radius: 14px; padding: 2px 4px; transition: background var(--duration-fast, .15s); }
+.read-line:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.read-line .ayah { margin: 4px 0; }
+.read-line .read-tile { border-color: var(--blue); box-shadow: 0 0 0 3px #cfdcf0; }
+.read-line.lit .read-tile { background: #fff3cf; border-color: var(--lamp); box-shadow: 0 0 14px var(--lamp-glow); }
+/* re-read: a word whose lamp has gone dim (due for Relight) keeps a grey dashed edge and fainter letters, lit or not */
+.read-line .read-tile.faded, .read-line.lit .read-tile.faded { border-style: dashed; border-color: var(--ink-soft); background: #f1ece2; box-shadow: none; }
+.read-tile.faded .ar-line { opacity: .62; }
+.read-say { text-align: center; color: var(--ink-soft); font-style: italic; padding: 0 8px 6px; animation: rise .45s var(--ease); }
+.read-say .cap { visibility: visible !important; }
+.read-finale { display: grid; justify-items: center; gap: 4px; margin-top: 14px; animation: rise .45s var(--ease); }
+.read-finale strong { font-size: 1.15rem; color: var(--ok); }
+.read-count { color: var(--ink-soft); }
+@media (prefers-reduced-motion: reduce) { .read-say, .read-finale { animation: none; } }
+/* English captions inside right-to-left ayah tiles keep their own direction ("is Allah," not ",is Allah") */
+.ayah .cap:lang(en) { direction: ltr; unicode-bidi: isolate; }
+
+/* Polish Phase 2: rest stop in long rooms (the lamp's ring shows how much of the room is done), full Relight count in the Guide */
+.big-lamp.half { animation: none; filter: drop-shadow(0 0 10px var(--lamp-glow)); }
+.rest-card .big-lamp.half::after { content: ""; display: block; width: 96px; height: 8px; margin: 8px auto 0; border-radius: 4px;
+  background: linear-gradient(90deg, var(--gold) var(--lit), var(--line) var(--lit)); }
+[dir="rtl"] .rest-card .big-lamp.half::after { background: linear-gradient(270deg, var(--gold) var(--lit), var(--line) var(--lit)); }
+.rest-say { max-width: 28ch; }
+.dict-count.due-all { display: flex; justify-content: center; align-items: center; gap: 4px; }
+.dict-count.due-all .pic-img { width: 22px; height: 22px; }
+/* Short screens (under 420 px tall): Qalam's line folds away and Relight joins the dock in one row, so the map keeps
+   most of the height. The end plaque on the path still says when every room is lit. */
+@media (max-height: 420px) {
+  .hall-top { padding: 4px 12px; }
+  /* room header: thinner bar on short screens, buttons stay 44 px tall (touch) */
+  .room-top { padding: 2px 12px; }
+  .room-top .icon-btn { min-height: 44px; }
+  .stage { padding-bottom: 10px; }
+  .map-foot { display: flex; align-items: stretch; gap: 8px; width: min(560px, calc(100% - 24px)); margin: 4px auto 6px; }
+  .map-foot .relight-btn { position: static; flex: 1; justify-content: center; }
+  .map-dock { margin: 0; }
+  .map-dock .map-say { display: none; }
+  .dock-btn { grid-auto-flow: column; gap: 4px; min-width: 0; }
+  .hall-map { margin-bottom: 24px; }
+}
+/* Short wide screens: the stakes, rest and done cards lie across instead of stacking, so ▶ shows without scrolling */
+@media (max-height: 520px) and (min-aspect-ratio: 3/2) {
+  .stakes { grid-auto-flow: column; align-items: center; column-gap: 22px; max-width: 600px; margin-top: 2vh; padding: 12px 18px; }
+  .stakes-art .pic-img { width: 80px; height: 80px; }
+  .stakes-num { font-size: 2rem; }
+  .room-done { padding: 6px 0; gap: 6px; }
+  .big-lamp .pic-img { width: 64px; height: 64px; }
+  /* ayah word cards: tighter lines and smaller pictures, so a long ayah and its translation fit */
+  .ar-line { line-height: 2; }
+  .gl-pic .pic-img { width: 40px; height: 40px; }
+}
+
+/* Keyboard play (ui/keys.js): once the keyboard is used, answer buttons show the number key that picks them */
+body.kbd :has(> .choice) { counter-reset: opt; }
+body.kbd .choice { position: relative; }
+body.kbd .choice::after { counter-increment: opt; content: counter(opt); position: absolute; top: 4px; inset-inline-start: 6px;
+  min-width: 20px; height: 20px; border-radius: 6px; background: var(--ink); color: var(--card); font: 700 .75rem/20px var(--ui); text-align: center; }
+.door:focus-visible, .choice:focus-visible, .tile:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+/* Beginner guidance: what to do now, under the room header (always shown, captions setting or not) */
+.howto { display: flex; align-items: center; gap: 10px; margin: 8px auto 0; padding: 8px 14px; width: min(760px, calc(100% - 24px));
+  border-radius: 14px; background: var(--card); border: 1px solid var(--line); border-inline-start: 4px solid var(--lamp);
+  font-weight: 600; font-size: .95rem; line-height: 1.4; color: var(--ink); }
+[dir="rtl"] .howto { font-size: .92rem; line-height: 2; }
+.howto .qalam-mini { font-size: 1.3rem; flex: none; }
+.howto .qalam-mini .pic-img { width: 28px; height: 28px; }
+.howto.miss { border-inline-start-color: var(--rose); background: #fff3f3; animation: fade .3s; }
+/* phone progress: the step dots are hidden under 420 px, so a thin bar shows how far through the room you are */
+.room-progress { display: none; height: 6px; margin: 0 12px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.room-progress i { display: block; height: 100%; width: var(--p, 0%); background: var(--gold); border-radius: 3px; transition: width .4s var(--ease); }
+@media (max-width: 420px) { .room-progress { display: block; margin-top: 6px; } }
+/* ▶ buttons say what they do */
+.next-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 20px; }
+.next-btn::after { content: attr(aria-label); font: 700 1rem var(--ui); }
+[dir="rtl"] .next-btn::after { font-family: var(--urdu); line-height: 1.8; }
+.room-done .next-btn, .stakes .next-btn, .rest-card .next-btn { margin-inline: auto; }
+/* intro: the goal and a language choice before the comic */
+.intro-head { display: grid; justify-items: center; gap: 8px; max-width: 560px; text-align: center; }
+.intro-brand .pic-img { width: 64px; height: 64px; }
+.intro-title { margin: 0; font-size: clamp(1.3rem, 1rem + 2vw, 1.9rem); line-height: 1.3; }
+[dir="rtl"] .intro-title { line-height: 2; }
+.intro-goal { margin: 0; color: var(--ink-soft); line-height: 1.5; }
+.intro-langs { display: flex; gap: 8px; margin-top: 4px; }
+@media (max-height: 520px) and (min-aspect-ratio: 3/2) { .howto { margin-top: 4px; padding: 4px 12px; font-size: .85rem; } }
+[dir="rtl"] .intro-goal { line-height: 2.2; }
+[dir="rtl"] .icon-btn.labeled:not(.hint-btn) > span[aria-hidden="true"]:first-child { display: inline-block; transform: scaleX(-1); } /* ◀ back points the reading way */
+.map-next { display: grid; gap: 2px; min-width: 0; }
+.map-next-name { display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; font-weight: 700; }
+.map-next-name .cap { display: inline; font-size: .95rem; color: var(--ink); font-weight: 700; }
+.map-next-do { font-size: .8rem; font-weight: 500; color: var(--ink-soft); }
+[dir="rtl"] .map-next-do { line-height: 2; }
+@media (max-height: 420px) { .howto { margin-top: 4px; padding: 4px 10px; font-size: .8rem; gap: 6px; } .howto .qalam-mini { display: none; } }
+
+/* How to play (Picture Guide tab 1) */
+.play-list { display: grid; gap: 10px; }
+.play-card { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: start; padding: 12px 14px; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--line); }
+.play-card h3 { margin: 0 0 4px; font-size: 1rem; }
+.play-card p { margin: 0; line-height: 1.5; color: var(--ink); }
+[dir="rtl"] .play-card p, [dir="rtl"] .game-list li { line-height: 2.1; }
+.play-pic { display: grid; place-items: center; min-height: 48px; font-size: 1.8rem; }
+.play-pic .pic-img { width: 48px; height: 48px; }
+.game-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.game-list li { display: grid; grid-template-columns: 36px 1fr; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); line-height: 1.4; }
+.game-icon { font-size: 1.4rem; text-align: center; }
+/* right answer: ✓ pop with six gold sparks, and the what-to-do strip glows green */
+.sparkle { position: fixed; z-index: 30; transform: translate(-50%, -50%); pointer-events: none; font: 800 1.6rem/1 var(--ui); color: var(--ok);
+  text-shadow: 0 0 10px #fff; animation: spark-pop .7s var(--ease) forwards; }
+.sparkle i { position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -3.5px; border-radius: 50%; background: var(--gold);
+  animation: spark-fly .7s var(--ease) forwards; transform: rotate(var(--a)) translateY(0); }
+@keyframes spark-pop { 0% { transform: translate(-50%, -50%) scale(.4); opacity: 0; } 25% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(1); } }
+@keyframes spark-fly { to { transform: rotate(var(--a)) translateY(-34px); opacity: 0; } }
+.howto.good { border-inline-start-color: var(--ok); background: #f2fbf4; transition: background .2s; }
+.relight-intro h2 { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .sparkle i { display: none; } }
+.game-name { display: block; font-size: .95rem; }
+.guide-tabs .pill { line-height: 1.2; padding: 6px 12px; }
+
+/* A translator's full meaning of the ayah (ayah steps and Reading Rooms), credited by name */
+.ayah-tr, .read-tr { display: grid; gap: 4px; margin: 10px auto 0; padding: 10px 14px; max-width: calc(640px / var(--fz, 1)); border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line); border-inline-start: 4px solid var(--teal); text-align: start; }
+.tr-label { font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--teal); }
+[dir="rtl"] .tr-label { text-transform: none; letter-spacing: 0; font-size: .8rem; }
+.ayah-tr .cap.tr-text, .read-tr .cap.tr-text { font-size: .95rem; color: var(--ink); line-height: 1.55; }
+[dir="rtl"] .ayah-tr .cap.tr-text, [dir="rtl"] .read-tr .cap.tr-text { line-height: 2.2; font-size: .95rem; }
+.tr-by { font-size: .72rem; color: var(--ink-soft); }
+[dir="rtl"] .tr-by { line-height: 2; }
+
+/* milestone card (ui/milestone.js): one-time, after a room-done card */
+.milestone { flex: 1; min-height: 0; overflow-y: auto; justify-content: safe center; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px 20px; text-align: center;
+  background: radial-gradient(circle at 50% 38%, var(--lamp-glow), transparent 62%); }
+.ms-label { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--lamp-ink); }
+[dir="rtl"] .ms-label { letter-spacing: 0; }
+.ms-icon { font-size: 4rem; line-height: 1; }
+.ms-art .meter { transform: scale(1.8); margin: 18px 0; }
+.ms-title { margin: 0; font-size: clamp(1.3rem, 1rem + 2vw, 1.9rem); }
+.ms-line { margin: 0; max-width: 32ch; color: var(--ink-soft); line-height: 1.6; }
+.milestone .next-btn { margin-top: 8px; }
+
+/* Reading Room page number (ui/steps/passage.js pages) */
+.read-pageno { font-size: .75rem; color: var(--ink-soft); }
+.read-pageno:empty { display: none; }
+
+/* Landscape phones (short and wide): long ayat and Reading Room pages lie side by side instead of stacking, so the
+   whole ayah, its translation and ▶ fit without scrolling (fit to screen, 2026-11-06).
+   Ayah step: ▶ sits beside the translation, not under it.
+   Reading Room: the room's title stands in a column on the left; the finale line and ▶ share one row. */
+@media (max-height: 520px) and (min-aspect-ratio: 3/2) {
+  .stage:has(> .ayah) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-content: start; }
+  .stage:has(> .ayah) > * { grid-column: 1 / -1; }
+  .stage:has(> .ayah) > .line { grid-column: 1; }
+  .stage:has(> .ayah) > .row-end { grid-column: 2; align-self: end; margin-top: 0; }
+  .stage:has(> .read-page) { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr) auto; column-gap: 12px; align-content: start; }
+  .stage:has(> .read-page) > .read-head { grid-column: 1; grid-row: 1 / span 2; align-self: start; margin: 4px 0 0; }
+  .stage:has(> .read-page) > .read-page { grid-column: 2 / -1; grid-row: 1; margin: 0; }
+  .stage:has(> .read-page) > .read-finale { grid-column: 2; grid-row: 2; margin-top: 6px; }
+  .stage:has(> .read-page) > .row-end { grid-column: 3; grid-row: 2; align-self: center; margin-top: 6px; }
+  /* translation box: label and translator share the top row, tighter spacing */
+  .stage > .ayah { margin: 4px 0; }
+  .stage > .line { margin-top: 4px; }
+  .ayah-tr, .read-tr { grid-template-columns: auto 1fr; column-gap: 10px; row-gap: 2px; margin-top: 4px; padding: 6px 12px; }
+  .ayah-tr .tr-text, .read-tr .tr-text { grid-column: 1 / -1; grid-row: 2; }
+  .ayah-tr .tr-by, .read-tr .tr-by { grid-row: 1; grid-column: 2; justify-self: end; }
+  .flower { width: min(280px, 62vh); }
+}
+
+/* confusable guess + done-screen words won (docs/AUDIT_100X_PLAN.md B/C) */
+.guess-ask { flex-basis: 100%; margin: 0 0 4px; text-align: center; font-weight: 600; }
+.won { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 100%; }
+.won-card { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 6px; border-radius: 10px; background: rgba(255, 255, 255, 0.5); }
+.won-card .pic, .won-card .medal { font-size: 1.4rem; }
+.won-ar { font-size: 1rem; }
+.won-more { align-self: center; font-weight: 600; }
+.next-up { font-size: 0.95rem; opacity: 0.85; }
+@media (max-height: 500px) { .won-card .pic, .won-card .medal { font-size: 1rem; } .won { gap: 3px; } }

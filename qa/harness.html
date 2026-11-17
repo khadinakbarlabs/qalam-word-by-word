@@ -1,0 +1,52 @@
+<!doctype html>
+<!-- QA only (not shipped): loads ../game/index.html with a recording ytgame stub in place of the real SDK.
+     Flags: ?fresh=1 clears the fake cloud save · ?corrupt=1 stores unreadable data · ?future=1 stores a v99 save
+            ?failLoad=1 makes loadData reject · ?lang=ur-PK · ?qa=1 exposes window.__qw (current hint target) -->
+<html><head><meta charset="utf-8"><title>Harness</title></head><body>
+<script>
+(async () => {
+  const params = new URLSearchParams(location.search);
+  if (params.has("fresh")) localStorage.removeItem("qa-save");
+  if (params.has("corrupt")) localStorage.setItem("qa-save", "{not json");
+  if (params.has("future")) localStorage.setItem("qa-save", JSON.stringify({ v: 99, rooms: { fatiha: 1 } }));
+  const html = await (await fetch("../game/index.html", { cache: "no-store" })).text();
+  const stub = `<script>(${stubFactory.toString()})(${JSON.stringify({
+    failLoad: params.has("failLoad"), lang: params.get("lang") || "en-US", qa: params.has("qa"),
+  })});<\/script>`;
+  const page = html
+    .replace('<script src="https://www.youtube.com/game_api/v1"><' + '/script>', () => stub)
+    .replace("<head>", '<head><base href="../game/">');
+  document.open(); document.write(page); document.close();
+})();
+
+function stubFactory(opts) {
+  const log = [];
+  const t0 = performance.now();
+  const rec = (name, detail) => log.push({ name, detail, t: Math.round(performance.now() - t0) });
+  const listeners = { pause: [], resume: [], audio: [] };
+  const sub = (kind) => (cb) => { listeners[kind].push(cb); return () => {}; };
+  if (opts.qa) window.__QW_QA = true;
+  window.__yt = {
+    log, listeners,
+    pause() { rec("HOST:pause"); listeners.pause.forEach((cb) => cb()); },
+    resume() { rec("HOST:resume"); listeners.resume.forEach((cb) => cb()); },
+    saved: () => localStorage.getItem("qa-save") || "",
+  };
+  window.ytgame = {
+    IN_PLAYABLES_ENV: true, SDK_VERSION: "qa-stub",
+    game: {
+      firstFrameReady: () => rec("firstFrameReady"),
+      gameReady: () => rec("gameReady"),
+      loadData: async () => { rec("loadData"); if (opts.failLoad) throw new Error("API_UNAVAILABLE"); return localStorage.getItem("qa-save") || ""; },
+      saveData: async (s) => { rec("saveData", s.length); localStorage.setItem("qa-save", s); },
+    },
+    system: {
+      getLanguage: async () => { rec("getLanguage"); return opts.lang; },
+      isAudioEnabled: () => true,
+      onAudioEnabledChange: sub("audio"), onPause: sub("pause"), onResume: sub("resume"),
+    },
+    health: { logError: () => rec("logError"), logWarning: () => rec("logWarning") },
+  };
+}
+</script>
+</body></html>

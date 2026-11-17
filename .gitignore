@@ -1,0 +1,7 @@
+data/reference/
+data/art-raw/
+data/art-old/
+qa/autoplay-out/
+node_modules/
+.DS_Store
+.claude/

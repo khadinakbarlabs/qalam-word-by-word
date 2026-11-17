@@ -1,0 +1,6 @@
+Source: https://corpus.quran.com/faq.jsp
+Retrieved: 2026-11-06 (plain-text extract of the page; not an official copy)
+
+has been published at several academic conferences and journals. Can I obtain part-of-speech tagged data for my research project? The data is still undergoing correction, but morphological annotation has been made publically available for download . We are happy to share the data for research purposes as long as: You do not use the data for commercial purposes. The data should be used purely for research and is made available under the GNU public license . You give a citation in your research publication. When contacting us for obtaining research data, it would be useful to
+
+the entire text, or do you prefer to use a sample? Can I download the Quranic Arabic Corpus data? All data in the Quranic Arabic Corpus is freely available for online viewing through this website. The data is also available on the download page. The final aim of the project will be to produce a highly accurate annotated Quran available freely for non-commercial use under the GNU public license . Although the information is quite accurate already, currently annotators are reviewing the morphological and syntactic annotation, as well as the word by word translation. Thi

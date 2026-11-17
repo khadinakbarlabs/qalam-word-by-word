@@ -1,0 +1,19 @@
+{
+ "ayat": 6236,
+ "words": 77429,
+ "tanzilWords": 77881,
+ "units": {
+  "lemmas": 4773,
+  "frontPieces": 13,
+  "personEndings": 14,
+  "grammarKeys": 7
+ },
+ "alignment": {
+  "unalignedAyat": 0,
+  "morphologyAyatNotInTanzil": 0,
+  "leadingBasmalaStripped": 112,
+  "morphologyWordsSpanningTwoTanzilWords": 4,
+  "examples": []
+ },
+ "mismatches": []
+}

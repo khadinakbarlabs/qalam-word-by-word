@@ -1,0 +1,627 @@
+{
+ "roomSize": 20,
+ "minReady": 0.8,
+ "minReadyEarly": 0.5,
+ "shapes": {
+  "word-type acts": [
+   {
+    "act": 1,
+    "units": 82,
+    "lemmas": 57,
+    "keys": [],
+    "rooms": 5,
+    "emptyRooms": 1,
+    "minCandidates": 0,
+    "roomsUnder10": 1,
+    "firstRoomExample": {
+     "ref": "53:61",
+     "words": 2,
+     "ready": 0.5,
+     "missing": [
+      "L:سامِد",
+      "K:plural"
+     ],
+     "text": "وَأَنتُمْ سَـٰمِدُونَ"
+    }
+   },
+   {
+    "act": 2,
+    "units": 312,
+    "lemmas": 310,
+    "keys": [
+     "K:plural",
+     "K:dual"
+    ],
+    "rooms": 16,
+    "emptyRooms": 0,
+    "minCandidates": 19,
+    "roomsUnder10": 0,
+    "firstRoomExample": {
+     "ref": "10:1",
+     "words": 5,
+     "ready": 0.8,
+     "missing": [
+      "L:حَكِيم"
+     ],
+     "text": "الٓر تِلْكَ ءَايَـٰتُ ٱلْكِتَـٰبِ ٱلْحَكِيمِ"
+    }
+   },
+   {
+    "act": 3,
+    "units": 92,
+    "lemmas": 87,
+    "keys": [
+     "K:past",
+     "K:present",
+     "K:command",
+     "K:passive",
+     "K:emphatic-n"
+    ],
+    "rooms": 5,
+    "emptyRooms": 0,
+    "minCandidates": 38,
+    "roomsUnder10": 0,
+    "firstRoomExample": {
+     "ref": "20:34",
+     "words": 2,
+     "ready": 1,
+     "missing": [],
+     "text": "وَنَذْكُرَكَ كَثِيرًا"
+    }
+   },
+   {
+    "act": 4,
+    "units": 72,
+    "lemmas": 72,
+    "keys": [],
+    "rooms": 4,
+    "emptyRooms": 0,
+    "minCandidates": 95,
+    "roomsUnder10": 0,
+    "firstRoomExample": {
+     "ref": "20:28",
+     "words": 2,
+     "ready": 1,
+     "missing": [],
+     "text": "يَفْقَهُوا۟ قَوْلِى"
+    }
+   },
+   {
+    "act": 5,
+    "units": 135,
+    "lemmas": 135,
+    "keys": [],
+    "rooms": 7,
+    "emptyRooms": 0,
+    "minCandidates": 178,
+    "roomsUnder10": 0,
+    "firstRoomExample": {
+     "ref": "43:2",
+     "words": 2,
+     "ready": 1,
+     "missing": [],
+     "text": "وَٱلْكِتَـٰبِ ٱلْمُبِينِ"
+    }
+   }
+  ],
+  "frequency bands": [
+   {
+    "act": 1,
+    "units": 48,
+    "lemmas": 28,
+    "keys": [
+     "K:past",
+     "K:present",
+     "K:plural",
+     "K:command",
+     "K:passive"
+    ],
+    "rooms": 3,
+    "emptyRooms": 0,
+    "minCandidates": 143,
+    "roomsUnder10": 0,
+    "firstRoomExample": {
+     "ref": "53:61",
+     "words": 2,
+     "ready": 0.5,
+     "missing": [
+      "L:سامِد"
+     ],
+     "text": "وَأَنتُمْ سَـٰمِدُونَ"
+    }
+   },
+   {
+    "act": 2,
+    "units": 55,
+    "lemmas": 50,
+    "keys": [
+     "K:dual",
+     "K:emphatic-n"
+    ],
+    "rooms": 3,
+    "emptyRooms": 0,
+    "minCandidates": 52,
+    "roomsUnder10": 0,
+    "firstRoomExample": {
+     "ref": "15:93",
+     "words": 3,
+     "ready": 1,
+     "missing": [],
+     "text": "عَمَّا كَانُوا۟ يَعْمَلُونَ"
+    }
+   },
+   {
+    "act": 3,
+    "units": 147,
+    "lemmas": 143,
+    "keys": [],
+    "rooms": 8,
+    "emptyRooms": 0,
+    "minCandidates": 104,
+    "roomsUnder10": 0,
+    "firstRoomExample": {
+     "ref": "37:161",
+     "words": 3,
+     "ready": 1,
+     "missing": [],
+     "text": "فَإِنَّكُمْ وَمَا تَعْبُدُونَ"
+    }
+   },
+   {
+    "act": 4,
+    "units": 224,
+    "lemmas": 221,
+    "keys": [],
+    "rooms": 12,
+    "emptyRooms": 0,
+    "minCandidates": 50,
+    "roomsUnder10": 0,
+    "firstRoomExample": {
+     "ref": "37:155",
+     "words": 2,
+     "ready": 1,
+     "missing": [],
+     "text": "أَفَلَا تَذَكَّرُونَ"
+    }
+   },
+   {
+    "act": 5,
+    "units": 219,
+    "lemmas": 219,
+    "keys": [],
+    "rooms": 11,
+    "emptyRooms": 0,
+    "minCandidates": 181,
+    "roomsUnder10": 0,
+    "firstRoomExample": {
+     "ref": "80:16",
+     "words": 2,
+     "ready": 1,
+     "missing": [],
+     "text": "كِرَامٍۭ بَرَرَةٍ"
+    }
+   }
+  ]
+ },
+ "passages": [
+  {
+   "label": "Al-Fatiha",
+   "words": 29,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.17,
+     0.72,
+     0.76,
+     0.83,
+     0.9
+    ],
+    "firstActAt90": 5
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.28,
+     0.34,
+     0.59,
+     0.83,
+     0.9
+    ],
+    "firstActAt90": 5
+   },
+   "extraPassageUnits": 3,
+   "extra": [
+    "L:مالِك",
+    "L:اسْتَعِينُ",
+    "L:مَغْضُوب"
+   ]
+  },
+  {
+   "label": "Al-Ikhlas",
+   "words": 15,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.33,
+     0.6,
+     0.6,
+     0.73,
+     0.73
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.33,
+     0.6,
+     0.73,
+     0.73,
+     0.73
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 3,
+   "extra": [
+    "L:صَمَد",
+    "L:وَلَدَ",
+    "L:كُفُو"
+   ]
+  },
+  {
+   "label": "Al-Asr",
+   "words": 14,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.21,
+     0.5,
+     0.64,
+     0.64,
+     0.71
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.36,
+     0.5,
+     0.64,
+     0.64,
+     0.71
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 3,
+   "extra": [
+    "L:عَصْر",
+    "L:خُسْر",
+    "L:تَواصَ"
+   ]
+  },
+  {
+   "label": "An-Nas",
+   "words": 20,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.2,
+     0.7,
+     0.7,
+     0.75,
+     0.75
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.3,
+     0.6,
+     0.6,
+     0.7,
+     0.75
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 5,
+   "extra": [
+    "L:عُذْ",
+    "L:وَسْواس",
+    "L:خَنّاس",
+    "L:وَسْوَسَ",
+    "L:جِنَّة"
+   ]
+  },
+  {
+   "label": "Al-Falaq",
+   "words": 23,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.35,
+     0.57,
+     0.61,
+     0.65,
+     0.65
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.43,
+     0.48,
+     0.48,
+     0.65,
+     0.65
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 8,
+   "extra": [
+    "L:عُذْ",
+    "L:فَلَق",
+    "L:غاسِق",
+    "L:وَقَبَ",
+    "L:نَفّاثَة",
+    "L:عُقْدَة",
+    "L:حاسِد",
+    "L:حَسَدَ"
+   ]
+  },
+  {
+   "label": "Al-Kawthar",
+   "words": 10,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.3,
+     0.4,
+     0.4,
+     0.4,
+     0.4
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.3,
+     0.4,
+     0.4,
+     0.4,
+     0.4
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 6,
+   "extra": [
+    "L:أَعْطَى",
+    "L:كَوْثَر",
+    "L:صَلَّى",
+    "L:انْحَرْ",
+    "L:شانِئ",
+    "L:أَبْتَر"
+   ]
+  },
+  {
+   "label": "Al-Ma'un",
+   "words": 25,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.32,
+     0.64,
+     0.64,
+     0.68,
+     0.72
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.32,
+     0.48,
+     0.56,
+     0.64,
+     0.72
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 7,
+   "extra": [
+    "L:يَدُعُّ",
+    "L:يَحُضُّ",
+    "L:مُصَلّي",
+    "L:ساهي",
+    "L:يُراءُ",
+    "L:مَنَعَ",
+    "L:ماعُون"
+   ]
+  },
+  {
+   "label": "Al-Kafirun",
+   "words": 26,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.5,
+     0.62,
+     0.85,
+     0.88,
+     0.88
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.42,
+     0.5,
+     0.85,
+     0.88,
+     0.88
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 1,
+   "extra": [
+    "L:عابِد"
+   ]
+  },
+  {
+   "label": "Al-Qadr",
+   "words": 30,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.3,
+     0.63,
+     0.63,
+     0.63,
+     0.7
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.3,
+     0.4,
+     0.47,
+     0.57,
+     0.7
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 5,
+   "extra": [
+    "L:لَيْلَة",
+    "L:قَدْر",
+    "L:تَنَزَّلَتْ",
+    "L:مَطْلَع",
+    "L:فَجْر"
+   ]
+  },
+  {
+   "label": "Ayat al-Kursi",
+   "words": 50,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.48,
+     0.74,
+     0.76,
+     0.8,
+     0.82
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.5,
+     0.66,
+     0.74,
+     0.78,
+     0.82
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 9,
+   "extra": [
+    "L:قَيُّوم",
+    "L:سِنَة",
+    "L:نَوْم",
+    "L:يَشْفَعُ",
+    "L:وَسِعَ",
+    "L:كُرْسِيّ",
+    "L:يَئُودُ",
+    "L:حِفْظ",
+    "L:عَلِيّ"
+   ]
+  },
+  {
+   "label": "Al-Mulk 1-5",
+   "words": 60,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.27,
+     0.67,
+     0.75,
+     0.8,
+     0.85
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.25,
+     0.43,
+     0.63,
+     0.77,
+     0.85
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 9,
+   "extra": [
+    "L:تَبارَكَ",
+    "L:طَبَق",
+    "L:تَفاوُت",
+    "L:فُطُور",
+    "L:كَرَّة",
+    "L:خاسِئ",
+    "L:حَسِير",
+    "L:مِصْباح",
+    "L:رُجُوم"
+   ]
+  },
+  {
+   "label": "Al-Baqarah 1-5",
+   "words": 36,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.42,
+     0.72,
+     0.75,
+     0.75,
+     0.94
+    ],
+    "firstActAt90": 5
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.5,
+     0.69,
+     0.86,
+     0.92,
+     0.94
+    ],
+    "firstActAt90": 4
+   },
+   "extraPassageUnits": 2,
+   "extra": [
+    "L:يُوقِنُ",
+    "L:مُفْلِح"
+   ]
+  },
+  {
+   "label": "Al-Hashr 22-24",
+   "words": 49,
+   "word-type acts": {
+    "readyAfterAct": [
+     0.37,
+     0.78,
+     0.8,
+     0.8,
+     0.86
+    ],
+    "firstActAt90": null
+   },
+   "frequency bands": {
+    "readyAfterAct": [
+     0.35,
+     0.55,
+     0.67,
+     0.8,
+     0.86
+    ],
+    "firstActAt90": null
+   },
+   "extraPassageUnits": 7,
+   "extra": [
+    "L:قُدُّوس",
+    "L:مُهَيْمِن",
+    "L:جَبّار",
+    "L:مُتَكَبِّر",
+    "L:خالِق",
+    "L:بارِئ",
+    "L:مُصَوِّر"
+   ]
+  }
+ ]
+}
