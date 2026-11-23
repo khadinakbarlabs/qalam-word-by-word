@@ -378,3 +378,23 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 html[lang="ur"] .wing-head { min-height: 68px; max-height: 84px; padding-block: 4px; }
 html[lang="ur"] .wing-head-text { gap: 0; }
 html[lang="ur"] .wing-head-name, html[lang="ur"] .wing-head-count, html[lang="ur"] .wing-head-toggle { line-height: 1.55; }
+
+/* Meet pages: progress dots sit beside the ▶ button. */
+.row-end:has(> .dots) { align-items: center; gap: 14px; }
+
+/* Relight / Quick practice sits in the map footer, above the dock, instead of floating over the doors and their names. */
+@media (min-height: 421px) {
+  .map-foot { display: grid; justify-items: center; padding-top: 8px; }
+  .map-foot .relight-btn { position: static; margin: 0 0 8px; }
+  .map-foot .relight-btn[hidden] { display: none; }
+  .map-foot .map-dock { justify-self: stretch; }
+}
+
+/* Room-done on tall phones: tighter column so the whole card, Next included, fits without scrolling (Urdu lines are taller). */
+@media (max-width: 480px) and (min-height: 521px) {
+  .room-done { padding: 8px 0; gap: 6px; }
+  .room-done .big-lamp .pic-img { width: 72px; height: 72px; }
+  .room-done .done-pct { font-size: 2.2rem; }
+  html[lang="ur"] .room-done :is(.done-label, .done-count span, .done-meter-label, .won-say, .next-up) { line-height: 1.6; }
+  html[lang="ur"] .room-done .done-count strong { line-height: 1.2; }
+}
