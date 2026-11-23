@@ -1,6 +1,7 @@
 // E4 Six Petals: a verb's root sits in the middle of a flower; each petal is one of its six forms (past, now/later,
 // command, doer, done-to, the action itself). A form appears (يَفْتَحُ, فَاتِح …); tap the petal it belongs to.
-import { h, ar, pic, dots, wait, wobble } from "../kit.js";
+import { tipSaid } from "../tips.js";
+import { h, arSay, pic, dots, wait, wobble } from "../kit.js";
 
 export const PETALS = { past: "⏪", present: "✍️", command: "☝️", doer: "🧑‍🔧", done: "📦", action: "⚙️" };
 
@@ -10,7 +11,7 @@ export function run(ctx, step) {
     const petals = ids.map((id, k) => {
       const a = (k / ids.length) * 2 * Math.PI - Math.PI / 2;
       const art = ctx.words[`ui:${id}`]?.pic;
-      return h("button", { class: `petal petal-${id}`, "aria-label": id, "data-tip": `petal_${id}`, style: `left:${50 + 37 * Math.cos(a)}%;top:${50 + 37 * Math.sin(a)}%` },
+      return h("button", { class: `petal petal-${id}`, "aria-label": tipSaid(`petal_${id}`), "data-tip": `petal_${id}`, style: `left:${50 + 37 * Math.cos(a)}%;top:${50 + 37 * Math.sin(a)}%` },
         pic(art ?? PETALS[id]));
     });
     const heart = h("div", { class: "flower-heart" }, h("span", { class: "seeds", lang: "ar", dir: "rtl" }, step.root.map((l) => h("span", { class: "seed" }, l))));
@@ -30,7 +31,7 @@ export function run(ctx, step) {
       if (i >= step.items.length) return done();
       const item = step.items[i];
       ctx.item([item.w]);
-      prompt.replaceChildren(ar(item.ar, "word"));
+      prompt.replaceChildren(arSay(item, "word"));
       ctx.target(petals[ids.indexOf(item.petal)]);
       const d = dots(i, step.items.length);
       progress.replaceWith(d);

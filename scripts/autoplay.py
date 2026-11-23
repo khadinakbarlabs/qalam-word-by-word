@@ -17,6 +17,7 @@ Exit code 0 = every viewport finished its rooms with no errors. Screenshots of f
 """
 import argparse
 import asyncio
+import os
 import pathlib
 import socket
 import subprocess
@@ -157,10 +158,15 @@ async def main():
     try:
         async with async_playwright() as pw:
             # the installed Google Chrome first (no download), else Playwright's own Chromium
+            # QA_BROWSER=bundled skips Google Chrome, so a run never starts a second Chrome beside the user's own
             try:
+                if os.environ.get("QA_BROWSER") == "bundled":
+                    raise RuntimeError("bundled Chromium asked for")
                 browser = await pw.chromium.launch(channel="chrome", headless=not args.headed)
             except Exception:
-                browser = await pw.chromium.launch(headless=not args.headed)
+                # QA_BROWSER_PATH: a Chromium binary to use when Playwright's own download is missing
+                path = os.environ.get("QA_BROWSER_PATH") or None
+                browser = await pw.chromium.launch(headless=not args.headed, executable_path=path)
             sizes = {k: v for k, v in VIEWPORTS.items() if not args.only or k == args.only}
             results = await asyncio.gather(*(play_viewport(browser, f"http://127.0.0.1:{port}", n, s, args) for n, s in sizes.items()))
             await browser.close()

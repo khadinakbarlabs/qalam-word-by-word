@@ -35,9 +35,16 @@ Every word in the Notebook is a small lamp with **0–6 flames** (its level). Th
 | 5 | 5 flames | in 16 days |
 | 6 Gold | golden lamp | in 35 days (keeps coming back, rarely) |
 
+- **A new word's first gap is short (2026-11-23).** The Last Check comes minutes after a word is first seen, so passing it shows working memory, not learning. A new word answered right every time and asked in the Last Check ends its room at **1 flame, back tomorrow**; a right answer then makes 2 flames. A new word that needed help, was missed, was only met, or was not reached by the Last Check ends at 1 flame and is **due the same day**: the next room's warm-up asks it (up to 8 such words), and so do Relight and Quick practice. The map does not count these same-day words as "lamps to relight" on the day they were learnt.
+- **Last Check.** At most 8 words (the ones missed, helped or never asked come first). Wing 1: one right answer in each direction (Arabic → meaning, meaning → Arabic), and a miss keeps the dots already earned. Later wings: two right answers in a row, a miss resets the word. An answer after Show me never counts.
+- **Meaning, not shape.** A calligraphy word (a Name of Allah, a prophet's name, a word with no picture) is asked by its meaning written out, never by its medallion: the medallion is the Arabic itself.
+- **Every answer shows a pairing.** After a right answer the Arabic and its meaning stay together for a moment; after a wrong tap the helper line says what the tapped choice really is.
 - **Recalled first try, no hint** → up one flame.
-- **Recalled with the show-me hand (hint 1)** → stays, comes back sooner.
-- **Wrong or answer revealed (hint 2)** → down one flame (never below 1) and returns again 3 cards later in the same session.
+- **Recalled with help** (the first Show me, which only takes away some wrong choices; or the tutorial hand pointing at the answer the first time a game is met) → the flame stays and the word comes back in about a quarter of the time (levels 3–6: 1, 2, 4, 9 days).
+- **Wrong, or answer revealed (the second Show me)** → down one flame (never below 1) and returns again 3 cards later in the same session. In Relight it is then asked until it has been answered right twice without help, once from each side (word → picture, picture → word); those make-up answers never raise it again, and it is due the next day.
+- **Words that keep being missed** (3 or more lapses) come back within 3 days however high the lamp, until they have been recalled unaided often enough (each unaided recall takes one lapse off).
+- **A word that is not due does not move** when its room is played again (or when a later room reviews it early); a miss always counts.
+- **Relight sessions** serve 12 lamps, 16 when more than 40 wait and 20 when more than 60 wait. When a session ends with lamps still due, the end card says how many and offers to keep going; "All lamps are lit" shows only when it is true.
 - A lamp that is **due** glows dimmer — a gentle "relight me" signal. It **never goes out**, nothing is lost, the coverage meter never drops, and there are no streaks or "you missed a day" messages.
 
 The next-review gap is shown as a picture (🌙 = later today, ☀️ ×N = in N days), so the schedule itself is visual.
@@ -51,6 +58,9 @@ The next-review gap is shown as a picture (🌙 = later today, ☀️ ×N = in N
 3. **Mixed into new rooms.** About a third of every room's rounds are older due words, and the ayah picker prefers ayat that contain due words, so review happens *inside* new play.
 4. **Reading Rooms revisited.** A finished passage can be re-read later; the share of words still glowing shows real retention.
 5. **Lamp Review (any time).** From the Notebook: review a wing, a root family, or "words I mix up".
+6. **Quick practice (built 2026-11-23).** When no lamp is due, the map's Relight button becomes Quick practice: 8 of the weakest and oldest words. It is never graded: no flame goes up or down and no due day moves, so it cannot lower progress and cannot be used to push words up early. Only mix-ups are noted.
+7. **Tell these apart (built 2026-11-23).** A wrong pick is kept on the word's card (the 3 most frequent, in the save). A pair mixed up twice comes back side by side, one meaning and the two Arabic words, in a room's warm-up and after a Relight or Quick practice round. Told apart first time with no help, the mix-up is settled.
+8. **Leaving a room.** Review words answered before the player leaves are graded on the way out (once), so the review is kept.
 
 Pace guard: if more than ~40 words are due, Qalam suggests a Relight room before new words (a suggestion, never a lock). A soft daily pace of ~15–20 new words keeps reviews light.
 

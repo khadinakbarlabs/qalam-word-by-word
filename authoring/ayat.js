@@ -6,6 +6,14 @@
 //   g      { en, ur } meaning of this word here, in context
 //   pic / medal   override the picture; otherwise the first card's picture is used
 //   pieces optional Root Lens split shown after decoding: [{ ar, g }]
+//   say    optional: how to say this word in Latin letters, when the rule-based spelling cannot work (الٓمٓ) or reads
+//          wrong (scripts/lib/translit.mjs). Shown only with "Show how to say it" on.
+//   note   why this word's meaning here differs from its card ("إِنَّمَا = only"). The build fails when a word's meaning
+//          shares nothing with the card it takes its picture from, unless a note says why (scripts/lib/checks.mjs).
+//          A note is a sign-off for that one word: write it only after checking the ayah. Not shipped in the pack.
+//   ofAllah  true on a word that shows a Name-of-Allah medallion but is not glossed with the Name's own wording.
+//          Names of Allah are written with a capital letter in English ("the All-Knowing"); a word about anyone
+//          else must not name a Name card (make it a given word, or name another card).
 
 const p = (ar, en, ur) => ({ ar, g: { en, ur } });
 
@@ -67,7 +75,7 @@ export const AYAT = {
   ],
   "14:20": [
     { ar: "وما", given: true, pic: "✕", art: "w:la", g: { en: "And it is not", ur: "اور نہیں ہے" } },
-    { ar: "ذلك", w: ["w:dhalika"], g: { en: "that", ur: "یہ (بات)" } },
+    { ar: "ذلك", w: ["w:dhalika"], note: "the far word is said with the near word (یہ) in Urdu, as the Urdu translation does", g: { en: "that", ur: "یہ (بات)" } },
     { ar: "على", w: ["w:ala"], g: { en: "upon", ur: "پر" } },
     { ar: "الله", w: ["w:allah"], g: { en: "Allah", ur: "اللہ" } },
     { ar: "بعزيز", given: true, pic: "🪨", art: "g:boulder", g: { en: "difficult", ur: "مشکل" } },
@@ -82,7 +90,7 @@ export const AYAT = {
   ],
   "23:59": [
     { ar: "والذين", w: ["w:wa", "w:alladhina"], g: { en: "And those who", ur: "اور وہ لوگ جو" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ" } },
+    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ (سب)" } },
     { ar: "بربهم", w: ["w:bi", "w:rabb", "w:hum"], g: { en: "with their Lord", ur: "اپنے رب کے ساتھ" }, pieces: [p("بِ", "with", "ساتھ"), p("رَبِّ", "Lord", "رب"), p("هِمْ", "their", "ان کا")] },
     { ar: "لا", w: ["w:la"], g: { en: "do not", ur: "نہیں" } },
     { ar: "يشركون", given: true, pic: "🚫", art: "w:la", g: { en: "associate partners", ur: "شریک ٹھہراتے" } },
@@ -91,7 +99,7 @@ export const AYAT = {
     { ar: "قل", given: true, pic: "🗣️", art: "w:qala", g: { en: "Say", ur: "کہہ دو" } },
     { ar: "هو", w: ["w:huwa"], g: { en: "He", ur: "وہ" } },
     { ar: "الله", w: ["w:allah"], g: { en: "(is) Allah", ur: "اللہ ہے" } },
-    { ar: "احد", given: true, pic: "☝️", medal: "أَحَد", g: { en: "the One", ur: "ایک" } },
+    { ar: "احد", given: true, pic: "☝️", medal: "أَحَد", ofAllah: true, g: { en: "the One", ur: "ایک" } },
   ],
 
   // Lamp & Box
@@ -171,7 +179,7 @@ export const AYAT = {
   ],
   "37:26": [
     { ar: "بل", w: ["w:bal"], g: { en: "Rather,", ur: "بلکہ" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ" } },
+    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ (سب)" } },
     { ar: "اليوم", w: ["w:al", "w:yawm"], g: { en: "today", ur: "آج" } },
     { ar: "مستسلمون", given: true, pic: "🏳️", art: "g:flag", g: { en: "surrender", ur: "سر جھکائے ہوئے ہیں" } },
   ],
@@ -179,7 +187,7 @@ export const AYAT = {
   // Connectors
   "82:16": [
     { ar: "وما", w: ["w:wa", "w:ma"], g: { en: "And not", ur: "اور نہیں" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ" } },
+    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ (سب)" } },
     { ar: "عنها", w: ["w:an", "w:ha"], g: { en: "from it", ur: "اس سے" }, pieces: [p("عَنْ", "away from", "سے"), p("هَا", "it", "اس")] },
     { ar: "بغائبين", given: true, pic: "🚶", art: "g:absent", g: { en: "(will be) absent", ur: "غائب ہونے والے" } },
   ],
@@ -192,7 +200,7 @@ export const AYAT = {
   // Verb Front Markers
   "102:3": [
     { ar: "كلا", w: ["w:kalla"], g: { en: "No indeed!", ur: "ہرگز نہیں" } },
-    { ar: "سوف", w: ["w:sawfa"], g: { en: "(you) will", ur: "عنقریب" } },
+    { ar: "سوف", w: ["w:sawfa"], g: { en: "(you) will, later on", ur: "آگے چل کر" } },
     { ar: "تعلمون", given: true, pic: "💡", art: "w:alima", g: { en: "come to know", ur: "جان لو گے" } },
   ],
   "106:3": [
@@ -240,7 +248,7 @@ export const AYAT = {
   "37:159": [
     { ar: "سبحن", w: ["w:subhan"], g: { en: "Glory be to", ur: "پاک ہے" } },
     { ar: "الله", w: ["w:allah"], g: { en: "Allah", ur: "اللہ" } },
-    { ar: "عما", w: ["w:an", "w:ma"], g: { en: "above what", ur: "ان باتوں سے جو" }, pieces: [p("عَنْ", "away from", "سے"), p("مَا", "what", "جو")] },
+    { ar: "عما", w: ["w:an", "w:ma"], note: "عَنْ after سُبْحَانَ: far above (what they say)", g: { en: "above what", ur: "ان باتوں سے جو" }, pieces: [p("عَنْ", "away from", "سے"), p("مَا", "what", "جو")] },
     { ar: "يصفون", given: true, pic: "🗣️", art: "w:yasifu", g: { en: "they describe", ur: "یہ بیان کرتے ہیں" } },
   ],
 
@@ -300,7 +308,7 @@ export const AYAT = {
   "56:14": [
     { ar: "وقليل", w: ["w:wa", "w:qalil"], g: { en: "and a few", ur: "اور تھوڑے" } },
     { ar: "من", w: ["w:min"], g: { en: "from", ur: "میں سے" } },
-    { ar: "الاخرين", w: ["w:al", "w:akhir"], g: { en: "the later ones", ur: "بعد والوں" } },
+    { ar: "الاخرين", w: ["w:al", "w:akhir"], note: "آخِر in the plural: the later people", g: { en: "the later ones", ur: "بعد والوں" } },
   ],
 
   // ---- Wing 2 · Signs in the Sky (Ash-Shams 1–6, then 45:36) ----
@@ -325,12 +333,12 @@ export const AYAT = {
   ],
   "91:5": [
     { ar: "والسماء", w: ["w:wa", "w:al", "w:sama"], g: { en: "and (by) the sky", ur: "اور آسمان کی" } },
-    { ar: "وما", w: ["w:wa", "w:ma"], g: { en: "and (by) the One who", ur: "اور اس کی جس نے" } },
+    { ar: "وما", w: ["w:wa", "w:ma"], note: "مَا in an oath: 'the One who' (also read 'and its building')", g: { en: "and (by) the One who", ur: "اور اس کی جس نے" } },
     { ar: "بنىها", given: true, pic: "🏗️", art: "g:skybuilt", g: { en: "built it", ur: "اسے بنایا" } },
   ],
   "91:6": [
     { ar: "والارض", w: ["w:wa", "w:al", "w:ard"], g: { en: "and (by) the earth", ur: "اور زمین کی" } },
-    { ar: "وما", w: ["w:wa", "w:ma"], g: { en: "and (by) the One who", ur: "اور اس کی جس نے" } },
+    { ar: "وما", w: ["w:wa", "w:ma"], note: "مَا in an oath: 'the One who' (also read 'and its spreading')", g: { en: "and (by) the One who", ur: "اور اس کی جس نے" } },
     { ar: "طحىها", given: true, pic: "↔️", art: "g:plain", g: { en: "spread it out", ur: "اسے بچھایا" } },
   ],
   "45:36": [
@@ -392,7 +400,7 @@ export const AYAT = {
   "15:50": [
     { ar: "وان", w: ["w:wa", "w:anna_that"], g: { en: "And that", ur: "اور یہ کہ" } },
     { ar: "عذابي", w: ["w:azab", "w:i"], g: { en: "My punishment", ur: "میرا عذاب" }, pieces: [p("عَذَاب", "punishment", "عذاب"), p("ـِي", "my", "میرا")] },
-    { ar: "هو", w: ["w:huwa"], g: { en: "it", ur: "وہی" } },
+    { ar: "هو", w: ["w:huwa"], note: "هُوَ points back to 'My punishment': it", g: { en: "it", ur: "وہی" } },
     { ar: "العذاب", w: ["w:al", "w:azab"], g: { en: "is the punishment", ur: "عذاب ہے" } },
     { ar: "الاليم", w: ["w:al", "w:alim_pain"], g: { en: "the painful", ur: "دردناک" } },
   ],
@@ -412,18 +420,18 @@ export const AYAT = {
   "35:20": [
     { ar: "ولا", w: ["w:wa", "w:la"], g: { en: "nor (are alike)", ur: "اور نہ" } },
     { ar: "الظلمت", w: ["w:al", "w:zulumat"], g: { en: "the darkness", ur: "اندھیرے" } },
-    { ar: "ولا", w: ["w:wa", "w:la"], g: { en: "and", ur: "اور نہ" } },
+    { ar: "ولا", w: ["w:wa", "w:la"], g: { en: "nor", ur: "اور نہ" } },
     { ar: "النور", w: ["w:al", "w:nur"], g: { en: "the light", ur: "روشنی" } },
   ],
   "56:95": [
     { ar: "ان", w: ["w:inna"], g: { en: "Indeed", ur: "بے شک" } },
     { ar: "هذا", w: ["w:hadha"], g: { en: "this", ur: "یہ" } },
-    { ar: "لهو", w: ["w:la_surely", "w:huwa"], g: { en: "surely it is", ur: "یقیناً یہی" } },
+    { ar: "لهو", w: ["w:la_surely", "w:huwa"], note: "لَ surely + هُوَ pointing back to 'this': it is", g: { en: "surely it is", ur: "یقیناً یہی" } },
     { ar: "حق", w: ["w:haqq"], g: { en: "the truth", ur: "حق ہے" } },
     { ar: "اليقين", given: true, pic: "✔️", art: "g:certain", g: { en: "of certainty", ur: "یقینی" } },
   ],
   "26:2": [
-    { ar: "تلك", w: ["w:tilka"], g: { en: "These", ur: "یہ" } },
+    { ar: "تلك", w: ["w:tilka"], note: "the far word تِلْكَ is said as 'these' in English and Urdu", g: { en: "These", ur: "یہ" } },
     { ar: "ءايت", w: ["w:aya"], g: { en: "are verses", ur: "آیتیں ہیں" }, pieces: [p("آيَة", "verse", "آیت"), p("ـَات", "many", "بہت سی")] },
     { ar: "الكتب", w: ["w:al", "w:kitab"], g: { en: "of the Book", ur: "کتاب کی" } },
     { ar: "المبين", w: ["w:al", "w:mubin"], g: { en: "the clear", ur: "واضح" } },
@@ -442,7 +450,7 @@ export const AYAT = {
   "37:60": [
     { ar: "ان", w: ["w:inna"], g: { en: "Indeed", ur: "بے شک" } },
     { ar: "هذا", w: ["w:hadha"], g: { en: "this", ur: "یہ" } },
-    { ar: "لهو", w: ["w:la_surely", "w:huwa"], g: { en: "surely it is", ur: "یقیناً یہی" } },
+    { ar: "لهو", w: ["w:la_surely", "w:huwa"], note: "لَ surely + هُوَ pointing back to 'this': it is", g: { en: "surely it is", ur: "یقیناً یہی" } },
     { ar: "الفوز", w: ["w:al", "w:fawz"], g: { en: "the triumph", ur: "کامیابی ہے" } },
     { ar: "العظيم", w: ["w:al", "w:azim"], g: { en: "the great", ur: "بڑی" } },
   ],
@@ -450,8 +458,8 @@ export const AYAT = {
     { ar: "فضلا", w: ["w:fadl"], g: { en: "As a bounty", ur: "فضل کے طور پر" } },
     { ar: "من", w: ["w:min"], g: { en: "from", ur: "کی طرف سے" } },
     { ar: "ربك", w: ["w:rabb", "w:ka"], g: { en: "your Lord", ur: "تمہارے رب" } },
-    { ar: "ذلك", w: ["w:dhalika"], g: { en: "That", ur: "یہی" } },
-    { ar: "هو", w: ["w:huwa"], g: { en: "is", ur: "ہے" } },
+    { ar: "ذلك", w: ["w:dhalika"], note: "the far word is said with the near word (یہ) in Urdu, as the Urdu translation does", g: { en: "That", ur: "یہی" } },
+    { ar: "هو", w: ["w:huwa"], note: "هُوَ between two parts of a sentence: 'that is'", g: { en: "is", ur: "ہے" } },
     { ar: "الفوز", w: ["w:al", "w:fawz"], g: { en: "the triumph", ur: "کامیابی" } },
     { ar: "العظيم", w: ["w:al", "w:azim"], g: { en: "the great", ur: "بڑی" } },
   ],
@@ -527,7 +535,7 @@ export const AYAT = {
     { ar: "اليم", w: ["w:alim_pain"], g: { en: "painful", ur: "دردناک" } },
   ],
   "64:15": [
-    { ar: "انما", w: ["w:inna", "w:ma"], g: { en: "Only", ur: "صرف" }, pieces: [p("إِنَّ", "indeed", "بے شک"), p("مَا", "(only)", "(صرف)")] },
+    { ar: "انما", w: ["w:inna", "w:ma"], note: "إِنَّمَا (إِنَّ + مَا) means 'only'", g: { en: "Only", ur: "صرف" }, pieces: [p("إِنَّ", "indeed", "بے شک"), p("مَا", "(only)", "(صرف)")] },
     { ar: "امولكم", w: ["w:mal", "w:kum"], g: { en: "your wealth", ur: "تمہارے مال" }, pieces: [p("أَمْوَال", "wealth (plural of مَال)", "مال (جمع)"), p("ـكُمْ", "your", "تمہارے")] },
     { ar: "واولدكم", w: ["w:wa", "w:walad", "w:kum"], g: { en: "and your children", ur: "اور تمہاری اولاد" } },
     { ar: "فتنة", w: ["w:fitna"], g: { en: "are a test", ur: "آزمائش ہیں" } },
@@ -541,7 +549,7 @@ export const AYAT = {
     { ar: "رحمة", w: ["w:rahma"], g: { en: "as a mercy", ur: "رحمت سے" } },
     { ar: "منا", w: ["w:min", "w:na"], g: { en: "from Us", ur: "ہماری طرف سے" } },
     { ar: "ومتعا", w: ["w:wa", "w:mataa"], g: { en: "and enjoyment", ur: "اور فائدہ" } },
-    { ar: "الى", w: ["w:ila"], g: { en: "for", ur: "تک" } },
+    { ar: "الى", w: ["w:ila"], note: "إِلَى with a time: until, for (a while)", g: { en: "for", ur: "تک" } },
     { ar: "حين", w: ["w:hina"], g: { en: "a while", ur: "ایک وقت" } },
   ],
 
@@ -561,7 +569,7 @@ export const AYAT = {
     { ar: "وان", w: ["w:wa", "w:inna"], g: { en: "And indeed", ur: "اور بے شک" } },
     { ar: "عليك", w: ["w:ala", "w:ka"], g: { en: "upon you is", ur: "تجھ پر" } },
     { ar: "اللعنة", w: ["w:al", "w:lana"], g: { en: "the curse", ur: "لعنت ہے" } },
-    { ar: "الى", w: ["w:ila"], g: { en: "until", ur: "تک" } },
+    { ar: "الى", w: ["w:ila"], note: "إِلَى with a time: until", g: { en: "until", ur: "تک" } },
     { ar: "يوم", w: ["w:yawm"], g: { en: "the Day", ur: "دن" } },
     { ar: "الدين", w: ["w:al", "w:din"], g: { en: "of Judgement", ur: "بدلے کے" } },
   ],
@@ -591,7 +599,7 @@ export const AYAT = {
   "56:77": [
     { ar: "انه", w: ["w:inna", "w:hu"], g: { en: "Indeed it is", ur: "بے شک یہ" } },
     { ar: "لقرءان", w: ["w:la_surely", "w:quran"], g: { en: "surely a Qur'an", ur: "یقیناً قرآن ہے" } },
-    { ar: "كريم", w: ["w:karim"], g: { en: "noble", ur: "عزت والا" } },
+    { ar: "كريم", w: ["w:karim"], note: "كَرِيم here describes the Qur'an (a noble Book), the card's everyday meaning; owner sign-off pending", g: { en: "noble", ur: "عزت والا" } },
   ],
   "26:107": [
     { ar: "اني", w: ["w:inna", "w:i"], g: { en: "Indeed I am", ur: "بے شک میں" } },
@@ -600,7 +608,7 @@ export const AYAT = {
     { ar: "امين", w: ["w:amin"], g: { en: "trustworthy", ur: "امانت دار" } },
   ],
   "26:115": [
-    { ar: "ان", w: ["w:in_if"], g: { en: "Not (here إِنْ means not)", ur: "نہیں (یہاں إِنْ کا مطلب نہیں)" } },
+    { ar: "ان", given: true, pic: "✕", art: "w:la", g: { en: "Not (here إِنْ means not)", ur: "نہیں (یہاں إِنْ کا مطلب نہیں)" } },
     { ar: "انا", w: ["w:ana"], g: { en: "am I", ur: "ہوں میں" } },
     { ar: "الا", w: ["w:illa"], g: { en: "but", ur: "مگر" } },
     { ar: "نذير", w: ["w:nadhir"], g: { en: "a warner", ur: "ڈرانے والا" } },
@@ -633,8 +641,8 @@ export const AYAT = {
     { ar: "ام", w: ["w:umm"], g: { en: "the Mother", ur: "اصل" } },
     { ar: "الكتب", w: ["w:al", "w:kitab"], g: { en: "of the Book", ur: "کتاب کی" } },
     { ar: "لدينا", w: ["w:lada", "w:na"], g: { en: "with Us", ur: "ہمارے پاس" }, pieces: [p("لَدَى", "with", "پاس"), p("ـنَا", "us", "ہمارے")] },
-    { ar: "لعلي", w: ["w:la_surely", "w:ali"], g: { en: "surely exalted", ur: "یقیناً بلند" } },
-    { ar: "حكيم", w: ["w:hakim"], g: { en: "full of wisdom", ur: "حکمت والا ہے" } },
+    { ar: "لعلي", w: ["w:la_surely", "w:ali"], note: "عَلِيّ here describes the Book (exalted), the card's everyday meaning; owner sign-off pending", g: { en: "surely exalted", ur: "یقیناً بلند" } },
+    { ar: "حكيم", given: true, pic: "🦉", art: "w:hikma", g: { en: "full of wisdom", ur: "حکمت والا ہے" } },
   ],
   "69:35": [
     { ar: "فليس", w: ["w:fa", "w:laysa"], g: { en: "So there is not", ur: "پس نہیں" } },
@@ -678,7 +686,7 @@ export const AYAT = {
   ],
   "23:4": [
     { ar: "والذين", w: ["w:wa", "w:alladhina"], g: { en: "And those who", ur: "اور وہ جو" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ" } },
+    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ (سب)" } },
     { ar: "للزكوة", w: ["w:li", "w:al", "w:zakah"], g: { en: "zakah", ur: "زکوٰۃ" } },
     { ar: "فعلون", w: ["w:fail"], g: { en: "are doers of", ur: "ادا کرنے والے ہیں" }, pieces: [p("فَاعِل", "doer", "کرنے والا"), p("ـُونَ", "many", "بہت سے")] },
   ],
@@ -687,7 +695,7 @@ export const AYAT = {
   "19:57": [
     { ar: "ورفعنه", w: ["w:wa", "w:rafaa", "w:na", "w:hu"], g: { en: "And We raised him", ur: "اور ہم نے اسے اٹھایا" }, pieces: [p("وَ", "and", "اور"), p("رَفَعْ", "raise (did)", "اٹھایا"), p("ـنَا", "we", "ہم نے"), p("ـهُ", "him", "اسے")] },
     { ar: "مكانا", w: ["w:makan"], g: { en: "to a place", ur: "ایک مقام پر" } },
-    { ar: "عليا", w: ["w:ali"], g: { en: "high", ur: "بلند" } },
+    { ar: "عليا", w: ["w:ali"], note: "عَلِيّ here describes a place (high), the card's everyday meaning; owner sign-off pending", g: { en: "high", ur: "بلند" } },
   ],
   "26:88": [
     { ar: "يوم", w: ["w:yawm"], g: { en: "The Day", ur: "جس دن" } },
@@ -746,13 +754,13 @@ export const AYAT = {
     { ar: "فسجد", w: ["w:fa", "w:sajada"], g: { en: "So … bowed down", ur: "تو سجدہ کیا" } },
     { ar: "الملئكة", w: ["w:al", "w:malak"], g: { en: "the angels", ur: "فرشتوں نے" } },
     { ar: "كلهم", w: ["w:kull", "w:hum"], g: { en: "all of them", ur: "سب نے" } },
-    { ar: "اجمعون", w: ["w:ajma"], g: { en: "together", ur: "اکٹھے" } },
+    { ar: "اجمعون", w: ["w:ajma"], note: "أَجْمَعُونَ: all of them, together", g: { en: "together", ur: "اکٹھے" } },
   ],
   "37:78": [
     { ar: "وتركنا", w: ["w:wa", "w:taraka", "w:na"], g: { en: "And We left", ur: "اور ہم نے چھوڑا" }, pieces: [p("وَ", "and", "اور"), p("تَرَكْ", "leave (did)", "چھوڑا"), p("ـنَا", "we", "ہم نے")] },
-    { ar: "عليه", w: ["w:ala", "w:hu"], g: { en: "for him", ur: "اس کے لیے" } },
+    { ar: "عليه", w: ["w:ala", "w:hu"], note: "عَلَى with تَرَكْنَا: (We left) for him", g: { en: "for him", ur: "اس کے لیے" } },
     { ar: "في", w: ["w:fi"], g: { en: "among", ur: "میں" } },
-    { ar: "الاخرين", w: ["w:al", "w:akhir"], g: { en: "the later people", ur: "بعد والوں" } },
+    { ar: "الاخرين", w: ["w:al", "w:akhir"], note: "آخِر in the plural: the later people", g: { en: "the later people", ur: "بعد والوں" } },
   ],
   "20:34": [
     { ar: "ونذكرك", w: ["w:wa", "w:dhakara", "w:ka"], g: { en: "and remember You", ur: "اور تجھے یاد کریں" }, pieces: [p("وَ", "and", "اور"), p("نَذْكُرَ", "we remember", "ہم یاد کریں"), p("ـكَ", "you", "تجھے")] },
@@ -777,7 +785,7 @@ export const AYAT = {
   ],
   "76:3": [
     { ar: "انا", w: ["w:inna", "w:na"], g: { en: "Indeed We", ur: "بے شک ہم نے" } },
-    { ar: "هدينه", w: ["w:ihdi", "w:na", "w:hu"], g: { en: "showed him", ur: "اسے دکھایا" }, pieces: [p("هَدَيْ", "guide (did)", "راہ دکھائی"), p("ـنَا", "we", "ہم نے"), p("ـهُ", "him", "اسے")] },
+    { ar: "هدينه", w: ["w:ihdi", "w:na", "w:hu"], note: "هَدَى guide: 'We showed him (the way)'", g: { en: "showed him", ur: "اسے دکھایا" }, pieces: [p("هَدَيْ", "guide (did)", "راہ دکھائی"), p("ـنَا", "we", "ہم نے"), p("ـهُ", "him", "اسے")] },
     { ar: "السبيل", w: ["w:al", "w:sabil"], g: { en: "the way", ur: "راستہ" } },
     { ar: "اما", w: ["w:imma"], g: { en: "either", ur: "یا تو" } },
     { ar: "شاكرا", w: ["w:shakir"], g: { en: "grateful", ur: "شکر گزار" } },
@@ -852,12 +860,12 @@ export const AYAT = {
   "56:2": [
     { ar: "ليس", w: ["w:laysa"], g: { en: "There is not", ur: "نہیں ہے" } },
     { ar: "لوقعتها", given: true, pic: "💥", art: "w:waqi", g: { en: "about its happening", ur: "اس کے واقع ہونے کو" } },
-    { ar: "كاذبة", w: ["w:kadhib"], g: { en: "any denying (it is a lie)", ur: "کوئی جھٹلانے والا" } },
+    { ar: "كاذبة", w: ["w:kadhib"], note: "كَاذِبَة: no one (no soul) calling it a lie", g: { en: "any denying (it is a lie)", ur: "کوئی جھٹلانے والا" } },
   ],
 
   // ---- Wing 3 · Doing Words 5 ----
   "37:41": [
-    { ar: "اولئك", w: ["w:ulaika"], g: { en: "Those", ur: "یہی لوگ" } },
+    { ar: "اولئك", w: ["w:ulaika"], note: "the far word is said with the near word (یہ) in Urdu, as the Urdu translation does", g: { en: "Those", ur: "یہی لوگ" } },
     { ar: "لهم", w: ["w:li", "w:hum"], g: { en: "will have", ur: "ان کے لیے" } },
     { ar: "رزق", w: ["w:rizq"], g: { en: "a provision", ur: "رزق ہے" } },
     { ar: "معلوم", w: ["w:malum"], g: { en: "well-known", ur: "معلوم" } },
@@ -877,7 +885,7 @@ export const AYAT = {
     { ar: "للبث", w: ["w:la_surely", "w:labitha"], g: { en: "he would have stayed", ur: "تو وہ ضرور رہتا" } },
     { ar: "في", w: ["w:fi"], g: { en: "in", ur: "میں" } },
     { ar: "بطنه", w: ["w:batn", "w:hu"], g: { en: "its belly", ur: "اس کے پیٹ" } },
-    { ar: "الى", w: ["w:ila"], g: { en: "until", ur: "تک" } },
+    { ar: "الى", w: ["w:ila"], note: "إِلَى with a time: until", g: { en: "until", ur: "تک" } },
     { ar: "يوم", w: ["w:yawm"], g: { en: "the Day", ur: "اس دن" } },
     { ar: "يبعثون", w: ["w:yubathun"], g: { en: "they are raised up", ur: "جب وہ اٹھائے جائیں گے" } },
   ],
@@ -889,7 +897,7 @@ export const AYAT = {
   ],
   "88:11": [
     { ar: "لا", w: ["w:la"], g: { en: "Not", ur: "نہیں" } },
-    { ar: "تسمع", w: ["w:samia"], g: { en: "will you hear", ur: "سنے گا" } },
+    { ar: "تسمع", w: ["w:samia"], g: { en: "will you hear", ur: "تو سنے گا" } },
     { ar: "فيها", w: ["w:fi", "w:ha"], g: { en: "in it", ur: "اس میں" } },
     { ar: "لغية", given: true, pic: "🔇", art: "g:idletalk", g: { en: "any idle talk", ur: "کوئی بے ہودہ بات" } },
   ],
@@ -903,20 +911,20 @@ export const AYAT = {
   ],
   "37:172": [
     { ar: "انهم", w: ["w:inna", "w:hum"], g: { en: "Indeed they", ur: "بے شک وہی" } },
-    { ar: "لهم", w: ["w:li", "w:hum"], g: { en: "surely they", ur: "یقیناً وہ" } },
+    { ar: "لهم", w: ["w:la_surely", "w:humu"], g: { en: "surely they", ur: "یقیناً وہ" }, pieces: [p("لَ", "surely", "یقیناً"), p("هُمُ", "they", "وہ (سب)")] },
     { ar: "المنصورون", w: ["w:al", "w:mansur"], g: { en: "are the ones helped", ur: "مدد کیے جانے والے ہیں" } },
   ],
   "50:34": [
     { ar: "ادخلوها", w: ["w:dakhala", "w:ha"], g: { en: "Enter it", ur: "اس میں داخل ہو جاؤ" }, pieces: [p("ادْخُلُو", "go in! (all of you)", "داخل ہو جاؤ"), p("ـهَا", "it", "اس میں")] },
     { ar: "بسلم", w: ["w:bi", "w:salam"], g: { en: "in peace", ur: "سلامتی کے ساتھ" } },
-    { ar: "ذلك", w: ["w:dhalika"], g: { en: "That is", ur: "یہ ہے" } },
+    { ar: "ذلك", w: ["w:dhalika"], note: "the far word is said with the near word (یہ) in Urdu, as the Urdu translation does", g: { en: "That is", ur: "یہ ہے" } },
     { ar: "يوم", w: ["w:yawm"], g: { en: "the Day", ur: "دن" } },
     { ar: "الخلود", w: ["w:al", "w:khulud"], g: { en: "of lasting forever", ur: "ہمیشگی کا" } },
   ],
   "80:18": [
-    { ar: "من", w: ["w:min"], g: { en: "From", ur: "کس" } },
-    { ar: "اي", w: ["w:ayyu"], g: { en: "what", ur: "کس" } },
-    { ar: "شيء", w: ["w:shay"], g: { en: "thing", ur: "چیز سے" } },
+    { ar: "من", w: ["w:min"], g: { en: "From", ur: "سے" } },
+    { ar: "اي", w: ["w:ayyu"], note: "أَيّ before a noun: which / what (thing)", g: { en: "what", ur: "کس" } },
+    { ar: "شيء", w: ["w:shay"], g: { en: "thing", ur: "چیز" } },
     { ar: "خلقه", w: ["w:khalaqa", "w:hu"], g: { en: "did He create him?", ur: "اسے پیدا کیا؟" } },
   ],
   "104:3": [
@@ -956,9 +964,9 @@ export const AYAT = {
   ],
   "37:119": [
     { ar: "وتركنا", w: ["w:wa", "w:taraka", "w:na"], g: { en: "And We left", ur: "اور ہم نے چھوڑا" } },
-    { ar: "عليهما", w: ["w:ala", "w:huma_end"], g: { en: "for them both", ur: "ان دونوں کے لیے" } },
+    { ar: "عليهما", w: ["w:ala", "w:huma_end"], note: "عَلَى with تَرَكْنَا: (We left) for them both", g: { en: "for them both", ur: "ان دونوں کے لیے" } },
     { ar: "في", w: ["w:fi"], g: { en: "among", ur: "میں" } },
-    { ar: "الاخرين", w: ["w:al", "w:akhir"], g: { en: "the later people", ur: "بعد والوں" } },
+    { ar: "الاخرين", w: ["w:al", "w:akhir"], note: "آخِر in the plural: the later people", g: { en: "the later people", ur: "بعد والوں" } },
   ],
   "55:13": [
     { ar: "فباي", w: ["w:fa", "w:bi", "w:ayyu"], g: { en: "So which", ur: "تو کون کون سی" } },
@@ -971,7 +979,7 @@ export const AYAT = {
     { ar: "القمر", w: ["w:al", "w:qamar"], g: { en: "the moon", ur: "چاند کو" } },
     { ar: "فيهن", w: ["w:fi", "w:hunna_end"], g: { en: "within them", ur: "ان میں" }, pieces: [p("فِي", "in", "میں"), p("ـهِنَّ", "them (many, feminine)", "ان (سب)")] },
     { ar: "نورا", w: ["w:nur"], g: { en: "a light", ur: "روشنی" } },
-    { ar: "وجعل", w: ["w:wa", "w:jaala"], g: { en: "and made", ur: "اور بنایا" } },
+    { ar: "وجعل", w: ["w:wa", "w:jaala"], g: { en: "and He made", ur: "اور بنایا" } },
     { ar: "الشمس", w: ["w:al", "w:shams"], g: { en: "the sun", ur: "سورج کو" } },
     { ar: "سراجا", given: true, pic: "🪔", art: "g:siraj", g: { en: "a lamp", ur: "چراغ" } },
   ],
@@ -996,7 +1004,7 @@ export const AYAT = {
   "51:5": [
     { ar: "انما", w: ["w:inna", "w:ma"], g: { en: "Indeed what", ur: "بے شک جس کا" } },
     { ar: "توعدون", w: ["w:waada"], g: { en: "you are promised", ur: "تم سے وعدہ کیا جاتا ہے" }, pieces: [p("تُو", "you … are (passive)", "تم سے … کیا جاتا ہے"), p("عَدُ", "promise", "وعدہ"), p("ـُونَ", "all of you", "تم سب")] },
-    { ar: "لصادق", w: ["w:la_surely", "w:sadiq"], g: { en: "is surely true", ur: "ضرور سچ ہے" } },
+    { ar: "لصادق", w: ["w:la_surely", "w:sadiq"], note: "صَادِق said of a promise: true", g: { en: "is surely true", ur: "ضرور سچ ہے" } },
   ],
   "51:6": [
     { ar: "وان", w: ["w:wa", "w:inna"], g: { en: "And indeed", ur: "اور بے شک" } },
@@ -1030,7 +1038,7 @@ export const AYAT = {
   ],
   "70:33": [
     { ar: "والذين", w: ["w:wa", "w:alladhina"], g: { en: "And those who", ur: "اور وہ جو" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ" } },
+    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ (سب)" } },
     { ar: "بشهدتهم", w: ["w:bi", "w:shahada", "w:hum"], g: { en: "in their testimonies", ur: "اپنی گواہیوں پر" } },
     { ar: "قائمون", w: ["w:qaim"], g: { en: "stand firm", ur: "قائم رہتے ہیں" } },
   ],
@@ -1044,7 +1052,7 @@ export const AYAT = {
   ],
   "26:69": [
     { ar: "واتل", w: ["w:wa", "w:tala"], g: { en: "And recite", ur: "اور سناؤ" }, pieces: [p("وَ", "and", "اور"), p("اتْلُ", "recite! (the last letter has dropped)", "تلاوت کرو (آخری حرف گر گیا)")] },
-    { ar: "عليهم", w: ["w:ala", "w:hum"], g: { en: "to them", ur: "انہیں" } },
+    { ar: "عليهم", w: ["w:ala", "w:hum"], note: "عَلَى with اُتْلُ: (recite) to them", g: { en: "to them", ur: "انہیں" } },
     { ar: "نبا", w: ["w:naba"], g: { en: "the news", ur: "خبر" } },
     { ar: "ابرهيم", w: ["w:ibrahim"], g: { en: "of Ibrahim", ur: "ابراہیم کی" } },
   ],
@@ -1074,7 +1082,7 @@ export const AYAT = {
     { ar: "ممدود", w: ["w:mamdud"], g: { en: "spread wide", ur: "پھیلا ہوا" } },
   ],
   "82:6": [
-    { ar: "يايها", w: ["w:ya", "w:ayyu"], g: { en: "O", ur: "اے" } },
+    { ar: "يايها", w: ["w:ya", "w:ayyu"], art: "w:ya", note: "يَا أَيُّهَا is one call, 'O'; أَيّ is not a question here", g: { en: "O", ur: "اے" } },
     { ar: "الانسن", w: ["w:al", "w:insan"], g: { en: "human being", ur: "انسان" } },
     { ar: "ما", w: ["w:ma"], g: { en: "what", ur: "کس چیز نے" } },
     { ar: "غرك", w: ["w:gharra", "w:ka"], g: { en: "has deceived you", ur: "تجھے دھوکے میں ڈالا" }, pieces: [p("غَرَّ", "deceive (did) — رّ is the doubled letter", "دھوکا دیا — رّ دوہرا حرف"), p("ـكَ", "you", "تجھے")] },
@@ -1087,7 +1095,7 @@ export const AYAT = {
     { ar: "مدت", w: ["w:madda"], g: { en: "is stretched out", ur: "پھیلا دی جائے گی" }, pieces: [p("مُدَّ", "was stretched (passive)", "پھیلائی گئی"), p("ـتْ", "she (the earth)", "وہ")] },
   ],
   "74:12": [
-    { ar: "وجعلت", w: ["w:wa", "w:jaala", "w:i"], g: { en: "And I gave", ur: "اور میں نے دیا" } },
+    { ar: "وجعلت", w: ["w:wa", "w:jaala", "w:i"], note: "جَعَلَ لَهُ: made for him, gave him", g: { en: "And I gave", ur: "اور میں نے دیا" } },
     { ar: "له", w: ["w:li", "w:hu"], g: { en: "him", ur: "اسے" } },
     { ar: "مالا", w: ["w:mal"], g: { en: "wealth", ur: "مال" } },
     { ar: "ممدودا", w: ["w:mamdud"], g: { en: "spread wide", ur: "بہت سا" } },
@@ -1109,7 +1117,7 @@ export const AYAT = {
     { ar: "اني", w: ["w:inna", "w:i"], g: { en: "Indeed I", ur: "بے شک میں" } },
     { ar: "امنت", w: ["w:amana", "w:i"], g: { en: "have believed", ur: "ایمان لایا" }, pieces: [p("آمَنْ", "believe (did) — آ is two hamzas joined", "ایمان لایا — آ میں دو ہمزے"), p("ـتُ", "I", "میں")] },
     { ar: "بربكم", w: ["w:bi", "w:rabb", "w:kum"], g: { en: "in your Lord", ur: "تمہارے رب پر" } },
-    { ar: "فاسمعون", w: ["w:fa", "w:samia", "w:i"], g: { en: "so listen to me", ur: "تو میری سنو" } },
+    { ar: "فاسمعون", w: ["w:fa", "w:samia", "w:i"], note: "سَمِعَ as a command: listen (to me)", g: { en: "so listen to me", ur: "تو میری سنو" } },
   ],
   "37:111": [
     { ar: "انه", w: ["w:inna", "w:hu"], g: { en: "Indeed he", ur: "بے شک وہ" } },
@@ -1137,7 +1145,7 @@ export const AYAT = {
   ],
   "88:21": [
     { ar: "فذكر", w: ["w:fa", "w:dhakkara"], g: { en: "So remind!", ur: "تو نصیحت کیجیے" }, pieces: [p("فَ", "so", "تو"), p("ذَكِّرْ", "remind! — ذَكَرَ remember + the doubled كّ", "یاد دلاؤ — ذَكَرَ یاد کرنا + دوہرا كّ")] },
-    { ar: "انما", w: ["w:inna", "w:ma"], g: { en: "you are only", ur: "بس" } },
+    { ar: "انما", w: ["w:inna", "w:ma"], note: "إِنَّمَا (إِنَّ + مَا) means 'only'", g: { en: "you are only", ur: "بس" } },
     { ar: "انت", w: ["w:anta"], g: { en: "you", ur: "آپ" } },
     { ar: "مذكر", w: ["w:mudhakkir"], g: { en: "one who reminds", ur: "نصیحت کرنے والے ہیں" } },
   ],
@@ -1198,7 +1206,7 @@ export const AYAT = {
   "37:148": [
     { ar: "فامنوا", w: ["w:fa", "w:amana", "w:hum"], g: { en: "Then they believed", ur: "پھر وہ ایمان لائے" } },
     { ar: "فمتعنهم", w: ["w:fa", "w:mattaa", "w:na", "w:hum"], g: { en: "so We let them enjoy (life)", ur: "تو ہم نے انہیں فائدہ اٹھانے دیا" } },
-    { ar: "الى", w: ["w:ila"], g: { en: "until", ur: "تک" } },
+    { ar: "الى", w: ["w:ila"], note: "إِلَى with a time: until", g: { en: "until", ur: "تک" } },
     { ar: "حين", w: ["w:hina"], g: { en: "a time", ur: "ایک مدت" } },
   ],
   "26:170": [
@@ -1227,7 +1235,7 @@ export const AYAT = {
   ],
   "69:20": [
     { ar: "اني", w: ["w:inna", "w:i"], g: { en: "Indeed I", ur: "بے شک میں" } },
-    { ar: "ظننت", w: ["w:zanna", "w:i"], g: { en: "was sure", ur: "یقین رکھتا تھا" } },
+    { ar: "ظننت", w: ["w:zanna", "w:i"], note: "ظَنَّ can mean being sure: I was sure", g: { en: "was sure", ur: "یقین رکھتا تھا" } },
     { ar: "اني", w: ["w:anna_that", "w:i"], g: { en: "that I", ur: "کہ میں" } },
     { ar: "ملق", w: ["w:mulaqi"], g: { en: "would meet", ur: "ملنے والا ہوں" } },
     { ar: "حسابيه", w: ["w:hisab", "w:i"], g: { en: "my account", ur: "اپنے حساب سے" } },
@@ -1252,12 +1260,12 @@ export const AYAT = {
   "29:6": [
     { ar: "ومن", w: ["w:wa", "w:man"], g: { en: "And whoever", ur: "اور جو" } },
     { ar: "جهد", w: ["w:jaahada"], g: { en: "strives", ur: "جدوجہد کرتا ہے" } },
-    { ar: "فانما", w: ["w:fa", "w:inna", "w:ma"], g: { en: "only", ur: "تو بس" } },
+    { ar: "فانما", w: ["w:fa", "w:inna", "w:ma"], note: "إِنَّمَا (إِنَّ + مَا) means 'only'", g: { en: "only", ur: "تو بس" } },
     { ar: "يجهد", w: ["w:jaahada"], g: { en: "strives", ur: "جدوجہد کرتا ہے" } },
     { ar: "لنفسه", w: ["w:li", "w:nafs", "w:hu"], g: { en: "for himself", ur: "اپنے ہی لیے" } },
     { ar: "ان", w: ["w:inna"], g: { en: "Indeed", ur: "بے شک" } },
     { ar: "الله", w: ["w:allah"], g: { en: "Allah", ur: "اللہ" } },
-    { ar: "لغني", given: true, pic: "💎", medal: "غَنِيّ", g: { en: "surely needs nothing", ur: "ضرور بے نیاز ہے" } },
+    { ar: "لغني", given: true, pic: "💎", medal: "غَنِيّ", ofAllah: true, g: { en: "surely needs nothing", ur: "ضرور بے نیاز ہے" } },
     { ar: "عن", w: ["w:an"], g: { en: "from", ur: "سے" } },
     { ar: "العلمين", w: ["w:al", "w:alam"], g: { en: "the worlds", ur: "تمام جہانوں" } },
   ],
@@ -1290,12 +1298,12 @@ export const AYAT = {
     { ar: "الصلحين", w: ["w:al", "w:salih"], g: { en: "the righteous", ur: "نیک لوگوں" } },
   ],
   "20:32": [
-    { ar: "واشركه", w: ["w:wa", "w:ashraka", "w:hu"], g: { en: "and make him share", ur: "اور اسے شریک کر دے" }, pieces: [p("وَ", "and", "اور"), p("أَشْرِكْ", "make share! — شَرِيك partner + أَ: make a partner", "شریک کر — شَرِيك ساتھی + أَ: ساتھی بنانا"), p("ـهُ", "him", "اسے")] },
+    { ar: "واشركه", w: ["w:wa", "w:ashraka", "w:hu"], note: "أَشْرَكَ: give a share; here Musa asks that Harun share his task", g: { en: "and make him share", ur: "اور اسے شریک کر دے" }, pieces: [p("وَ", "and", "اور"), p("أَشْرِكْ", "make share! — شَرِيك partner + أَ: make a partner", "شریک کر — شَرِيك ساتھی + أَ: ساتھی بنانا"), p("ـهُ", "him", "اسے")] },
     { ar: "في", w: ["w:fi"], g: { en: "in", ur: "میں" } },
     { ar: "امري", w: ["w:amr", "w:i"], g: { en: "my task", ur: "میرے کام" } },
   ],
   "37:110": [
-    { ar: "كذلك", w: ["w:ka_like", "w:hadha"], g: { en: "Like this", ur: "اسی طرح" } },
+    { ar: "كذلك", w: ["w:ka_like", "w:dhalika"], g: { en: "Like that", ur: "اسی طرح" } },
     { ar: "نجزي", w: ["w:jazaa_v"], g: { en: "We reward", ur: "ہم بدلہ دیتے ہیں" } },
     { ar: "المحسنين", w: ["w:al", "w:muhsin"], g: { en: "those who do good", ur: "نیکی کرنے والوں کو" } },
   ],
@@ -1307,7 +1315,7 @@ export const AYAT = {
 
   // ---- Wing 5 · Make-It Verbs 2 ----
   "23:1": [
-    { ar: "قد", w: ["w:qad"], g: { en: "Certainly", ur: "یقیناً" } },
+    { ar: "قد", w: ["w:qad"], note: "قَدْ before a past verb: certainly, already", g: { en: "Certainly", ur: "یقیناً" } },
     { ar: "افلح", w: ["w:aflaha"], g: { en: "have succeeded", ur: "کامیاب ہو گئے" } },
     { ar: "المؤمنون", w: ["w:al", "w:mumin"], g: { en: "the believers", ur: "ایمان والے" } },
   ],
@@ -1334,7 +1342,7 @@ export const AYAT = {
     { ar: "الاخرين", w: ["w:al", "w:akhar"], g: { en: "the others", ur: "دوسروں کو" } },
   ],
   "37:72": [
-    { ar: "ولقد", w: ["w:wa", "w:la_surely", "w:qad"], g: { en: "And certainly", ur: "اور یقیناً" } },
+    { ar: "ولقد", w: ["w:wa", "w:la_surely", "w:qad"], note: "لَقَدْ: certainly (لَ surely + قَدْ)", g: { en: "And certainly", ur: "اور یقیناً" } },
     { ar: "ارسلنا", w: ["w:arsala", "w:na"], g: { en: "We sent", ur: "ہم نے بھیجے" } },
     { ar: "فيهم", w: ["w:fi", "w:hum"], g: { en: "among them", ur: "ان میں" } },
     { ar: "منذرين", w: ["w:mundhir"], g: { en: "warners", ur: "ڈرانے والے" } },
@@ -1363,7 +1371,7 @@ export const AYAT = {
   // ---- Wing 5 · Make-It Verbs 3 ----
   "53:44": [
     { ar: "وانه", w: ["w:wa", "w:anna_that", "w:hu"], g: { en: "And that it is He", ur: "اور یہ کہ وہی" } },
-    { ar: "هو", w: ["w:huwa"], g: { en: "who", ur: "ہے جس نے" } },
+    { ar: "هو", w: ["w:huwa"], note: "هُوَ for stress: 'it is He who'", g: { en: "who", ur: "ہے جس نے" } },
     { ar: "امات", w: ["w:amata"], g: { en: "causes death", ur: "موت دی" }, pieces: [p("أَمَاتَ", "cause to die — مَاتَ die + أَ in front", "موت دی — مَاتَ مرنا + آگے أَ")] },
     { ar: "واحيا", w: ["w:wa", "w:ahya"], g: { en: "and gives life", ur: "اور زندگی دی" } },
   ],
@@ -1380,23 +1388,23 @@ export const AYAT = {
     { ar: "ترحمون", w: ["w:rahima", "w:kum"], g: { en: "receive mercy", ur: "رحم کیا جائے" } },
   ],
   "44:30": [
-    { ar: "ولقد", w: ["w:wa", "w:la_surely", "w:qad"], g: { en: "And certainly", ur: "اور یقیناً" } },
+    { ar: "ولقد", w: ["w:wa", "w:la_surely", "w:qad"], note: "لَقَدْ: certainly (لَ surely + قَدْ)", g: { en: "And certainly", ur: "اور یقیناً" } },
     { ar: "نجينا", w: ["w:najja", "w:na"], g: { en: "We saved", ur: "ہم نے بچا لیا" } },
-    { ar: "بني", w: ["w:ibn"], g: { en: "the Children", ur: "بنی" } },
+    { ar: "بني", w: ["w:ibn"], note: "بَنِي: sons of = the Children (of Israil)", g: { en: "the Children", ur: "بنی" } },
     { ar: "اسرءيل", w: ["w:israil"], g: { en: "of Israel", ur: "اسرائیل کو" } },
     { ar: "من", w: ["w:min"], g: { en: "from", ur: "سے" } },
     { ar: "العذاب", w: ["w:al", "w:azab"], g: { en: "the punishment", ur: "عذاب" } },
     { ar: "المهين", w: ["w:al", "w:muhin"], g: { en: "that humiliated", ur: "ذلت والے" } },
   ],
   "37:75": [
-    { ar: "ولقد", w: ["w:wa", "w:la_surely", "w:qad"], g: { en: "And certainly", ur: "اور یقیناً" } },
+    { ar: "ولقد", w: ["w:wa", "w:la_surely", "w:qad"], note: "لَقَدْ: certainly (لَ surely + قَدْ)", g: { en: "And certainly", ur: "اور یقیناً" } },
     { ar: "نادىنا", w: ["w:naada", "w:na"], g: { en: "called on Us", ur: "ہمیں پکارا" } },
     { ar: "نوح", w: ["w:nuh"], g: { en: "Nuh", ur: "نوح نے" } },
     { ar: "فلنعم", w: ["w:fa", "w:la_surely", "w:nima"], g: { en: "and how excellent", ur: "تو کیا ہی خوب" } },
-    { ar: "المجيبون", w: ["w:al", "w:mujib"], g: { en: "We are in answering", ur: "قبول کرنے والے ہیں ہم" } },
+    { ar: "المجيبون", w: ["w:al", "w:mujib"], ofAllah: true, g: { en: "We are in answering", ur: "قبول کرنے والے ہیں ہم" } },
   ],
   "8:3": [
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "Those who", ur: "وہ جو" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "Those who", ur: "وہ جو" } },
     { ar: "يقيمون", w: ["w:aqama", "w:hum"], g: { en: "keep up", ur: "قائم رکھتے ہیں" }, pieces: [p("يُقِيمُ", "keep up (now) — قَامَ stand + the أَ mould: make it stand", "قائم رکھتا ہے — قَامَ کھڑا ہونا + أَ کا سانچا: کھڑا کرنا"), p("ـونَ", "they", "وہ")] },
     { ar: "الصلوة", w: ["w:al", "w:salah"], g: { en: "the prayer", ur: "نماز" } },
     { ar: "ومما", w: ["w:wa", "w:min", "w:ma"], g: { en: "and from what", ur: "اور جو کچھ" } },
@@ -1424,7 +1432,7 @@ export const AYAT = {
     { ar: "لها", w: ["w:li", "w:ha"], g: { en: "her (the earth)", ur: "اسے (زمین کو)" } },
   ],
   "20:56": [
-    { ar: "ولقد", w: ["w:wa", "w:la_surely", "w:qad"], g: { en: "And certainly", ur: "اور یقیناً" } },
+    { ar: "ولقد", w: ["w:wa", "w:la_surely", "w:qad"], note: "لَقَدْ: certainly (لَ surely + قَدْ)", g: { en: "And certainly", ur: "اور یقیناً" } },
     { ar: "اريناه", w: ["w:ara", "w:na", "w:hu"], g: { en: "We showed him", ur: "ہم نے اسے دکھائیں" }, pieces: [p("أَرَيْ", "show (did) — رَأَى see + أَ: make see", "دکھایا — رَأَى دیکھنا + أَ: دکھانا"), p("ـنَا", "We", "ہم نے"), p("ـهُ", "him", "اسے")] },
     { ar: "ايتنا", w: ["w:aya", "w:na"], g: { en: "Our signs", ur: "اپنی نشانیاں" } },
     { ar: "كلها", w: ["w:kull", "w:ha"], g: { en: "all of them", ur: "سب کی سب" } },
@@ -1458,7 +1466,7 @@ export const AYAT = {
     { ar: "ما", w: ["w:ma"], g: { en: "Not", ur: "نہیں" } },
     { ar: "اريد", w: ["w:arada"], g: { en: "do I want", ur: "میں چاہتا" } },
     { ar: "منهم", w: ["w:min", "w:hum"], g: { en: "from them", ur: "ان سے" } },
-    { ar: "من", w: ["w:min"], g: { en: "any", ur: "کوئی" } },
+    { ar: "من", w: ["w:min"], note: "مِنْ after 'not': any (at all)", g: { en: "any", ur: "کوئی" } },
     { ar: "رزق", w: ["w:rizq"], g: { en: "provision", ur: "رزق" } },
     { ar: "وما", w: ["w:wa", "w:ma"], g: { en: "and not", ur: "اور نہ" } },
     { ar: "اريد", w: ["w:arada"], g: { en: "do I want", ur: "میں چاہتا ہوں" } },
@@ -1489,7 +1497,7 @@ export const AYAT = {
   ],
   "30:14": [
     { ar: "ويوم", w: ["w:wa", "w:yawm"], g: { en: "And on the Day", ur: "اور جس دن" } },
-    { ar: "تقوم", w: ["w:qama"], g: { en: "will be established", ur: "قائم ہو گی" } },
+    { ar: "تقوم", w: ["w:qama"], note: "قَامَ said of the Hour: is established, comes", g: { en: "will be established", ur: "قائم ہو گی" } },
     { ar: "الساعة", w: ["w:al", "w:saa"], g: { en: "the Hour", ur: "قیامت" } },
     { ar: "يومىذ", w: ["w:yawm", "w:idh"], g: { en: "that Day", ur: "اس دن" } },
     { ar: "يتفرقون", w: ["w:tafarraqa", "w:hum"], g: { en: "they will be split apart", ur: "وہ الگ الگ ہو جائیں گے" }, pieces: [p("يَتَفَرَّقُ", "split up — فَرِيق group, تَفَعَّلَ: become groups", "الگ ہوتے ہیں — فَرِيق گروہ، تَفَعَّلَ: گروہ گروہ ہو جانا"), p("ـونَ", "they", "وہ")] },
@@ -1518,7 +1526,7 @@ export const AYAT = {
     { ar: "الرحيم", w: ["w:al", "w:rahim"], g: { en: "the Most Merciful", ur: "نہایت رحم والے" } },
   ],
   "16:42": [
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "Those who", ur: "جنہوں نے" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "Those who", ur: "جنہوں نے" } },
     { ar: "صبروا", w: ["w:sabara", "w:hum"], g: { en: "were patient", ur: "صبر کیا" } },
     { ar: "وعلى", w: ["w:wa", "w:ala"], g: { en: "and upon", ur: "اور پر" } },
     { ar: "ربهم", w: ["w:rabb", "w:hum"], g: { en: "their Lord", ur: "اپنے رب" } },
@@ -1536,16 +1544,16 @@ export const AYAT = {
     { ar: "بما", w: ["w:bi", "w:ma"], g: { en: "what", ur: "اس کی جو" } },
     { ar: "اتينهم", w: ["w:ata_give", "w:na", "w:hum"], g: { en: "We gave them", ur: "ہم نے انہیں دیا" } },
     { ar: "فتمتعوا", w: ["w:fa", "w:tamattaa", "w:kum"], g: { en: "So enjoy yourselves", ur: "تو مزے کر لو" } },
-    { ar: "فسوف", w: ["w:fa", "w:sawfa"], g: { en: "for soon", ur: "پھر جلد ہی" } },
+    { ar: "فسوف", w: ["w:fa", "w:sawfa"], g: { en: "for later on", ur: "پھر آگے چل کر" } },
     { ar: "تعلمون", w: ["w:alima", "w:kum"], g: { en: "you will know", ur: "تم جان لو گے" } },
   ],
   "3:82": [
     { ar: "فمن", w: ["w:fa", "w:man"], g: { en: "So whoever", ur: "تو جو کوئی" } },
     { ar: "تولى", w: ["w:tawalla"], g: { en: "turns away", ur: "منہ موڑے" }, pieces: [p("تَوَلَّى", "turned away — وَلَّى turn + تَ: turn yourself away", "منہ موڑا — وَلَّى پھیرنا + تَ: خود کو پھیر لینا")] },
     { ar: "بعد", w: ["w:bada"], g: { en: "after", ur: "بعد" } },
-    { ar: "ذلك", w: ["w:hadha"], g: { en: "that", ur: "اس کے" } },
-    { ar: "فاولىك", w: ["w:fa", "w:hadha"], g: { en: "then those", ur: "تو وہی لوگ" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "they are", ur: "وہ" } },
+    { ar: "ذلك", w: ["w:dhalika"], g: { en: "that", ur: "اس کے" } },
+    { ar: "فاولىك", w: ["w:fa", "w:ulaika"], g: { en: "then those", ur: "تو وہی لوگ" } },
+    { ar: "هم", w: ["w:humu"], g: { en: "they are", ur: "وہ (سب)" } },
     { ar: "الفسقون", w: ["w:al", "w:fasiq"], g: { en: "the disobedient", ur: "نافرمان ہیں" } },
   ],
   "92:16": [
@@ -1554,7 +1562,7 @@ export const AYAT = {
     { ar: "وتولى", w: ["w:wa", "w:tawalla"], g: { en: "and turned away", ur: "اور منہ موڑا" } },
   ],
   "16:32": [
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "Those whom", ur: "جن کی" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "Those whom", ur: "جن کی" } },
     { ar: "تتوفىهم", w: ["w:tawaffa", "w:hum"], g: { en: "take in death", ur: "روح قبض کرتے ہیں" }, pieces: [p("تَتَوَفَّى", "take in full — وَفَّى pay in full + تَ: take it in full", "پوری لے لیتے ہیں — وَفَّى پورا دینا + تَ: پورا لے لینا"), p("ـهُمُ", "them", "ان کی")] },
     { ar: "الملىكة", w: ["w:al", "w:malak"], g: { en: "the angels", ur: "فرشتے" } },
     { ar: "طيبين", given: true, pic: "🤍", art: "g:pure", g: { en: "while they are good and pure", ur: "پاکیزہ حالت میں" } },
@@ -1574,7 +1582,7 @@ export const AYAT = {
     { ar: "الذي", w: ["w:alladhi"], g: { en: "who", ur: "جس کے" } },
     { ar: "بيده", w: ["w:bi", "w:yad", "w:hu"], g: { en: "in whose hand is", ur: "ہاتھ میں ہے" } },
     { ar: "الملك", w: ["w:al", "w:mulk"], g: { en: "the dominion", ur: "بادشاہی" } },
-    { ar: "وهو", w: ["w:wa", "w:hu"], g: { en: "and He is", ur: "اور وہ" } },
+    { ar: "وهو", w: ["w:wa", "w:huwa"], g: { en: "and He is", ur: "اور وہ" } },
     { ar: "على", w: ["w:ala"], g: { en: "over", ur: "پر" } },
     { ar: "كل", w: ["w:kull"], g: { en: "every", ur: "ہر" } },
     { ar: "شيء", w: ["w:shay"], g: { en: "thing", ur: "چیز" } },
@@ -1595,13 +1603,13 @@ export const AYAT = {
     { ar: "والارض", w: ["w:wa", "w:al", "w:ard"], g: { en: "and the earth", ur: "اور زمین کو" } },
     { ar: "بالحق", w: ["w:bi", "w:al", "w:haqq"], g: { en: "in truth", ur: "حق کے ساتھ" } },
     { ar: "تعلى", w: ["w:taala"], g: { en: "Exalted is He", ur: "وہ بلند و برتر ہے" }, pieces: [p("تَعَالَى", "exalted, high above — عَلِيّ high + تَ and long ā", "بلند و برتر — عَلِيّ بلند + تَ اور لمبا ā")] },
-    { ar: "عما", w: ["w:an", "w:ma"], g: { en: "above what", ur: "اس سے جو" } },
+    { ar: "عما", w: ["w:an", "w:ma"], note: "عَنْ after تَعَالَى: far above (what they join with Him)", g: { en: "above what", ur: "اس سے جو" } },
     { ar: "يشركون", w: ["w:ashraka", "w:hum"], g: { en: "they associate (with Him)", ur: "وہ شریک ٹھہراتے ہیں" } },
   ],
   "20:62": [
     { ar: "فتنزعوا", w: ["w:fa", "w:tanazaa", "w:hum"], g: { en: "So they disputed", ur: "تو وہ آپس میں جھگڑے" }, pieces: [p("فَ", "so", "تو"), p("تَنَازَعُ", "disputed with one another — the تَفَاعَلَ mould: to each other", "آپس میں جھگڑے — تَفَاعَلَ کا سانچا: ایک دوسرے سے"), p("ـوا", "they", "وہ")] },
     { ar: "امرهم", w: ["w:amr", "w:hum"], g: { en: "over their matter", ur: "اپنے معاملے میں" } },
-    { ar: "بينهم", w: ["w:bayna", "w:hum"], g: { en: "among themselves", ur: "آپس میں" } },
+    { ar: "بينهم", w: ["w:bayna", "w:hum"], note: "بَيْنَهُمْ: between them = among themselves", g: { en: "among themselves", ur: "آپس میں" } },
     { ar: "واسروا", w: ["w:wa", "w:asarra", "w:hum"], g: { en: "and kept secret", ur: "اور چھپا کر کی" } },
     { ar: "النجوى", given: true, pic: "🤫", art: "g:quiet", g: { en: "their private talk", ur: "سرگوشی" } },
   ],
@@ -1614,7 +1622,7 @@ export const AYAT = {
   ],
   "68:23": [
     { ar: "فانطلقوا", w: ["w:fa", "w:intalaqa", "w:hum"], g: { en: "So they set off", ur: "تو وہ چل پڑے" }, pieces: [p("فَ", "so", "تو"), p("اِنْطَلَقُ", "set off — the اِنْفَعَلَ mould", "چل پڑے — اِنْفَعَلَ کا سانچا"), p("ـوا", "they", "وہ")] },
-    { ar: "وهم", w: ["w:wa", "w:hum"], g: { en: "while they", ur: "اور وہ" } },
+    { ar: "وهم", w: ["w:wa", "w:humu"], g: { en: "while they", ur: "اور وہ (سب)" } },
     { ar: "يتخفتون", given: true, pic: "🤫", art: "g:quiet", g: { en: "were whispering to one another", ur: "چپکے چپکے باتیں کر رہے تھے" } },
   ],
   "43:14": [
@@ -1631,13 +1639,13 @@ export const AYAT = {
   ],
   "3:107": [
     { ar: "واما", w: ["w:wa", "w:amma"], g: { en: "And as for", ur: "اور رہے" } },
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "those whose", ur: "وہ لوگ جن کے" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "those whose", ur: "وہ لوگ جن کے" } },
     { ar: "ابيضت", w: ["w:ibyadda"], g: { en: "will shine bright", ur: "روشن ہوں گے" }, pieces: [p("اِبْيَضَّ", "turned white — أَبْيَض white, last letter doubled: become white", "سفید ہو گیا — أَبْيَض سفید، آخری حرف دوہرا: سفید ہو جانا"), p("ـتْ", "they (the faces)", "وہ (چہرے)")] },
     { ar: "وجوههم", w: ["w:wajh", "w:hum"], g: { en: "faces", ur: "چہرے" } },
     { ar: "ففي", w: ["w:fa", "w:fi"], g: { en: "they are in", ur: "تو وہ میں ہوں گے" } },
     { ar: "رحمة", w: ["w:rahma"], g: { en: "the mercy", ur: "رحمت" } },
     { ar: "الله", w: ["w:allah"], g: { en: "of Allah", ur: "اللہ کی" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ" } },
+    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ (سب)" } },
     { ar: "فيها", w: ["w:fi", "w:ha"], g: { en: "in it", ur: "اس میں" } },
     { ar: "خلدون", w: ["w:khalid"], g: { en: "will abide forever", ur: "ہمیشہ رہیں گے" } },
   ],
@@ -1663,7 +1671,7 @@ export const AYAT = {
   ],
   "73:19": [
     { ar: "ان", w: ["w:inna"], g: { en: "Indeed", ur: "بے شک" } },
-    { ar: "هذه", w: ["w:hadha"], g: { en: "this", ur: "یہ" } },
+    { ar: "هذه", w: ["w:hadhihi"], g: { en: "this", ur: "یہ" } },
     { ar: "تذكرة", given: true, pic: "🧵", art: "w:dhakkara", g: { en: "is a reminder", ur: "ایک نصیحت ہے" } },
     { ar: "فمن", w: ["w:fa", "w:man"], g: { en: "so whoever", ur: "تو جو" } },
     { ar: "شاء", w: ["w:shaa"], g: { en: "wishes", ur: "چاہے" } },
@@ -1673,8 +1681,8 @@ export const AYAT = {
     { ar: "سبيلا", w: ["w:sabil"], g: { en: "a way", ur: "راستہ" } },
   ],
   "78:3": [
-    { ar: "الذي", w: ["w:alladhi"], g: { en: "about which", ur: "جس میں" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ" } },
+    { ar: "الذي", w: ["w:alladhi"], note: "الَّذِي pointing back to a thing: (the news) about which", g: { en: "about which", ur: "جس میں" } },
+    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ (سب)" } },
     { ar: "فيه", w: ["w:fi", "w:hu"], g: { en: "in it", ur: "اس میں" } },
     { ar: "مختلفون", w: ["w:mukhtalif"], g: { en: "differ", ur: "اختلاف کر رہے ہیں" }, pieces: [p("مُخْتَلِف", "differing — مُ in front of اِخْتَلَفَ", "اختلاف کرنے والا — اِخْتَلَفَ کے آگے مُ"), p("ـُونَ", "many", "کئی")] },
   ],
@@ -1705,7 +1713,7 @@ export const AYAT = {
     { ar: "تاب", w: ["w:taba"], g: { en: "turns back", ur: "توبہ کرے" } },
     { ar: "وامن", w: ["w:wa", "w:amana"], g: { en: "and believes", ur: "اور ایمان لائے" } },
     { ar: "وعمل", w: ["w:wa", "w:amila"], g: { en: "and does", ur: "اور کرے" } },
-    { ar: "صلحا", w: ["w:salih_prophet"], g: { en: "good", ur: "نیک عمل" } },
+    { ar: "صلحا", w: ["w:salih"], g: { en: "good", ur: "نیک عمل" } },
     { ar: "ثم", w: ["w:thumma"], g: { en: "then", ur: "پھر" } },
     { ar: "اهتدى", w: ["w:ihtada"], g: { en: "stays on the right way", ur: "سیدھی راہ پر رہے" }, pieces: [p("اِهْتَدَى", "found the way — هَدَى guide + the تَ of اِفْتَعَلَ: take the guidance for yourself", "راہ پا لی — هَدَى راہ دکھانا + اِفْتَعَلَ کا تَ: ہدایت خود اپنا لینا")] },
   ],
@@ -1715,25 +1723,25 @@ export const AYAT = {
     { ar: "لا", w: ["w:la"], g: { en: "do not", ur: "نہیں" } },
     { ar: "يسلكم", w: ["w:saala", "w:kum"], g: { en: "ask you", ur: "تم سے مانگتے" } },
     { ar: "اجرا", w: ["w:ajr"], g: { en: "for any reward", ur: "کوئی اجر" } },
-    { ar: "وهم", w: ["w:wa", "w:hum"], g: { en: "and they", ur: "اور وہ" } },
+    { ar: "وهم", w: ["w:wa", "w:humu"], g: { en: "and they", ur: "اور وہ (سب)" } },
     { ar: "مهتدون", w: ["w:muhtadi"], g: { en: "are rightly guided", ur: "ہدایت یافتہ ہیں" }, pieces: [p("مُهْتَدِي", "one who found the way — مُ in front of اِهْتَدَى", "راہ پانے والا — اِهْتَدَى کے آگے مُ"), p("ـُونَ", "many", "کئی")] },
   ],
   "35:19": [
     { ar: "وما", w: ["w:wa", "w:ma"], g: { en: "And not", ur: "اور نہیں" } },
     { ar: "يستوي", w: ["w:istawa"], g: { en: "equal are", ur: "برابر ہوتے" }, pieces: [p("يَسْتَوِي", "is equal — سَوَاء equal + the تَ of اِفْتَعَلَ: become level, be equal", "برابر ہوتا ہے — سَوَاء برابر + اِفْتَعَلَ کا تَ: برابر ہو جانا")] },
     { ar: "الاعمى", w: ["w:al", "w:ama"], g: { en: "the blind", ur: "اندھا" } },
-    { ar: "والبصير", w: ["w:wa", "w:al", "w:basir"], g: { en: "and the seeing", ur: "اور دیکھنے والا" } },
+    { ar: "والبصير", given: true, pic: "🧿", art: "w:basar", g: { en: "and the seeing", ur: "اور دیکھنے والا" } },
   ],
   "3:177": [
     { ar: "ان", w: ["w:inna"], g: { en: "Indeed", ur: "بے شک" } },
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "those who", ur: "جن لوگوں نے" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "those who", ur: "جن لوگوں نے" } },
     { ar: "اشتروا", w: ["w:ishtara", "w:hum"], g: { en: "bought", ur: "خریدا" }, pieces: [p("اِشْتَرَ", "bought — trade one thing for another, the اِفْتَعَلَ mould", "خریدا — ایک چیز دے کر دوسری لینا، اِفْتَعَلَ کا سانچا"), p("ـوا", "they", "انہوں نے")] },
     { ar: "الكفر", w: ["w:al", "w:kufr"], g: { en: "disbelief", ur: "کفر" } },
     { ar: "بالايمن", w: ["w:bi", "w:al", "w:iman"], g: { en: "for faith", ur: "ایمان کے بدلے" } },
     { ar: "لن", w: ["w:lan"], g: { en: "will never", ur: "ہرگز نہیں" } },
     { ar: "يضروا", w: ["w:yadurru", "w:hum"], g: { en: "harm", ur: "نقصان پہنچا سکیں گے" } },
     { ar: "الله", w: ["w:allah"], g: { en: "Allah", ur: "اللہ کو" } },
-    { ar: "شيا", w: ["w:shay"], g: { en: "at all", ur: "کچھ بھی" } },
+    { ar: "شيا", w: ["w:shay"], note: "شَيْئًا after 'not': (not) a thing = at all", g: { en: "at all", ur: "کچھ بھی" } },
     { ar: "ولهم", w: ["w:wa", "w:li", "w:hum"], g: { en: "and for them is", ur: "اور ان کے لیے ہے" } },
     { ar: "عذاب", w: ["w:azab"], g: { en: "a punishment", ur: "عذاب" } },
     { ar: "اليم", w: ["w:alim_pain"], g: { en: "painful", ur: "دردناک" } },
@@ -1741,7 +1749,7 @@ export const AYAT = {
   "10:69": [
     { ar: "قل", w: ["w:qala"], g: { en: "Say", ur: "کہہ دو" } },
     { ar: "ان", w: ["w:inna"], g: { en: "Indeed", ur: "بے شک" } },
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "those who", ur: "جو لوگ" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "those who", ur: "جو لوگ" } },
     { ar: "يفترون", w: ["w:iftara", "w:hum"], g: { en: "make up", ur: "گھڑتے ہیں" }, pieces: [p("يَفْتَرِ", "make up — the اِفْتَعَلَ mould: cut out a story yourself", "گھڑتے ہیں — اِفْتَعَلَ کا سانچا: اپنی طرف سے بات بنانا"), p("ـُونَ", "they", "وہ")] },
     { ar: "على", w: ["w:ala"], g: { en: "about", ur: "پر" } },
     { ar: "الله", w: ["w:allah"], g: { en: "Allah", ur: "اللہ" } },
@@ -1775,10 +1783,10 @@ export const AYAT = {
     { ar: "غفارا", w: ["w:ghaffar"], g: { en: "Most Forgiving", ur: "بہت بخشنے والا" } },
   ],
   "6:36": [
-    { ar: "انما", w: ["w:inna", "w:ma"], g: { en: "Only", ur: "صرف" } },
+    { ar: "انما", w: ["w:inna", "w:ma"], note: "إِنَّمَا (إِنَّ + مَا) means 'only'", g: { en: "Only", ur: "صرف" } },
     { ar: "يستجيب", w: ["w:istajaba"], g: { en: "respond", ur: "جواب دیتے (مانتے) ہیں" }, pieces: [p("يَسْتَجِيبُ", "responds — أَجَابَ answer + اِسْتَ: answer the call", "جواب دیتا ہے — أَجَابَ جواب دینا + اِسْتَ: پکار پر لبیک کہنا")] },
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "those who", ur: "وہ جو" } },
-    { ar: "يسمعون", w: ["w:samia", "w:hum"], g: { en: "listen", ur: "سنتے ہیں" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "those who", ur: "وہ جو" } },
+    { ar: "يسمعون", w: ["w:samia", "w:hum"], note: "سَمِعَ hear: here, those who listen", g: { en: "listen", ur: "سنتے ہیں" } },
     { ar: "والموتى", w: ["w:wa", "w:al", "w:mayyit"], g: { en: "And the dead", ur: "اور مردوں کو" } },
     { ar: "يبعثهم", w: ["w:baatha", "w:hum"], g: { en: "will raise them", ur: "اٹھائے گا" } },
     { ar: "الله", w: ["w:allah"], g: { en: "Allah", ur: "اللہ" } },
@@ -1809,10 +1817,10 @@ export const AYAT = {
   // ---- Wing 5 · Asking Verbs 2 ----
   "7:76": [
     { ar: "قال", w: ["w:qala"], g: { en: "Said", ur: "کہا" } },
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "those who", ur: "ان لوگوں نے جو" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "those who", ur: "ان لوگوں نے جو" } },
     { ar: "استكبروا", w: ["w:istakbara", "w:hum"], g: { en: "were arrogant", ur: "بڑے بنے" }, pieces: [p("اِسْتَكْبَرُ", "thought themselves big — أَكْبَر bigger + اِسْتَ: count yourself big", "اپنے آپ کو بڑا سمجھا — أَكْبَر بڑا + اِسْتَ: خود کو بڑا گننا"), p("ـوا", "they", "انہوں نے")] },
     { ar: "انا", w: ["w:inna", "w:na"], g: { en: "Indeed we", ur: "بے شک ہم" } },
-    { ar: "بالذي", w: ["w:bi", "w:alladhi"], g: { en: "in what", ur: "اس کا جس پر" } },
+    { ar: "بالذي", w: ["w:bi", "w:alladhi"], note: "بِ + الَّذِي pointing back to a thing: in what", g: { en: "in what", ur: "اس کا جس پر" } },
     { ar: "امنتم", w: ["w:amana", "w:kum"], g: { en: "you believe", ur: "تم ایمان لائے" } },
     { ar: "به", w: ["w:bi", "w:hu"], g: { en: "in it", ur: "اس پر" } },
     { ar: "كفرون", w: ["w:kafir"], g: { en: "are disbelievers", ur: "انکار کرنے والے ہیں" } },
@@ -1820,7 +1828,7 @@ export const AYAT = {
   "15:11": [
     { ar: "وما", w: ["w:wa", "w:ma"], g: { en: "And not", ur: "اور نہیں" } },
     { ar: "ياتيهم", w: ["w:ata", "w:hum"], g: { en: "came to them", ur: "آیا ان کے پاس" } },
-    { ar: "من", w: ["w:min"], g: { en: "any", ur: "کوئی" } },
+    { ar: "من", w: ["w:min"], note: "مِنْ after 'not': any (at all)", g: { en: "any", ur: "کوئی" } },
     { ar: "رسول", w: ["w:rasul"], g: { en: "messenger", ur: "رسول" } },
     { ar: "الا", w: ["w:illa"], g: { en: "but", ur: "مگر" } },
     { ar: "كانوا", w: ["w:kana", "w:hum"], g: { en: "they used to", ur: "وہ" } },
@@ -1832,13 +1840,13 @@ export const AYAT = {
     { ar: "تجري", w: ["w:jara"], g: { en: "runs", ur: "چل رہا ہے" } },
     { ar: "لمستقر", w: ["w:li", "w:istaqarra"], g: { en: "toward a resting place", ur: "ٹھکانے کی طرف" }, pieces: [p("لِ", "toward", "طرف"), p("مُسْتَقَرّ", "resting place — مُ in front of اِسْتَقَرَّ settle", "ٹھہرنے کی جگہ — اِسْتَقَرَّ کے آگے مُ")] },
     { ar: "لها", w: ["w:li", "w:ha"], g: { en: "of its own", ur: "اپنے" } },
-    { ar: "ذلك", w: ["w:hadha"], g: { en: "That is", ur: "یہ" } },
+    { ar: "ذلك", w: ["w:dhalika"], note: "the far word is said with the near word (یہ) in Urdu, as the Urdu translation does", g: { en: "That is", ur: "یہ" } },
     { ar: "تقدير", w: ["w:taqdir"], g: { en: "the measuring", ur: "اندازہ" } },
     { ar: "العزيز", w: ["w:al", "w:aziz"], g: { en: "of the Almighty", ur: "زبردست" } },
     { ar: "العليم", w: ["w:al", "w:alim"], g: { en: "the All-Knowing", ur: "سب جاننے والے کا" } },
   ],
   "2:2": [
-    { ar: "ذلك", w: ["w:hadha"], g: { en: "That is", ur: "یہ" } },
+    { ar: "ذلك", w: ["w:dhalika"], note: "the far word is said with the near word (یہ) in Urdu, as the Urdu translation does", g: { en: "That is", ur: "یہ" } },
     { ar: "الكتب", w: ["w:al", "w:kitab"], g: { en: "the Book", ur: "کتاب" } },
     { ar: "لا", w: ["w:la"], g: { en: "no", ur: "کوئی نہیں" } },
     { ar: "ريب", w: ["w:rayb"], g: { en: "doubt", ur: "شک" } },
@@ -1861,10 +1869,10 @@ export const AYAT = {
   "2:52": [
     { ar: "ثم", w: ["w:thumma"], g: { en: "Then", ur: "پھر" } },
     { ar: "عفونا", w: ["w:afa", "w:na"], g: { en: "We pardoned", ur: "ہم نے معاف کر دیا" }, pieces: [p("عَفَوْ", "pardoned — عَفَا + عَنْ: let go of someone's wrong", "معاف کیا — عَفَا + عَنْ: کسی کی غلطی سے درگزر"), p("ـنَا", "We", "ہم نے")] },
-    { ar: "عنكم", w: ["w:an", "w:kum"], g: { en: "you", ur: "تمہیں" } },
+    { ar: "عنكم", w: ["w:an", "w:kum"], note: "عَنْ with عَفَا: pardon (from) you; English says only 'you'", g: { en: "you", ur: "تمہیں" } },
     { ar: "من", w: ["w:min"], g: { en: "from", ur: "سے" } },
     { ar: "بعد", w: ["w:bada"], g: { en: "after", ur: "بعد" } },
-    { ar: "ذلك", w: ["w:hadha"], g: { en: "that", ur: "اس کے" } },
+    { ar: "ذلك", w: ["w:dhalika"], g: { en: "that", ur: "اس کے" } },
     { ar: "لعلكم", w: ["w:laalla", "w:kum"], g: { en: "so that you might", ur: "تاکہ تم" } },
     { ar: "تشكرون", w: ["w:shakara", "w:kum"], g: { en: "be thankful", ur: "شکر کرو" } },
   ],
@@ -1874,28 +1882,28 @@ export const AYAT = {
     { ar: "يقضي", w: ["w:qada"], g: { en: "will judge", ur: "فیصلہ کرے گا" }, pieces: [p("يَقْضِي", "decides — قَضَى + بَيْنَ: judge between", "فیصلہ کرتا ہے — قَضَى + بَيْنَ: کے درمیان فیصلہ کرنا")] },
     { ar: "بينهم", w: ["w:bayna", "w:hum"], g: { en: "between them", ur: "ان کے درمیان" } },
     { ar: "بحكمه", w: ["w:bi", "w:hukm", "w:hu"], g: { en: "by His judgement", ur: "اپنے حکم سے" } },
-    { ar: "وهو", w: ["w:wa", "w:hu"], g: { en: "and He is", ur: "اور وہ" } },
+    { ar: "وهو", w: ["w:wa", "w:huwa"], g: { en: "and He is", ur: "اور وہ" } },
     { ar: "العزيز", w: ["w:al", "w:aziz"], g: { en: "the Almighty", ur: "زبردست" } },
     { ar: "العليم", w: ["w:al", "w:alim"], g: { en: "the All-Knowing", ur: "سب جاننے والا ہے" } },
   ],
   "94:2": [
-    { ar: "ووضعنا", w: ["w:wa", "w:wadaa", "w:na"], g: { en: "And We lifted", ur: "اور ہم نے اتار دیا" }, pieces: [p("وَ", "and", "اور"), p("وَضَعْ", "put down — وَضَعَ + عَنْ: lift a load off someone", "رکھا — وَضَعَ + عَنْ: کسی سے بوجھ اتار دینا"), p("ـنَا", "We", "ہم نے")] },
+    { ar: "ووضعنا", w: ["w:wa", "w:wadaa", "w:na"], note: "وَضَعَ عَنْ: put down from = lifted off", g: { en: "And We lifted", ur: "اور ہم نے اتار دیا" }, pieces: [p("وَ", "and", "اور"), p("وَضَعْ", "put down — وَضَعَ + عَنْ: lift a load off someone", "رکھا — وَضَعَ + عَنْ: کسی سے بوجھ اتار دینا"), p("ـنَا", "We", "ہم نے")] },
     { ar: "عنك", w: ["w:an", "w:ka"], g: { en: "from you", ur: "تم سے" } },
     { ar: "وزرك", w: ["w:wizr", "w:ka"], g: { en: "your burden", ur: "تمہارا بوجھ" } },
   ],
 
   // ---- Wing 5 · Verb Partners 2 ----
   "7:112": [
-    { ar: "ياتوك", w: ["w:ata", "w:hum", "w:ka"], g: { en: "they will bring you", ur: "وہ تمہارے پاس لے آئیں" }, pieces: [p("يَأْتُو", "they come — أَتَى + بِ: bring", "وہ آئیں — أَتَى + بِ: لے آنا"), p("ـكَ", "to you", "تمہارے پاس")] },
+    { ar: "ياتوك", w: ["w:ata", "w:hum", "w:ka"], note: "أَتَى + بِ: come with = bring", g: { en: "they will bring you", ur: "وہ تمہارے پاس لے آئیں" }, pieces: [p("يَأْتُو", "they come — أَتَى + بِ: bring", "وہ آئیں — أَتَى + بِ: لے آنا"), p("ـكَ", "to you", "تمہارے پاس")] },
     { ar: "بكل", w: ["w:bi", "w:kull"], g: { en: "every", ur: "ہر" } },
     { ar: "سحر", w: ["w:sahir"], g: { en: "magician", ur: "جادوگر" } },
-    { ar: "عليم", w: ["w:alim"], g: { en: "skilled", ur: "ماہر" } },
+    { ar: "عليم", given: true, pic: "💡📘", art: "w:alima", g: { en: "skilled", ur: "ماہر" } },
   ],
   "55:20": [
     { ar: "بينهما", w: ["w:bayna", "w:huma_end"], g: { en: "Between them", ur: "ان دونوں کے درمیان" } },
     { ar: "برزخ", given: true, pic: "🌊", art: "g:barrier", g: { en: "is a barrier", ur: "ایک آڑ ہے" } },
     { ar: "لا", w: ["w:la"], g: { en: "not", ur: "نہیں" } },
-    { ar: "يبغيان", w: ["w:bagha", "w:huma_end"], g: { en: "they overstep", ur: "وہ دونوں حد سے بڑھتے" }, pieces: [p("يَبْغِي", "goes too far — بَغَى", "حد سے بڑھتا ہے — بَغَى"), p("ـَانِ", "the two of them", "وہ دونوں")] },
+    { ar: "يبغيان", w: ["w:bagha", "w:huma_end"], note: "بَغَى go too far: the two seas do not overstep", g: { en: "they overstep", ur: "وہ دونوں حد سے بڑھتے" }, pieces: [p("يَبْغِي", "goes too far — بَغَى", "حد سے بڑھتا ہے — بَغَى"), p("ـَانِ", "the two of them", "وہ دونوں")] },
   ],
   "26:15": [
     { ar: "قال", w: ["w:qala"], g: { en: "He said", ur: "فرمایا" } },
@@ -1909,7 +1917,7 @@ export const AYAT = {
   "26:30": [
     { ar: "قال", w: ["w:qala"], g: { en: "He said", ur: "کہا" } },
     { ar: "اولو", w: ["w:a", "w:wa", "w:law"], g: { en: "Even if", ur: "کیا اگرچہ" } },
-    { ar: "جئتك", w: ["w:jaa", "w:i", "w:ka"], g: { en: "I bring you", ur: "میں تمہارے پاس لے آؤں" }, pieces: [p("جِئْتُ", "I came — جَاءَ + بِ: bring", "میں آیا — جَاءَ + بِ: لے آنا"), p("ـكَ", "to you", "تمہارے پاس")] },
+    { ar: "جئتك", w: ["w:jaa", "w:i", "w:ka"], note: "جَاءَ + بِ: come with = bring", g: { en: "I bring you", ur: "میں تمہارے پاس لے آؤں" }, pieces: [p("جِئْتُ", "I came — جَاءَ + بِ: bring", "میں آیا — جَاءَ + بِ: لے آنا"), p("ـكَ", "to you", "تمہارے پاس")] },
     { ar: "بشيء", w: ["w:bi", "w:shay"], g: { en: "something", ur: "کوئی چیز" } },
     { ar: "مبين", w: ["w:mubin"], g: { en: "clear?", ur: "واضح؟" } },
   ],
@@ -1925,14 +1933,14 @@ export const AYAT = {
   ],
   "2:160": [
     { ar: "الا", w: ["w:illa"], g: { en: "Except", ur: "سوائے" } },
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "those who", ur: "ان کے جنہوں نے" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "those who", ur: "ان کے جنہوں نے" } },
     { ar: "تابوا", w: ["w:taba", "w:hum"], g: { en: "turned back", ur: "توبہ کی" } },
     { ar: "واصلحوا", w: ["w:wa", "w:aslaha", "w:hum"], g: { en: "and put things right", ur: "اور اصلاح کی" } },
     { ar: "وبينوا", w: ["w:wa", "w:bayyana", "w:hum"], g: { en: "and made clear", ur: "اور کھول کر بیان کیا" } },
-    { ar: "فاولئك", w: ["w:fa", "w:hadha"], g: { en: "those", ur: "تو یہی لوگ ہیں" } },
+    { ar: "فاولئك", w: ["w:fa", "w:ulaika"], note: "the far word is said with the near word (یہ) in Urdu, as the Urdu translation does", g: { en: "those", ur: "تو یہی لوگ ہیں" } },
     { ar: "اتوب", w: ["w:taba"], g: { en: "I turn in mercy", ur: "میں توبہ قبول کرتا ہوں" }, pieces: [p("أَتُوبُ", "I turn — تَابَ + عَلَى: turn to someone in mercy, accept their repentance", "میں رجوع کرتا ہوں — تَابَ + عَلَى: رحمت سے متوجہ ہونا، توبہ قبول کرنا")] },
-    { ar: "عليهم", w: ["w:ala", "w:hum"], g: { en: "to them", ur: "جن کی" } },
-    { ar: "وانا", w: ["w:wa", "w:i"], g: { en: "and I am", ur: "اور میں" } },
+    { ar: "عليهم", w: ["w:ala", "w:hum"], note: "عَلَى with تَابَ: (turn in mercy) to them", g: { en: "to them", ur: "جن کی" } },
+    { ar: "وانا", w: ["w:wa", "w:ana"], g: { en: "and I am", ur: "اور میں" } },
     { ar: "التواب", w: ["w:al", "w:tawwab"], g: { en: "the Accepter of repentance", ur: "بہت توبہ قبول کرنے والا" } },
     { ar: "الرحيم", w: ["w:al", "w:rahim"], g: { en: "the Merciful", ur: "رحم کرنے والا ہوں" } },
   ],
@@ -1941,15 +1949,15 @@ export const AYAT = {
   "56:35": [
     { ar: "انا", w: ["w:inna", "w:na"], g: { en: "Indeed We", ur: "بے شک ہم نے" } },
     { ar: "انشانهن", w: ["w:anshaa", "w:na", "w:hunna_end"], g: { en: "produced them (women)", ur: "انہیں (عورتوں کو) پیدا کیا" }, pieces: [p("أَنْشَأْ", "produced", "پیدا کیا"), p("ـنَا", "We", "ہم نے"), p("ـهُنَّ", "them — many women (the هُنَّ row of the table)", "انہیں — کئی عورتیں (نقشے کی هُنَّ والی صف)")] },
-    { ar: "انشاء", w: ["w:anshaa"], g: { en: "in a new creation", ur: "نئے سرے سے" } },
+    { ar: "انشاء", w: ["w:anshaa"], note: "إِنْشَاء is the action noun of أَنْشَأَ: a (new) creation", g: { en: "in a new creation", ur: "نئے سرے سے" } },
   ],
   "51:30": [
     { ar: "قالوا", w: ["w:qala", "w:hum"], g: { en: "They said", ur: "انہوں نے کہا" } },
-    { ar: "كذلك", w: ["w:ka_like", "w:hadha"], g: { en: "Thus", ur: "اسی طرح" } },
+    { ar: "كذلك", w: ["w:ka_like", "w:dhalika"], g: { en: "Like that", ur: "اسی طرح" } },
     { ar: "قال", w: ["w:qala"], g: { en: "has said", ur: "فرمایا ہے" } },
     { ar: "ربك", w: ["w:rabb", "w:ki"], g: { en: "your Lord (to a woman)", ur: "تمہارے رب نے (ایک عورت سے)" }, pieces: [p("رَبُّ", "Lord", "رب"), p("ـكِ", "your — one woman (كِ, not كَ)", "تمہارا — ایک عورت (كِ، كَ نہیں)")] },
     { ar: "انه", w: ["w:inna", "w:hu"], g: { en: "Indeed He", ur: "بے شک وہ" } },
-    { ar: "هو", w: ["w:huwa"], g: { en: "is", ur: "ہی" } },
+    { ar: "هو", w: ["w:huwa"], note: "هُوَ between two parts of a sentence: 'He is'", g: { en: "is", ur: "ہی" } },
     { ar: "الحكيم", w: ["w:al", "w:hakim"], g: { en: "the All-Wise", ur: "حکمت والا" } },
     { ar: "العليم", w: ["w:al", "w:alim"], g: { en: "the All-Knowing", ur: "سب جاننے والا ہے" } },
   ],
@@ -1960,7 +1968,7 @@ export const AYAT = {
     { ar: "يموسى", w: ["w:ya", "w:musa"], g: { en: "O Musa?", ur: "اے موسیٰ؟" } },
   ],
   "26:16": [
-    { ar: "فاتيا", w: ["w:fa", "w:ata", "w:kuma"], g: { en: "So go, you two, to", ur: "تو تم دونوں جاؤ" }, pieces: [p("فَ", "so", "تو"), p("أْتِيَا", "come, you two! — the command for two (اِفْعَلَا)", "تم دونوں آؤ — دو کے لیے حکم (اِفْعَلَا)")] },
+    { ar: "فاتيا", w: ["w:fa", "w:ata", "w:kuma"], note: "أَتَى with a person: come to = go to", g: { en: "So go, you two, to", ur: "تو تم دونوں جاؤ" }, pieces: [p("فَ", "so", "تو"), p("أْتِيَا", "come, you two! — the command for two (اِفْعَلَا)", "تم دونوں آؤ — دو کے لیے حکم (اِفْعَلَا)")] },
     { ar: "فرعون", w: ["w:firawn"], g: { en: "Pharaoh", ur: "فرعون کے پاس" } },
     { ar: "فقولا", w: ["w:fa", "w:qala", "w:kuma"], g: { en: "and say, you two:", ur: "اور تم دونوں کہو" }, pieces: [p("فَ", "and", "اور"), p("قُولَا", "say, you two! (اِفْعَلَا)", "تم دونوں کہو (اِفْعَلَا)")] },
     { ar: "انا", w: ["w:inna", "w:na"], g: { en: "We are", ur: "بے شک ہم" } },
@@ -1983,7 +1991,7 @@ export const AYAT = {
     { ar: "قل", w: ["w:qala"], g: { en: "Say", ur: "کہہ دو" }, pieces: [p("قُلْ", "say! — the command of قَالَ", "کہو — قَالَ کا حکم")] },
     { ar: "هو", w: ["w:huwa"], g: { en: "He", ur: "وہ" } },
     { ar: "الله", w: ["w:allah"], g: { en: "is Allah,", ur: "اللہ ہے" } },
-    { ar: "احد", w: ["w:ahad"], medal: "أَحَد", g: { en: "the One", ur: "ایک" } },
+    { ar: "احد", w: ["w:ahad"], medal: "أَحَد", ofAllah: true, g: { en: "the One", ur: "ایک" } },
   ],
   "112:2": [
     { ar: "الله", w: ["w:allah"], g: { en: "Allah,", ur: "اللہ" } },
@@ -2009,7 +2017,7 @@ export const AYAT = {
   ],
   "103:3": [
     { ar: "الا", w: ["w:illa"], g: { en: "Except", ur: "سوائے" } },
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "those who", ur: "ان کے جو" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "those who", ur: "ان کے جو" } },
     { ar: "امنوا", w: ["w:amana", "w:hum"], g: { en: "believed", ur: "ایمان لائے" } },
     { ar: "وعملوا", w: ["w:wa", "w:amila", "w:hum"], g: { en: "and did", ur: "اور کیے" } },
     { ar: "الصلحت", w: ["w:al", "w:salihat"], g: { en: "good deeds", ur: "نیک اعمال" }, pieces: [p("الْ", "the", "وہ"), p("صَالِح", "good", "نیک"), p("ـَات", "many (feminine plural)", "کئی (مؤنث جمع)")] },
@@ -2022,7 +2030,7 @@ export const AYAT = {
   // ---- Reading Room 3 · Surah Al-Kafirun (109:2 and 109:6 are shared with earlier rooms) ----
   "109:1": [
     { ar: "قل", w: ["w:qala"], g: { en: "Say:", ur: "کہہ دو" }, pieces: [p("قُلْ", "say! — the command of قَالَ", "کہو — قَالَ کا حکم")] },
-    { ar: "يايها", w: ["w:ya", "w:ayyu", "w:ha"], g: { en: "O", ur: "اے" }, pieces: [p("يَا", "O", "اے"), p("أَيُّهَا", "you (who are)", "وہ جو")] },
+    { ar: "يايها", w: ["w:ya", "w:ayyu"], art: "w:ya", note: "يَا أَيُّهَا is one call, 'O'; أَيّ is not a question here", g: { en: "O", ur: "اے" }, pieces: [p("يَا", "O", "اے"), p("أَيُّهَا", "you (who are)", "وہ جو")] },
     { ar: "الكفرون", w: ["w:al", "w:kafir"], g: { en: "rejecters of faith!", ur: "کافرو!" }, pieces: [p("الْ", "the", "وہ"), p("كَافِر", "rejecter of faith", "انکار کرنے والا"), p("ـُونَ", "many", "کئی")] },
   ],
   "109:3": [
@@ -2054,10 +2062,10 @@ export const AYAT = {
     { ar: "اله", w: ["w:ilah"], g: { en: "god", ur: "کوئی معبود" } },
     { ar: "الا", w: ["w:illa"], g: { en: "except", ur: "سوائے" } },
     { ar: "هو", w: ["w:huwa"], g: { en: "Him,", ur: "اس کے" } },
-    { ar: "الحي", w: ["w:al", "w:hayy"], medal: "الْحَيّ", g: { en: "the Ever-Living,", ur: "ہمیشہ زندہ" } },
+    { ar: "الحي", w: ["w:al", "w:hayy"], medal: "الْحَيّ", ofAllah: true, g: { en: "the Ever-Living,", ur: "ہمیشہ زندہ" } },
     { ar: "القيوم", w: ["w:al", "w:qayyum"], g: { en: "the Self-Sustaining.", ur: "سب کو قائم رکھنے والا" } },
     { ar: "لا", w: ["w:la"], g: { en: "Does not", ur: "نہ" } },
-    { ar: "تاخذه", w: ["w:akhadha", "w:hu"], g: { en: "overtake Him", ur: "اسے آتی ہے" }, pieces: [p("تَأْخُذُ", "takes, seizes", "پکڑتی ہے"), p("ـهُ", "Him", "اسے")] },
+    { ar: "تاخذه", w: ["w:akhadha", "w:hu"], note: "أَخَذَ take, seize: sleep does not overtake Him", g: { en: "overtake Him", ur: "اسے آتی ہے" }, pieces: [p("تَأْخُذُ", "takes, seizes", "پکڑتی ہے"), p("ـهُ", "Him", "اسے")] },
     { ar: "سنة", w: ["w:sina"], g: { en: "drowsiness", ur: "اونگھ" } },
     { ar: "ولا", w: ["w:wa", "w:la"], g: { en: "nor", ur: "اور نہ" } },
     { ar: "نوم", w: ["w:nawm"], g: { en: "sleep.", ur: "نیند" } },
@@ -2069,7 +2077,7 @@ export const AYAT = {
     { ar: "في", w: ["w:fi"], g: { en: "in", ur: "میں" } },
     { ar: "الارض", w: ["w:al", "w:ard"], g: { en: "the earth.", ur: "زمین" } },
     { ar: "من", w: ["w:man"], g: { en: "Who", ur: "کون" } },
-    { ar: "ذا", w: ["w:hadha"], g: { en: "is it", ur: "ہے" } },
+    { ar: "ذا", w: ["w:hadha"], note: "ذَا is the bare pointing word (this): مَنْ ذَا 'who is it'", g: { en: "is it", ur: "ہے" } },
     { ar: "الذي", w: ["w:alladhi"], g: { en: "that", ur: "جو" } },
     { ar: "يشفع", w: ["w:yashfau"], g: { en: "can intercede", ur: "سفارش کرے" } },
     { ar: "عنده", w: ["w:inda", "w:hu"], g: { en: "with Him", ur: "اس کے پاس" } },
@@ -2077,8 +2085,8 @@ export const AYAT = {
     { ar: "باذنه", w: ["w:bi", "w:idhn", "w:hu"], g: { en: "by His permission?", ur: "اس کی اجازت سے" } },
     { ar: "يعلم", w: ["w:alima"], g: { en: "He knows", ur: "وہ جانتا ہے" } },
     { ar: "ما", w: ["w:ma"], g: { en: "what is", ur: "جو" } },
-    { ar: "بين", w: ["w:bayna"], g: { en: "before", ur: "سامنے" } },
-    { ar: "ايديهم", w: ["w:yad", "w:hum"], g: { en: "them", ur: "ان کے" }, pieces: [p("بَيْنَ أَيْدِي", "between the hands of: in front of", "ہاتھوں کے درمیان: سامنے"), p("ـهِمْ", "them", "ان کے")] },
+    { ar: "بين", w: ["w:bayna"], note: "بَيْنَ أَيْدِيهِمْ: between their hands = before them", g: { en: "before", ur: "سامنے" } },
+    { ar: "ايديهم", w: ["w:yad", "w:hum"], note: "بَيْنَ أَيْدِيهِمْ: between their hands = before them", g: { en: "them", ur: "ان کے" }, pieces: [p("بَيْنَ أَيْدِي", "between the hands of: in front of", "ہاتھوں کے درمیان: سامنے"), p("ـهِمْ", "them", "ان کے")] },
     { ar: "وما", w: ["w:wa", "w:ma"], g: { en: "and what is", ur: "اور جو" } },
     { ar: "خلفهم", w: ["w:khalfa", "w:hum"], g: { en: "behind them.", ur: "ان کے پیچھے ہے" } },
     { ar: "ولا", w: ["w:wa", "w:la"], g: { en: "And not", ur: "اور نہیں" } },
@@ -2096,17 +2104,17 @@ export const AYAT = {
     { ar: "ولا", w: ["w:wa", "w:la"], g: { en: "and does not", ur: "اور نہیں" } },
     { ar: "يئوده", w: ["w:yaudu", "w:hu"], g: { en: "tire Him", ur: "اسے تھکاتی" }, pieces: [p("يَئُودُ", "weighs down, tires", "تھکاتا ہے"), p("ـهُ", "Him", "اسے")] },
     { ar: "حفظهما", w: ["w:hifz", "w:huma_end"], g: { en: "guarding them both.", ur: "ان دونوں کی حفاظت" } },
-    { ar: "وهو", w: ["w:wa", "w:hu"], g: { en: "And He is", ur: "اور وہ" } },
+    { ar: "وهو", w: ["w:wa", "w:huwa"], g: { en: "And He is", ur: "اور وہ" } },
     { ar: "العلي", w: ["w:al", "w:ali"], g: { en: "the Most High,", ur: "سب سے بلند" } },
-    { ar: "العظيم", w: ["w:al", "w:azim"], medal: "الْعَظِيم", g: { en: "the Most Great.", ur: "بہت عظمت والا ہے" } },
+    { ar: "العظيم", w: ["w:al", "w:azim"], medal: "الْعَظِيم", ofAllah: true, g: { en: "the Most Great.", ur: "بہت عظمت والا ہے" } },
   ],
 
   // ---- Reading Room 5 · Al-Baqarah 1–5 (2:2 is shared with Asking Verbs 2) ----
   "2:1": [
-    { ar: "الم", w: ["w:alm"], g: { en: "Alif Lam Mim", ur: "الف لام میم" } },
+    { ar: "الم", say: "alif lām mīm", w: ["w:alm"], g: { en: "Alif Lam Mim", ur: "الف لام میم" } },
   ],
   "2:3": [
-    { ar: "الذين", w: ["w:alladhi"], g: { en: "who", ur: "جو" } },
+    { ar: "الذين", w: ["w:alladhina"], g: { en: "who", ur: "جو" } },
     { ar: "يؤمنون", w: ["w:amana", "w:hum"], g: { en: "believe", ur: "ایمان لاتے ہیں" }, pieces: [p("يُؤْمِنُ", "believes — آمَنَ, the أَفْعَلَ mould (أ in front), now", "ایمان لاتا ہے — آمَنَ، أَفْعَلَ کا سانچا، حال"), p("ـُونَ", "they", "وہ")] },
     { ar: "بالغيب", w: ["w:bi", "w:al", "w:ghayb"], g: { en: "in the unseen", ur: "غیب پر" } },
     { ar: "ويقيمون", w: ["w:wa", "w:aqama", "w:hum"], g: { en: "and keep up", ur: "اور قائم کرتے ہیں" }, pieces: [p("وَ", "and", "اور"), p("يُقِيمُ", "keeps up — أَقَامَ, from قَامَ stand: make it stand", "قائم کرتا ہے — أَقَامَ، قَامَ کھڑا ہونا سے: کھڑا کرنا"), p("ـُونَ", "they", "وہ")] },
@@ -2116,7 +2124,7 @@ export const AYAT = {
     { ar: "ينفقون", w: ["w:anfaqa", "w:hum"], g: { en: "they spend", ur: "وہ خرچ کرتے ہیں" } },
   ],
   "2:4": [
-    { ar: "والذين", w: ["w:wa", "w:alladhi"], g: { en: "And who", ur: "اور جو" } },
+    { ar: "والذين", w: ["w:wa", "w:alladhina"], g: { en: "And who", ur: "اور جو" } },
     { ar: "يؤمنون", w: ["w:amana", "w:hum"], g: { en: "believe", ur: "ایمان لاتے ہیں" } },
     { ar: "بما", w: ["w:bi", "w:ma"], g: { en: "in what", ur: "اس پر جو" } },
     { ar: "انزل", w: ["w:anzala"], g: { en: "was sent down", ur: "اتارا گیا" }, pieces: [p("أُنْزِلَ", "was sent down — ُ on the first letter: done to it (passive)", "اتارا گیا — پہلے حرف پر پیش: مجہول")] },
@@ -2126,17 +2134,17 @@ export const AYAT = {
     { ar: "من", w: ["w:min"], g: { en: "from", ur: "سے" } },
     { ar: "قبلك", w: ["w:qabla", "w:ka"], g: { en: "before you", ur: "تم سے پہلے" } },
     { ar: "وبالاخرة", w: ["w:wa", "w:bi", "w:al", "w:akhir"], g: { en: "and in the Hereafter", ur: "اور آخرت پر" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ" } },
+    { ar: "هم", w: ["w:humu"], g: { en: "they", ur: "وہ (سب)" } },
     { ar: "يوقنون", w: ["w:yuqinu", "w:hum"], g: { en: "are certain", ur: "یقین رکھتے ہیں" } },
   ],
   "2:5": [
-    { ar: "اولئك", w: ["w:hadha"], g: { en: "Those", ur: "یہی لوگ" } },
+    { ar: "اولئك", w: ["w:ulaika"], note: "the far word is said with the near word (یہ) in Urdu, as the Urdu translation does", g: { en: "Those", ur: "یہی لوگ" } },
     { ar: "على", w: ["w:ala"], g: { en: "are on", ur: "پر ہیں" } },
     { ar: "هدى", w: ["w:huda"], g: { en: "guidance", ur: "ہدایت" } },
     { ar: "من", w: ["w:min"], g: { en: "from", ur: "کی طرف سے" } },
     { ar: "ربهم", w: ["w:rabb", "w:hum"], g: { en: "their Lord,", ur: "اپنے رب" } },
-    { ar: "واولئك", w: ["w:wa", "w:hadha"], g: { en: "and those", ur: "اور یہی لوگ" } },
-    { ar: "هم", w: ["w:humu"], g: { en: "are", ur: "ہی" } },
+    { ar: "واولئك", w: ["w:wa", "w:ulaika"], note: "the far word is said with the near word (یہ) in Urdu, as the Urdu translation does", g: { en: "and those", ur: "اور یہی لوگ" } },
+    { ar: "هم", w: ["w:humu"], note: "هُمْ between two parts of a sentence: 'they are'", g: { en: "are", ur: "ہی" } },
     { ar: "المفلحون", w: ["w:al", "w:muflih"], g: { en: "the successful.", ur: "کامیاب ہیں" }, pieces: [p("الْ", "the", "وہ"), p("مُفْلِح", "successful one — مُ in front of أَفْلَحَ", "کامیاب — أَفْلَحَ کے آگے مُ"), p("ـُونَ", "many", "کئی")] },
   ],
 };

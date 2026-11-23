@@ -7,6 +7,8 @@
 import { h } from "./kit.js";
 import { lang } from "../i18n.js";
 import { later } from "../core/clock.js";
+import { tipShowMs } from "../core/reading.js";
+import { whyOf } from "./why.js";
 
 const T = (en, ur) => ({ en, ur });
 
@@ -23,19 +25,19 @@ export const TIPS = {
   scroll: T("Name scroll: a prophet, an angel or a revealed book. Never shown as a picture.", "نام کا طومار: نبی، فرشتہ یا آسمانی کتاب۔ کبھی تصویر نہیں دکھائی جاتی۔"),
   plain: T("Plain ink: a word that gets no picture at all.", "سادہ روشنائی: ایسا لفظ جس کی کوئی تصویر نہیں۔"),
   // ayah tiles
-  tileNew: T("Gold glow: a new word. Tap it to meet it.", "سنہری چمک: نیا لفظ۔ ملنے کے لیے ٹیپ کریں۔"),
-  tileKnown: T("Blue glow: a word you know. Tap it and pick its meaning.", "نیلی چمک: جانا پہچانا لفظ۔ ٹیپ کریں اور معنی چنیں۔"),
+  tileNew: T("Gold glow: a new word. Tap it to meet it.", "سنہری چمک: نیا لفظ۔ ملنے کے لیے دبائیں۔"),
+  tileKnown: T("Blue glow: a word you know. Tap it and pick its meaning.", "نیلی چمک: جانا پہچانا لفظ۔ دبائیں اور معنی چنیں۔"),
   tileGiven: T("Grey: not learned yet, so its meaning is shown for you.", "سرمئی: ابھی نہیں سیکھا، اس لیے معنی دکھایا گیا ہے۔"),
   tileLit: T("Lit: you have read this word.", "روشن: یہ لفظ آپ نے پڑھ لیا۔"),
   pieces: T("Pieces: the small parts this word is built from.", "ٹکڑے: وہ چھوٹے حصے جن سے یہ لفظ بنا ہے۔"),
   // time and place
-  past: T("⏪ Past: already happened", "⏪ ماضی: ہو چکا"),
-  now: T("📍 Now", "📍 ابھی"),
-  future: T("⏩ Later: still to come", "⏩ بعد میں: آنے والا"),
-  done: T("✔️ Done for sure (قَدْ)", "✔️ یقیناً ہو چکا (قَدْ)"),
-  soon: T("⏩ Soon (سَـ)", "⏩ جلد (سَـ)"),
-  later: T("⏩⏩ Later on (سَوْفَ)", "⏩⏩ کچھ دیر بعد (سَوْفَ)"),
-  stamp: T("✕ The No stamp cancels the time it lands on", "✕ نہیں کی مہر جس وقت پر لگے اسے رد کرتی ہے"),
+  past: T("Past: already happened", "ماضی: ہو چکا"),
+  now: T("Now", "ابھی"),
+  future: T("Later: still to come", "بعد میں: آنے والا"),
+  done: T("Done for sure (قَدْ)", "یقیناً ہو چکا (قَدْ)"),
+  soon: T("Soon (سَـ)", "جلد (سَـ)"),
+  later: T("Later on (سَوْفَ)", "کچھ دیر بعد (سَوْفَ)"),
+  stamp: T("The No stamp cancels the time it lands on", "نہیں کی مہر جس وقت پر لگے اسے رد کرتی ہے"),
   timeArrow: T("Time runs right to left, the way Arabic is read", "وقت دائیں سے بائیں چلتا ہے، جیسے عربی پڑھی جاتی ہے"),
   near: T("Big and close: near (this)", "بڑا اور قریب: پاس (یہ)"),
   far: T("Small and across the room: far (that)", "چھوٹا اور دور: دور (وہ)"),
@@ -43,15 +45,15 @@ export const TIPS = {
   // game pieces
   pot: T("Root pot: three letter-seeds. Every word that grows from them shares their meaning.", "مادے کا گملا: تین حرفی بیج۔ ان سے اگنے والے سب لفظوں کا معنی ملتا جلتا ہے۔"),
   rungBase: T("Low rung: the plain describing word (big)", "نچلا ڈنڈا: سادہ صفت (بڑا)"),
-  rungMore: T("High rung ⬆: the أَفْعَل mould (bigger, biggest)", "اوپر کا ڈنڈا ⬆: أَفْعَل کا سانچہ (زیادہ بڑا، سب سے بڑا)"),
-  sent: T("📜 Sent by Allah with the message", "📜 اللہ کی طرف سے پیغام کے ساتھ بھیجے گئے"),
-  refused: T("🚫 Refused the message", "🚫 پیغام کو رد کیا"),
-  garden: T("🌳 The good end: the Garden", "🌳 اچھا انجام: جنت"),
-  fire: T("🔥 The bad end: the Fire", "🔥 برا انجام: آگ"),
-  light: T("🕯️ Light: truth, what is clear", "🕯️ روشنی: حق، جو واضح ہے"),
-  dark: T("🌑 Dark: falsehood, what is hidden", "🌑 اندھیرا: باطل، جو چھپا ہے"),
-  good: T("🌷 Good: deeds and people on the right path", "🌷 اچھا: صحیح راستے کے اعمال اور لوگ"),
-  bad: T("🍂 Bad: deeds and people on the wrong path", "🍂 برا: غلط راستے کے اعمال اور لوگ"),
+  rungMore: T("High rung: the أَفْعَل mould (bigger, biggest)", "اوپر کا ڈنڈا: أَفْعَل کا سانچا (زیادہ بڑا، سب سے بڑا)"),
+  sent: T("Sent by Allah with the message", "اللہ کی طرف سے پیغام کے ساتھ بھیجے گئے"),
+  refused: T("Refused the message", "پیغام کو رد کیا"),
+  garden: T("The good end: the Garden", "اچھا انجام: جنت"),
+  fire: T("The bad end: the Fire", "برا انجام: آگ"),
+  light: T("Light: truth, what is clear", "روشنی: حق، جو واضح ہے"),
+  dark: T("Dark: falsehood, what is hidden", "اندھیرا: باطل، جو چھپا ہے"),
+  good: T("Good: deeds and people on the right path", "اچھا: صحیح راستے کے اعمال اور لوگ"),
+  bad: T("Bad: deeds and people on the wrong path", "برا: غلط راستے کے اعمال اور لوگ"),
   frontPiece: T("Front piece: clicks onto the start of a word", "اگلا ٹکڑا: لفظ کے شروع میں لگتا ہے"),
   endPiece: T("End piece: clicks onto the end of a word (whose?)", "پچھلا ٹکڑا: لفظ کے آخر میں لگتا ہے (کس کا؟)"),
   person: T("Person wheel: who is meant (I, you, he, she, we, they)", "شخص کا پہیہ: کون مراد ہے (میں، تم، وہ، ہم)"),
@@ -65,11 +67,11 @@ export const TIPS = {
   ruleObjects: T("When Allah is the one who does it (gives, creates, protects), the picture shows only things — never a figure", "جب کرنے والا اللہ ہو (عطا، پیدا، حفاظت) تو تصویر میں صرف چیزیں ہیں — کوئی شخص نہیں"),
   ruleCalm: T("Pictures of the Hereafter, death and fear are calm and gentle, never frightening", "آخرت، موت اور خوف کی تصویریں پرسکون ہیں، ڈراؤنی نہیں"),
   ruleModest: T("Men and women never touch in the pictures; friends and partners are drawn with their own kind", "تصویروں میں مرد اور عورت ایک دوسرے کو نہیں چھوتے؛ دوست اور ساتھی ہم جنس دکھائے گئے ہیں"),
-  masteryLamp: T("Mastery lamp: two dots fill when you get the word right twice in a row; a miss empties it", "مہارت کا چراغ: لفظ لگاتار دو بار درست ہو تو دونوں نقطے بھرتے ہیں؛ غلطی پر خالی"),
-  readLine: T("Reading Room: tap the next line to read it — its words and its meaning appear", "مطالعہ کا کمرہ: اگلی سطر پر ٹیپ کریں — اس کے الفاظ اور معنی سامنے آ جائیں گے"),
+  masteryLamp: T("Last-check lamp: one dot for each right answer; two dots and the word is done. After the first hall, a miss empties them", "آخری امتحان کا چراغ: ہر صحیح جواب پر ایک نقطہ؛ دو نقطے ہوں تو لفظ مکمل۔ پہلے ہال کے بعد غلطی پر نقطے مٹ جاتے ہیں"),
+  readLine: T("Reading Room: tap the next line to read it — its words and its meaning appear", "مطالعہ کا کمرہ: اگلی سطر کو دبائیں — اس کے الفاظ اور معنی سامنے آ جائیں گے"),
   partner: T("Same verb, new path: a verb you know joins a small partner word (فِي، عَلَى، عَنْ …) and its meaning changes", "وہی فعل، نیا راستہ: آپ کا جانا ہوا فعل ایک چھوٹے ساتھی لفظ (فِي، عَلَى، عَنْ …) سے مل کر نیا معنی دیتا ہے"),
   mould: T("Mould Press: a word you know goes into the pattern and comes out grown, with a new meaning from the same root", "سانچا: آپ کا جانا ہوا لفظ سانچے میں جا کر بڑھ جاتا ہے، اسی جڑ سے نیا معنی"),
-  story: T("Story: tap each picture in turn — the room's words tell a little story", "کہانی: ہر تصویر کو باری باری چھوئیں — کمرے کے الفاظ ایک چھوٹی کہانی سناتے ہیں"),
+  story: T("Story: tap each picture in turn — the room's words tell a little story", "کہانی: ہر تصویر کو باری باری دبائیں — کمرے کے الفاظ ایک چھوٹی کہانی سناتے ہیں"),
   stakesWords: T("How many new words this room teaches", "یہ کمرہ کتنے نئے الفاظ سکھاتا ہے"),
   stakesUses: T("How many words of the Qur'an use them — learn these and you meet them that often", "قرآن کے کتنے الفاظ میں یہ آتے ہیں — انہیں سیکھیں تو اتنی بار پہچانیں گے"),
   doerDid: T("Bin: someone did it — the doer is said (خَلَقَ he created)", "خانہ: کسی نے کیا — کرنے والا بتایا گیا (خَلَقَ اس نے پیدا کیا)"),
@@ -79,7 +81,7 @@ export const TIPS = {
   // scene spots
   sky: T("Sky", "آسمان"), sun: T("Sun", "سورج"), moon: T("Moon", "چاند"), day: T("Daytime", "دن"), night: T("Night", "رات"),
   wind: T("Wind", "ہوا"), mountain: T("Mountain", "پہاڑ"), cattle: T("Cattle", "مویشی"), sea: T("Sea", "سمندر"), earth: T("Earth, ground", "زمین"),
-  me: T("🙋 You: the family tree is seen from here", "🙋 آپ: خاندان کو یہیں سے دیکھا جاتا ہے"),
+  me: T("You: the family tree is seen from here", "آپ: خاندان کو یہیں سے دیکھا جاتا ہے"),
   father: T("Your father", "آپ کے والد"), mother: T("Your mother", "آپ کی والدہ"), brother: T("Your brother", "آپ کا بھائی"),
   spouse: T("Your spouse (husband or wife)", "آپ کا شریکِ حیات (شوہر یا بیوی)"), son: T("Your son", "آپ کا بیٹا"),
   daughter: T("Your daughter", "آپ کی بیٹی"), offspring: T("Your children and their children", "آپ کی اولاد اور ان کی اولاد"),
@@ -90,17 +92,21 @@ export const TIPS = {
   here: T("Here, where you are", "یہاں، جہاں آپ ہیں"), there: T("There, far off", "وہاں، دور"),
   people: T("People", "لوگ"), wealth: T("Wealth", "مال"), path: T("Way, path", "راستہ"), goods: T("Goods", "سامان"),
   // progress
-  meter: T("Lamp meter: how much of the Qur'an's words you can now recognise", "چراغ میٹر: قرآن کے کتنے الفاظ آپ پہچانتے ہیں"),
-  doorDone: T("🪔 Room finished", "🪔 کمرہ مکمل"),
-  doorNext: T("✨ Your next room", "✨ آپ کا اگلا کمرہ"),
-  doorLocked: T("🔒 Opens after the room before it", "🔒 پچھلے کمرے کے بعد کھلے گا"),
+  meter: T("Lamp meter: how much of the Qur'an's words you have met so far", "چراغ میٹر: قرآن کے کتنے الفاظ سے آپ اب تک مل چکے ہیں"),
+  practice: T("Quick practice: a short round of your weakest words. It never lowers a lamp.", "فوری مشق: آپ کے کمزور ترین الفاظ کا چھوٹا دور۔ اس سے کوئی چراغ کم نہیں ہوتا۔"),
+  doorDone: T("Room finished", "کمرہ مکمل"),
+  doorNext: T("Your next room", "آپ کا اگلا کمرہ"),
+  doorLocked: T("Opens after the room before it", "پچھلے کمرے کے بعد کھلے گا"),
   doorSoon: T("Being built: coming soon", "زیرِ تعمیر: جلد آ رہا ہے"),
-  relight: T("🔁 Relight: words whose lamps are fading. Review them to keep them lit.", "🔁 دہرائیں: وہ الفاظ جن کے چراغ مدھم ہو رہے ہیں۔ روشن رکھنے کے لیے دہرائیں۔"),
-  hint: T("👆 Show me: first the hand shows where to tap; ask again to see the answer", "👆 دکھائیں: پہلے ہاتھ بتاتا ہے کہاں ٹیپ کریں؛ دوبارہ مانگیں تو جواب"),
+  relight: T("Relight: words whose lamps are fading. Review them to keep them lit.", "دہرائیں: وہ الفاظ جن کے چراغ مدھم ہو رہے ہیں۔ روشن رکھنے کے لیے دہرائیں۔"),
+  hint: T("Show me: first the hand shows where to tap; ask again to see the answer", "دکھائیں: پہلے ہاتھ بتاتا ہے کہاں دبائیں؛ دوبارہ مانگیں تو جواب"),
   dots: T("Dots: how far you are in this round", "نقطے: اس مرحلے میں آپ کتنا آگے ہیں"),
   lampLevel: T("Lamp brightness: how well you remember this word (0–6)", "چراغ کی روشنی: یہ لفظ آپ کو کتنا یاد ہے (0–6)"),
   guide: T("Picture Guide: what every picture and sign means", "تصویری رہنما: ہر تصویر اور نشان کا مطلب"),
 };
+
+/** The text of a tip in the player's language (screen-reader labels of game pieces). */
+export const tipSaid = (key) => TIPS[key]?.[lang()] ?? TIPS[key]?.en ?? "";
 
 export function tip(el, key) {
   if (TIPS[key]) el.dataset.tip = key;
@@ -109,8 +115,10 @@ export function tip(el, key) {
 
 /** A word's full explanation for its tooltip: meaning, extra meanings, and what its picture shows. */
 export function explain(w) {
-  const en = [w.g.en, w.more?.en, w.why ? `Picture: ${w.why.en}` : null].filter(Boolean).join(" · ");
-  const ur = [w.g.ur, w.more?.ur, w.why ? `تصویر: ${w.why.ur ?? w.why.en}` : null].filter(Boolean).join(" · ");
+  // an ayah word or a meaning card carries its own picture line; a word card's comes from content/why.json (ui/why.js)
+  const why = w.why ?? whyOf(w);
+  const en = [w.g.en, w.more?.en, why ? `Picture: ${why.en}` : null].filter(Boolean).join(" · ");
+  const ur = [w.g.ur, w.more?.ur, why ? `تصویر: ${why.ur ?? why.en}` : null].filter(Boolean).join(" · ");
   return { en, ur };
 }
 
@@ -127,7 +135,8 @@ const textOf = (el) => {
 
 const LONG_PRESS_MS = 450;
 const HOVER_MS = 350;
-const SHOW_MS = 2200;
+// after a long-press the finger lifts: only a click that follows within this time belongs to that press
+const OWN_CLICK_MS = 400;
 
 let hideAll = () => {};
 /** Hide the bubble and drop any pending show (YouTube pause, Esc). True when a bubble was showing. */
@@ -140,7 +149,12 @@ export function installTips(root = document) {
   document.body.append(bubble);
   let cancelShow = () => {};
   let cancelHide = () => {};
+  // A long-press explains; it must not also answer. So the click that ends that same press is swallowed, and only
+  // that one: the flag is dropped when the press is cancelled, shortly after the finger lifts, and at the start of
+  // every new press, so the player's next real tap always counts.
   let swallowClick = false;
+  let cancelSwallow = () => {};
+  const keepNextTap = () => { cancelSwallow(); swallowClick = false; };
   const find = (e) => e.target.closest?.("[data-tip], [data-tip-en]");
   const hide = () => { cancelShow(); bubble.hidden = true; };
   hideAll = () => { const was = !bubble.hidden; cancelHide(); hide(); return was; };
@@ -156,6 +170,7 @@ export function installTips(root = document) {
     const left = Math.min(Math.max(8, r.left + r.width / 2 - b.width / 2), innerWidth - b.width - 8);
     bubble.style.top = `${top}px`;
     bubble.style.left = `${left}px`;
+    return text;
   };
   root.addEventListener("pointerover", (e) => {
     if (e.pointerType === "touch") return;
@@ -166,21 +181,30 @@ export function installTips(root = document) {
   });
   root.addEventListener("pointerout", (e) => { if (e.pointerType !== "touch" && find(e)) hide(); });
   root.addEventListener("pointerdown", (e) => {
+    keepNextTap();
     hide();
     if (e.pointerType !== "touch") return;
     const el = find(e);
     if (!el) return;
     cancelShow = later(() => {
-      show(el);
-      swallowClick = true; // a long-press explains; it must not also answer
+      const text = show(el);
+      if (!text) return;
+      swallowClick = true;
       cancelHide();
-      cancelHide = later(hide, SHOW_MS);
+      cancelHide = later(hide, tipShowMs(text)); // longer text stays up longer
     }, LONG_PRESS_MS);
-  });
-  for (const ev of ["pointerup", "pointercancel"]) root.addEventListener(ev, () => cancelShow());
+  }, true);
+  root.addEventListener("pointerup", () => {
+    cancelShow();
+    if (!swallowClick) return;
+    cancelSwallow();
+    cancelSwallow = later(() => { swallowClick = false; }, OWN_CLICK_MS);
+  }, true);
+  // the browser took the press over (a scroll, a system gesture): no click will follow it
+  root.addEventListener("pointercancel", () => { cancelShow(); keepNextTap(); }, true);
   root.addEventListener("click", (e) => {
     if (!swallowClick) return;
-    swallowClick = false;
+    keepNextTap();
     e.preventDefault();
     e.stopPropagation();
   }, true);

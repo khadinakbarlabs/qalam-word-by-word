@@ -1,6 +1,7 @@
 // E1 Scene Hunt: a word appears; tap the thing in a drawn scene (step.scene: signs, family, body, town; see
 // game/core/scenes.js). Signs = day | night under one sky; family = a tree around "me"; body = a standing figure.
-import { h, ar, pic, dots, wait, wobble } from "../kit.js";
+import { tipSaid } from "../tips.js";
+import { h, ar, pic, dots, wait, wobble, arSay } from "../kit.js";
 import { SCENES } from "../../core/scenes.js";
 
 const graphemes = (s) => [...new Intl.Segmenter().segment(s)].length;
@@ -12,7 +13,7 @@ export function run(ctx, step) {
     const spots = new Map(used.map((id) => {
       const s = def.spots[id];
       const look = (s.art && ctx.words[s.art]?.pic) || s.pic;
-      return [id, h("button", { class: `scene-spot${s.big ? " big" : ""}${graphemes(s.pic) > 1 && look === s.pic ? " multi" : ""}`, "aria-label": id, "data-tip": id, style: `left:${s.x}%;top:${s.y}%` }, pic(look))];
+      return [id, h("button", { class: `scene-spot${s.big ? " big" : ""}${graphemes(s.pic) > 1 && look === s.pic ? " multi" : ""}`, "aria-label": tipSaid(id), "data-tip": id, style: `left:${s.x}%;top:${s.y}%` }, pic(look))];
     }));
     const marks = Object.entries(def.marks ?? {}).map(([id, m]) =>
       h("span", { class: "scene-mark", "data-tip": id, style: `left:${m.x}%;top:${m.y}%` }, pic((m.art && ctx.words[m.art]?.pic) || m.pic)));
@@ -36,7 +37,7 @@ export function run(ctx, step) {
       if (i >= step.items.length) return done();
       const item = step.items[i];
       ctx.item([item.w]);
-      prompt.replaceChildren(ar(ctx.words[item.w].ar, "word"));
+      prompt.replaceChildren(arSay(ctx.words[item.w], "word"));
       ctx.target(spots.get(item.spot));
       const d = dots(i, step.items.length);
       progress.replaceWith(d);

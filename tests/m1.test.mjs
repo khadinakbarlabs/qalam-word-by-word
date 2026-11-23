@@ -8,13 +8,15 @@ import { newCard } from "../game/core/srs.js";
 import { startMastery, answer, direction, isMastered } from "../game/core/mastery.js";
 import { keys, resolveLang } from "../game/i18n.js";
 
+import { ROOM_SPLITS } from "../game/core/room-splits.js";
 const corpus = await loadCorpus();
 const { pack, errors } = buildPack(corpus);
 
 test("content pack builds with no validation errors", () => {
   assert.deepEqual(errors, []);
-  assert.equal(pack.rooms.filter((r) => r.wing === 1).length, 13, "Wing 1 complete: Al-Fatiha in 2 rooms + 10 rooms + Reading Room 1");
-  assert.equal(pack.rooms.filter((r) => r.wing === 2).length, 13, "Wing 2 complete: 10 rooms + 2 review halls + Reading Room 2");
+  // rooms are split so none teaches too many words at once (authoring/splits.js): Wing 1 at most 8, later wings 20
+  assert.equal(pack.rooms.filter((r) => r.wing === 1).length, 24, "Wing 1 complete: Al-Fatiha in 5 rooms + 18 rooms + Reading Room 1");
+  assert.equal(pack.rooms.filter((r) => r.wing === 2).length, 20, "Wing 2 complete: 17 rooms + 2 review halls (split) + Reading Room 2");
   const wing2End = pack.rooms.filter((r) => r.wing === 2).at(-1).coverageAfter;
   // Reading Room 2 (Al-Asr) pulls آمَنَ / عَمِلَ / صَبْر forward, so Wing 2 ends a little above the booklet's ≈ 60%
   assert.ok(wing2End > 55 && wing2End < 67, `Wing 2 ends at ${wing2End}% (booklet pp. 1–15 ≈ 60%)`);
@@ -49,15 +51,21 @@ test("the meter only goes up, room by room, and names of Allah have no pictures"
   const pcts = pack.rooms.map((r) => r.coverageAfter);
   assert.deepEqual([...pcts].sort((a, b) => a - b), pcts);
   const wing1End = pack.rooms.filter((r) => r.wing === 1).at(-1).coverageAfter;
-  assert.ok(pcts[0] > 3 && pcts[1] > 5 && wing1End > 40 && wing1End < 50, `Al-Fatiha reaches ${pcts[0]}% then ${pcts[1]}%; Wing 1 ends at ${wing1End}%`);
+  assert.ok(pcts[0] > 3 && pcts[2] > 5 && pcts[4] > 11 && wing1End > 40 && wing1End < 50, `Al-Fatiha reaches ${pcts[0]}%, ${pcts[2]}% then ${pcts[4]}%; Wing 1 ends at ${wing1End}%`);
   for (const id of ["w:allah", "w:rahman", "w:rahim", "w:rabb", "w:malik", "w:alim", "w:sami", "w:basir", "w:aziz", "w:hakim", "w:ghafur"]) {
     assert.ok(pack.words[id].medal && !pack.words[id].pic, id);
   }
 });
 
 test("later rooms repeat earlier words (built-in review)", () => {
-  // the second Al-Fatiha room continues the same surah, so only the rooms after it must bring earlier words back
-  for (const room of pack.rooms.slice(2)) assert.ok(room.reviews.length >= 5, room.id);
+  // Al-Fatiha's rooms continue one surah, so only the rooms after it must bring earlier words back. A room written
+  // as one and played in parts (core/room-splits.js) is counted as a whole: its first part may be all new words.
+  const whole = new Map();
+  for (const room of pack.rooms.filter((r) => !/^fatiha/.test(r.id))) {
+    const base = Object.keys(ROOM_SPLITS).find((old) => ROOM_SPLITS[old].includes(room.id)) ?? room.id;
+    whole.set(base, new Set([...(whole.get(base) ?? []), ...room.reviews]));
+  }
+  for (const [id, reviews] of whole) assert.ok(reviews.size >= 5, id);
 });
 
 test("save round-trips; corrupt or future saves are blocked, bad cards dropped", () => {
@@ -79,7 +87,8 @@ test("room results: worst outcome wins; new words land at level 1 or 2", () => {
   assert.deepEqual(s.results, { a: "easy", b: "wrong" });
   const room = { teaches: ["a", "b", "c"], reviews: [] };
   const out = Object.fromEntries(finishRoom(s, room, {}, 100).map((c) => [c.id, [c.level, c.due - 100]]));
-  assert.deepEqual(out, { a: [2, 1], b: [1, 0], c: [1, 0] });
+  // right every time: one flame, back tomorrow; missed or only met: one flame, back today
+  assert.deepEqual(out, { a: [1, 1], b: [1, 0], c: [1, 0] });
 });
 
 test("reviewed words move only when due; a miss always counts", () => {
@@ -96,7 +105,7 @@ test("map unlocks rooms in order and the meter follows finished rooms", () => {
   assert.deepEqual(roomStates(pack, { fatiha: 1 }), ["done", "next", ...locked(pack.rooms.length - 2)]);
   assert.equal(meter(pack, {}), 0);
   assert.equal(meter(pack, { fatiha: 1, "near-far": 1 }), pack.rooms[0].coverageAfter, "the meter stops at the first room not done");
-  assert.equal(meter(pack, { fatiha: 1, "fatiha-2": 1, "near-far": 1 }), pack.rooms[2].coverageAfter);
+  assert.equal(meter(pack, { fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "near-far": 1 }), pack.rooms[2].coverageAfter);
 });
 
 test("English and Urdu interface strings match key for key; Urdu hosts get Urdu", () => {
@@ -154,7 +163,7 @@ test("finished rooms get back any word card the save is missing, due today", () 
   const room = pack.rooms[1];
   const cards = Object.fromEntries(room.teaches.slice(1).map((id) => [id, newCard(id, 1)]));
   const out = missingCards(pack, { [room.id]: 1 }, cards, 50);
-  assert.deepEqual(out.map((c) => [c.id, c.due]), [[room.teaches[0], 50]]);
+  assert.deepEqual(out.map((c) => [c.id, c.due, c.level]), [[room.teaches[0], 50, 1]], "level 1: a level-0 card is never due");
   assert.deepEqual(missingCards(pack, {}, {}, 50), []);
 });
 
@@ -264,11 +273,12 @@ test("every Reading Room closes its wing and reads a whole surah with only learn
 
 test("Wing 3: every Six Petals form grows from its root and every verb card has a picture prompt", async () => {
   const { ART } = await import("../authoring/art.js");
+  const { WORDS } = await import("../authoring/words.js");
   const petals = pack.rooms.flatMap((r) => r.steps).filter((s) => s.type === "petals");
   assert.ok(petals.length >= 4);
   for (const st of petals) assert.equal(new Set(st.items.map((it) => it.petal)).size, st.items.length, "each petal asked once per round");
   for (const id of Object.keys(pack.words).filter((k) => k.startsWith("w:"))) {
-    if (pack.words[id].emoji) assert.ok(ART[id], `${id} has a picture prompt`);
+    if (WORDS[id].pic) assert.ok(ART[id], `${id} has a picture prompt`);
   }
 });
 

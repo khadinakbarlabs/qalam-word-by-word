@@ -15,13 +15,15 @@
 html, body { margin: 0; height: 100%; }
 body { background: radial-gradient(circle at 50% -10%, #fff6dd 0, var(--paper) 60%); color: var(--ink); font-family: var(--ui); overflow: hidden; -webkit-tap-highlight-color: transparent; }
 [dir="rtl"] body { font-family: var(--urdu); }
-#app { height: 100dvh; display: flex; flex-direction: column; }
+#app { height: 100vh; height: 100dvh; display: flex; flex-direction: column; } /* vh first: browsers without dvh keep a height */
 button { font: inherit; color: inherit; cursor: pointer; }
 button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 [lang="ar"] { font-family: var(--quran); }
-.cap { display: block; font-size: .8rem; color: var(--ink-soft); line-height: 1.6; }
-[lang="ur"].cap, [dir="rtl"] .cap { font-family: var(--urdu); line-height: 2.2; font-size: .82rem; }
-body.nocap .cap:not(.title-cap):not(.sign-text):not(.room-name):not(.tr-text) { visibility: hidden; }
+.cap { display: block; font-size: var(--t-cap); color: var(--ink-soft); line-height: 1.6; } /* type floors: feel.css */
+[lang="ur"].cap, [dir="rtl"] .cap { font-family: var(--urdu); line-height: 2.2; font-size: var(--t-ur); }
+/* instructions are not picture captions: they stay when captions are off (tell-title, left-label and say-line carry
+   no "cap" class at all and have their own rules) */
+body.nocap .cap:not(.title-cap):not(.sign-text):not(.room-name):not(.tr-text):not(.rest-say):not(.door-cap) { visibility: hidden; }
 .wrong .cap, .reveal .cap { visibility: visible !important; }
 .pic { font-size: 2.2rem; line-height: 1.2; position: relative; display: inline-block; }
 /* painted pictures scale with the same font-size the emoji used, a little larger since they carry detail */
@@ -47,7 +49,23 @@ body.nocap .cap:not(.title-cap):not(.sign-text):not(.room-name):not(.tr-text) { 
 .loading-text[lang="ur"] { font-family: var(--urdu); line-height: 2.1; }
 .boot-error .loading-text { color: var(--ink); }
 .retry-btn { margin-top: 10px; min-height: var(--touch); padding-inline: 18px; }
-.toast { position: fixed; inset: auto 12px 12px; padding: 10px 14px; border-radius: 12px; background: var(--ink); color: var(--paper); font-size: .85rem; z-index: 50; }
+/* notices sit under the header, never over the bottom controls (map dock, the ▶ of a stage), and carry their own ✕ */
+.notice { position: fixed; inset: calc(64px + env(safe-area-inset-top, 0px)) 12px auto; display: flex; align-items: center; gap: 8px; max-width: 520px; margin-inline: auto;
+  padding: 6px 6px 6px 14px; border-radius: 12px; background: var(--ink); color: var(--paper); font-size: .9rem; line-height: 1.35; z-index: 50; animation: fade .3s; }
+[dir="rtl"] .notice { padding: 6px 14px 6px 6px; font-family: var(--urdu); line-height: 1.9; }
+.notice-text { flex: 1; min-width: 0; }
+.notice-x { flex: none; min-width: 44px; min-height: 44px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--paper) 45%, transparent); background: none; color: inherit; font-size: 1rem; }
+.notice-x:focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; }
+.boot-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+/* the "Something went wrong" card (ui/oops.js) */
+.oops-screen { flex: 1; display: grid; place-content: center; padding: 16px; }
+.oops-lamp { filter: grayscale(.5); }
+.oops .rest-say { margin: 0; max-width: 32ch; }
+.oops-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
+.oops-btn { min-height: var(--touch); padding-inline: 18px; font-weight: 600; }
+.oops-btn:first-child { border: 2px solid var(--lamp); background: #fff8e6; }
+/* a tapped door while its room loads */
+.door.opening .arch { animation: breathe 1s infinite; }
 
 /* ---------- hall map ---------- */
 .hall { flex: 1; display: flex; flex-direction: column; min-height: 0; position: relative; }
@@ -61,8 +79,6 @@ body.nocap .cap:not(.title-cap):not(.sign-text):not(.room-name):not(.tr-text) { 
 .hall-map { position: relative; max-width: 560px; margin: 0 auto 140px; } /* room below the last door for the Relight button */
 .hall-banner { position: sticky; top: 0; z-index: 2; display: flex; justify-content: center; gap: 8px; align-items: center; padding: 6px; font-weight: 700;
   background: linear-gradient(var(--paper), transparent); }
-.wing-gate { position: absolute; left: 50%; transform: translate(-50%, -50%); z-index: 1; display: flex; gap: 8px; align-items: center; white-space: nowrap;
-  padding: 6px 16px; border-radius: 20px; font-weight: 700; background: #e3f0dc; border: 2px solid #9cc79a; color: #2f5d34; }
 .hall-path { position: absolute; inset: 0; pointer-events: none; }
 .door { position: absolute; transform: translate(-50%, -50%); background: none; border: 0; display: flex; flex-direction: column; align-items: center; width: 120px; padding: 0; }
 .arch { width: 76px; height: 86px; border-radius: 40px 40px 10px 10px; display: grid; place-items: center; background: #e9dcc0; border: 3px solid #b8955f;
@@ -466,6 +482,7 @@ body.paused *, body.paused *::before, body.paused *::after { animation-play-stat
 .step-dots li.m { border-radius: 2px; }
 
 /* "what the picture shows": a short line under a word's meaning (meet card back, dictionary) */
+.why-slot { display: contents; }
 .cap.why { font-size: .66rem; font-style: italic; line-height: 1.3; padding: 0 8px; text-align: center; }
 .meet-card .back .cap.why { max-height: 2.7em; overflow: hidden; }
 
@@ -505,10 +522,10 @@ body.paused *, body.paused *::before, body.paused *::after { animation-play-stat
 /* E8 Reading Room: the whole passage on one page, read line by line */
 .read-head { display: grid; justify-items: center; gap: 2px; margin-bottom: 8px; }
 .read-label { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--lamp); }
-.read-title { font-family: var(--quran-font, inherit); font-size: 1.7rem; line-height: 2.2; }
+.read-title { font-family: var(--quran); font-size: 1.7rem; line-height: 2.2; }
 .read-page { max-width: calc(640px / var(--fz, 1)); margin: 0 auto; padding: 10px 12px; background: var(--card); border: 2px solid var(--line); border-radius: 18px;
   box-shadow: inset 0 0 0 6px #fbf3e2; display: grid; gap: 6px; }
-.read-line { all: unset; cursor: pointer; display: block; border-radius: 14px; padding: 2px 4px; transition: background var(--duration-fast, .15s); }
+.read-line { all: unset; cursor: pointer; display: block; border-radius: 14px; padding: 2px 4px; transition: opacity .15s; }
 .read-line:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 .read-line .ayah { margin: 4px 0; }
 .read-line .read-tile { border-color: var(--blue); box-shadow: 0 0 0 3px #cfdcf0; }
@@ -531,6 +548,9 @@ body.paused *, body.paused *::before, body.paused *::after { animation-play-stat
   background: linear-gradient(90deg, var(--gold) var(--lit), var(--line) var(--lit)); }
 [dir="rtl"] .rest-card .big-lamp.half::after { background: linear-gradient(270deg, var(--gold) var(--lit), var(--line) var(--lit)); }
 .rest-say { max-width: 28ch; }
+/* an end-of-session line in Relight and Quick practice: an instruction, shown whether captions are on or off */
+.say-line { display: block; font-size: .8rem; color: var(--ink-soft); line-height: 1.6; text-align: center; }
+[dir="rtl"] .say-line, [dir="rtl"] .left-label, [dir="rtl"] .tell-title { font-family: var(--urdu); line-height: 2.2; }
 .dict-count.due-all { display: flex; justify-content: center; align-items: center; gap: 4px; }
 .dict-count.due-all .pic-img { width: 22px; height: 22px; }
 /* Short screens (under 420 px tall): Qalam's line folds away and Relight joins the dock in one row, so the map keeps
@@ -593,7 +613,6 @@ body.kbd .choice::after { counter-increment: opt; content: counter(opt); positio
 .intro-langs { display: flex; gap: 8px; margin-top: 4px; }
 @media (max-height: 520px) and (min-aspect-ratio: 3/2) { .howto { margin-top: 4px; padding: 4px 12px; font-size: .85rem; } }
 [dir="rtl"] .intro-goal { line-height: 2.2; }
-[dir="rtl"] .icon-btn.labeled:not(.hint-btn) > span[aria-hidden="true"]:first-child { display: inline-block; transform: scaleX(-1); } /* ◀ back points the reading way */
 .map-next { display: grid; gap: 2px; min-width: 0; }
 .map-next-name { display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; font-weight: 700; }
 .map-next-name .cap { display: inline; font-size: .95rem; color: var(--ink); font-weight: 700; }
@@ -683,3 +702,80 @@ body.kbd .choice::after { counter-increment: opt; content: counter(opt); positio
 .won-more { align-self: center; font-weight: 600; }
 .next-up { font-size: 0.95rem; opacity: 0.85; }
 @media (max-height: 500px) { .won-card .pic, .won-card .medal { font-size: 1rem; } .won { gap: 3px; } }
+
+/* fair grading (Phase B): the hint ladder, helped answers, the Relight counter and its honest end card */
+.nudged { opacity: .28; filter: grayscale(1); pointer-events: none; transition: opacity .25s; }
+.helped { border-color: var(--gold) !important; box-shadow: 0 0 0 5px var(--lamp-glow) !important; }
+.howto.note { border-inline-start-color: var(--gold); background: #fff9ea; animation: fade .3s; }
+.m-lamp.again { animation: pop .5s var(--ease) 2; border-color: var(--gold); }
+.relight-left { display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 10px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-size: .85rem; white-space: nowrap; }
+.relight-left .left-num { font-size: 1rem; }
+.relight-left .left-label { font-size: .8rem; color: var(--ink-soft); }
+.done-choices { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
+.more-num { font-size: 1.4rem; color: var(--lamp); }
+
+/* ---- Phase D (gentler start and real learning) ---- */
+/* a meaning written out: never hidden with captions, it is the only meaning a calligraphy word has */
+.means { font-weight: 600; line-height: 1.35; text-align: center; overflow-wrap: anywhere; }
+html[lang="ur"] .means { line-height: 1.9; }
+.medal.means-medal { min-width: 84px; width: auto; max-width: 100%; height: auto; min-height: 56px; padding: 8px 12px; border-radius: 18px; font-family: inherit; font-size: .95rem; direction: inherit; }
+.medal.means-medal.scroll { border-radius: 6px; }
+.big-means { display: grid; place-items: center; min-width: 160px; max-width: 520px; padding: 10px 18px; border-radius: 18px; background: #fff; border: 2px solid var(--lamp); box-shadow: 0 0 0 6px var(--lamp-glow); }
+.big-means .means { font-size: 1.5rem; }
+/* "how to say it": off unless the player turns it on (Settings) */
+.say { display: none; font-size: .85rem; line-height: 1.3; color: var(--ink-soft); font-style: normal; letter-spacing: .01em; unicode-bidi: isolate; }
+body.say-on .say { display: block; }
+.ar-say { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; }
+.tile .say { font-size: .78rem; }
+.won-card .say { font-size: .7rem; }
+/* a word with its meaning: after a right answer, and for the choice tapped by mistake */
+.pair { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.pair-ar { font-size: 1.3rem; line-height: 1.9; }
+.pair-eq { color: var(--ink-soft); }
+.pair-g { font-size: .95rem; }
+.pair .say { font-size: .8rem; }
+.prompt { flex-direction: column; gap: 4px; }
+.prompt .pair.learned { animation: fade .3s; padding: 2px 12px; border-radius: 12px; background: #f2fbf4; border: 1px solid var(--ok); }
+.howto-lines { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.howto-picked { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: .9rem; }
+.howto-picked[hidden] { display: none; }
+.howto-picked-label { color: var(--ink-soft); }
+.howto-picked .pair-ar { font-size: 1.15rem; line-height: 1.7; }
+/* Last Check: one compact row of two-dot lamps, no title text (the helper strip says the rule once) */
+.m-shelf { gap: 3px; margin-bottom: 4px; }
+.m-shelf .m-badge { margin-inline-end: 4px; font-size: .85rem; }
+.m-lamp { padding: 2px 4px; border-radius: 8px; }
+.m-lamp i { width: 6px; height: 6px; }
+/* tell these apart: two Arabic words side by side */
+.tell { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.tell-title { display: block; font-size: 1rem; font-weight: 700; color: var(--ink); text-align: center; }
+.tell-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: min(520px, 100%); }
+.tell-pair .choice { min-height: 96px; }
+.tell-after { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+/* small picture legends under a game (Near & Far, Snap Pieces) instead of rules in the sentence */
+.legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin: 6px auto 0; padding: 0; list-style: none; font-size: .82rem; color: var(--ink-soft); }
+.legend li { display: inline-flex; align-items: center; gap: 5px; }
+.legend .legend-pic { display: inline-grid; place-items: center; min-width: 22px; font-size: 1rem; color: var(--ink); }
+.legend .legend-pic.big { font-size: 1.35rem; }
+.legend .legend-pic.small { font-size: .75rem; }
+.legend .chip.demo { padding: 1px 8px; min-height: 0; font-size: .8rem; }
+/* honest progress */
+.meter { flex-direction: row; }
+.meter-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.05; }
+.meter-label { font-size: .68rem; font-weight: 600; color: var(--ink-soft); max-width: 9ch; }
+.done-counts { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+.done-count { display: flex; flex-direction: column; align-items: center; }
+.done-count strong { font-size: 1.5rem; color: var(--lamp-ink); }
+.done-count span { font-size: .85rem; }
+.report { display: flex; flex-direction: column; gap: 12px; max-width: 560px; margin: 0 auto; }
+.report-row { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.report-row strong { font-size: 1.6rem; color: var(--lamp-ink); min-width: 2.5ch; text-align: end; }
+.report-row .of { color: var(--ink-soft); }
+.report-row p { margin: 0; flex: 1; }
+.report-row small { display: block; color: var(--ink-soft); }
+.report-bars { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.report-bar { display: grid; grid-template-columns: 5.5em 1fr 3ch; align-items: center; gap: 8px; font-size: .85rem; }
+.report-bar i { display: block; height: 10px; border-radius: 5px; background: var(--gold); min-width: 2px; width: calc(var(--w) * 1%); }
+.guide-tabs { flex-wrap: wrap; }
+.set-row .set-note { flex-basis: 100%; font-weight: 400; font-size: .82rem; color: var(--ink-soft); }
+.relight-btn.practice { border-color: var(--line); box-shadow: none; }

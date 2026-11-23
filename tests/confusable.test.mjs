@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { pickOptions, whyNot } from "../game/core/confusable.js";
+import { whyNot } from "../game/core/confusable.js";
+import { pickOptions } from "../game/core/options.js";
 import { warmUpWords } from "../game/core/warmup.js";
 import { today, sessionSize } from "../game/core/srs.js";
 

@@ -1,12 +1,12 @@
 // E2 Time Line: a word appears; tap its place on the time arrow (past / now / later, or done / soon / later).
 // With `stamp`, the tap drops that stamp on the segment: the "No Stamp" (لَمْ ✕ past, لَنْ ✕ future, لَا ✕ now).
 // As a `sort` step the same game has no arrow: the segments are bins (garden 🌳 / fire 🔥, light 🕯️ / dark 🌑).
-import { h, ar, pic, dots, wait, wobble } from "../kit.js";
-import { tip } from "../tips.js";
+import { h, arSay, pic, dots, wait, wobble } from "../kit.js";
+import { tip, tipSaid } from "../tips.js";
 
 export function run(ctx, step) {
   return new Promise((done) => {
-    const segs = step.segments.map((s) => tip(h("button", { class: `seg seg-${s.id}`, "aria-label": s.id }, pic(s.art && ctx.words[s.art]?.pic ? ctx.words[s.art].pic + (s.pic.match(/[▲●]$/)?.[0] ?? "") : s.pic)), s.id));
+    const segs = step.segments.map((s) => tip(h("button", { class: `seg seg-${s.id}`, "aria-label": tipSaid(s.id) }, pic(s.art && ctx.words[s.art]?.pic ? ctx.words[s.art].pic + (s.pic.match(/[▲●]$/)?.[0] ?? "") : s.pic)), s.id));
     const prompt = h("div", { class: "prompt" });
     let progress = dots(0, step.items.length);
     let i = 0;
@@ -31,7 +31,7 @@ export function run(ctx, step) {
       if (i >= step.items.length) return done();
       const item = step.items[i];
       ctx.item([item.w]);
-      prompt.replaceChildren(ar(item.ar ?? ctx.words[item.w].ar, "word"));  // `ar`: another shape of the same word (خُلِقَ for خَلَقَ)
+      prompt.replaceChildren(arSay(item.ar ? item : ctx.words[item.w], "word"));  // `ar`: another shape of the same word (خُلِقَ for خَلَقَ)
       ctx.target(segs[step.segments.findIndex((s) => s.id === item.seg)]);
       const d = dots(i, step.items.length);
       progress.replaceWith(d);

@@ -53,38 +53,68 @@ const DONE_SOON_LATER = [{ id: "done", pic: "✔️", art: "ui:done" }, { id: "s
 
 export const ROOMS = [
   {
-    // Al-Fatiha is two short rooms, not one: the first session stays about 3 minutes (POLISH_PLAN B1). Verses 1–4 praise
-    // Allah; verses 5–7 ask for guidance. The "Al-Fatiha understood" milestone (core/milestones.js) needs both.
-    id: "fatiha", wing: 1, icon: "📜", art: "w:hamd", ref: "prologue",
-    title: { en: "Al-Fatiha: Praise", ur: "سورۃ الفاتحہ: حمد" },
+    // Al-Fatiha is five short rooms (docs/AUDIT_2026-11-23.md, "gentler start"): no room teaches more than 8 new words,
+    // the ayat stay in order, and every new word is asked once in a Picture Match before the room's Last Check.
+    // 1:1 · 1:2–1:4 · 1:5 · 1:6 · 1:7. The "Al-Fatiha understood" milestone (core/milestones.js) needs all five.
+    // Before save v6 the surah was two rooms ("fatiha" 1:1–1:4, "fatiha-2" 1:5–1:7): game/core/room-splits.js.
+    id: "fatiha", wing: 1, icon: "📜", art: "w:ism", ref: "prologue",
+    title: { en: "Al-Fatiha: Bismillah", ur: "سورۃ الفاتحہ: بسم اللہ" },
     steps: [
       { type: "ayah", ref: "1:1" },
-      { type: "ayah", ref: "1:2" },
-      { type: "ayah", ref: "1:3" },
-      { type: "ayah", ref: "1:4" },
-      { type: "match", words: ["w:ism", "w:yawm", "w:alam", "w:hamd", "w:din"] },
+      { type: "match", words: ["w:ism", "w:allah", "w:rahman", "w:bi", "w:rahim", "w:al"] },
       {
-        type: "snap", chips: ["w:bi", "w:li", "w:al"],
-        tasks: [
-          { base: { ar: "اسْم", pic: "🏷️" }, want: ["w:bi"], result: "بِسْمِ", show: ["✋", "🏷️"] },
-          { base: { ar: "اللّٰه", medal: "اللّٰه" }, want: ["w:li"], result: "لِلّٰهِ", show: ["🎁", "medal:اللّٰه"] },
-        ],
+        type: "snap", chips: ["w:bi", "w:al"],
+        tasks: [{ base: { ar: "اسْم", pic: "🏷️" }, want: ["w:bi"], result: "بِسْمِ", show: ["✋", "🏷️"] }],
       },
     ],
   },
   {
-    id: "fatiha-2", wing: 1, icon: "🧭", art: "w:sirat", ref: "prologue",
-    title: { en: "Al-Fatiha: Guidance", ur: "سورۃ الفاتحہ: ہدایت" },
+    id: "fatiha-1b", wing: 1, icon: "✨", art: "w:hamd", ref: "prologue",
+    title: { en: "Al-Fatiha: Praise", ur: "سورۃ الفاتحہ: حمد" },
+    steps: [
+      { type: "ayah", ref: "1:2" },
+      { type: "match", words: ["w:hamd", "w:rabb", "w:li", "w:alam"] },
+      { type: "ayah", ref: "1:3" },
+      { type: "ayah", ref: "1:4" },
+      { type: "match", words: ["w:yawm", "w:malik", "w:din"] },
+      {
+        type: "snap", chips: ["w:bi", "w:li", "w:al"],
+        tasks: [{ base: { ar: "اللّٰه", medal: "اللّٰه" }, want: ["w:li"], result: "لِلّٰهِ", show: ["🎁", "medal:اللّٰه"] }],
+      },
+    ],
+  },
+  {
+    id: "fatiha-2", wing: 1, icon: "🤲", art: "w:nabudu", ref: "prologue",
+    title: { en: "Al-Fatiha: You Alone", ur: "سورۃ الفاتحہ: تیری ہی عبادت" },
     steps: [
       { type: "ayah", ref: "1:5" },
+      { type: "match", words: ["w:nabudu", "w:iyya", "w:nastain", "w:wa", "w:ka"] },
+    ],
+  },
+  {
+    id: "fatiha-2b", wing: 1, icon: "🧭", art: "w:sirat", ref: "prologue",
+    title: { en: "Al-Fatiha: Guide Us", ur: "سورۃ الفاتحہ: ہدایت" },
+    steps: [
       { type: "ayah", ref: "1:6" },
-      { type: "ayah", ref: "1:7" },
+      { type: "match", words: ["w:sirat", "w:ihdi", "w:mustaqim", "w:na"] },
       {
-        type: "snap", chips: ["w:bi", "w:li", "w:na", "w:hum", "w:wa"],
-        tasks: [
-          { base: { ar: "اهْدِ", pic: "🧭" }, want: ["w:na"], result: "اهْدِنَا", show: ["🧭", "🙋🙋"] },
-          { base: { ar: "عَلَى", pic: "⏬" }, want: ["w:hum"], result: "عَلَيْهِمْ", show: ["⏬", "👥"] },
-        ],
+        type: "snap", chips: ["w:bi", "w:li", "w:na", "w:ka"],
+        tasks: [{ base: { ar: "اهْدِ", pic: "🧭" }, want: ["w:na"], result: "اهْدِنَا", show: ["🧭", "🙋🙋"] }],
+      },
+    ],
+  },
+  {
+    // the long last ayah is read in two halves, each followed by its own Picture Match
+    id: "fatiha-2c", wing: 1, icon: "🛤️", art: "w:anamta", ref: "prologue",
+    title: { en: "Al-Fatiha: The Path", ur: "سورۃ الفاتحہ: راستہ" },
+    steps: [
+      { type: "ayah", ref: "1:7", part: [1, 4] },
+      { type: "match", words: ["w:anamta", "w:alladhina", "w:ala", "w:hum"] },
+      { type: "ayah", ref: "1:7", part: [5, 9] },
+      { type: "match", words: ["w:ghayr", "w:dallin", "w:la", "w:maghdub"] },
+      {
+        type: "snap", chips: ["w:na", "w:hum", "w:ka", "w:wa"],
+        tasks: [{ base: { ar: "عَلَى", pic: "⏬" }, want: ["w:hum"], result: "عَلَيْهِمْ", show: ["⏬", "👥"] }],
       },
     ],
   },
@@ -575,8 +605,8 @@ export const ROOMS = [
         type: "ladder",
         items: [
           { w: "w:ahsan", base: "w:hasana", rung: "more" }, { w: "w:ali", base: "w:ali", rung: "base" }, { w: "w:ala_more", base: "w:ali", rung: "more" },
-          { w: "w:ahaqq", base: "w:haqq", rung: "more" }, { w: "w:qarib", base: "w:qarib", rung: "base" }, { w: "w:adna", base: "w:qarib", rung: "more" },
-          { w: "w:azlam", base: "w:sharr", rung: "more" }, { w: "w:ahda", base: "w:ihdi", rung: "more" }, { w: "w:ahabb", base: "w:qalb", rung: "more" },
+          { w: "w:ahaqq", base: "w:haqq", rung: "more" }, { w: "w:qarib", base: "w:qarib", rung: "base" }, { w: "w:adna", base: "w:adna", rung: "more" },
+          { w: "w:azlam", base: "w:azlam", rung: "more" }, { w: "w:ahda", base: "w:ihdi", rung: "more" }, { w: "w:ahabb", base: "w:ahabb", rung: "more" },
           { w: "w:wali", base: "w:wali", rung: "base" }, { w: "w:awla", base: "w:wali", rung: "more" },
         ],
       },

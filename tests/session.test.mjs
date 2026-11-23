@@ -33,16 +33,16 @@ test("finishing the room, or a content change to its steps, drops the checkpoint
   assert.equal(parseSave(JSON.stringify(done)).save.at, null);
 });
 
-test("the first session is light: Al-Fatiha is two short rooms (POLISH_PLAN B1)", () => {
-  const [first, second, third] = pack.rooms;
-  assert.deepEqual([first.id, second.id], ["fatiha", "fatiha-2"]);
-  assert.ok(first.teaches.length <= 15 && second.teaches.length <= 18, `${first.teaches.length} + ${second.teaches.length} new words`);
-  assert.equal(first.teaches.length + second.teaches.length, 30, "the whole surah's 30 words are still taught");
-  for (const r of [first, second]) {
-    assert.ok(roomTaps(r, pack.words) <= 80, `${r.id}: ${roomTaps(r, pack.words)} taps`);
+test("the first session is light: Al-Fatiha is five short rooms, none with more than 8 new words", () => {
+  const surah = pack.rooms.slice(0, 5);
+  assert.deepEqual(surah.map((r) => r.id), ["fatiha", "fatiha-1b", "fatiha-2", "fatiha-2b", "fatiha-2c"]);
+  assert.ok(surah.every((r) => r.teaches.length <= 8), surah.map((r) => r.teaches.length).join(" + "));
+  assert.equal(surah.reduce((n, r) => n + r.teaches.length, 0), 30, "the whole surah's 30 words are still taught");
+  for (const r of surah) {
+    assert.ok(roomTaps(r, pack.words) <= 60, `${r.id}: ${roomTaps(r, pack.words)} taps`);
     assert.deepEqual(restStops(r, pack.words), [], `${r.id} needs no rest stop`);
   }
-  assert.ok(roomTaps(third, pack.words) <= 80, "the third room is no heavier");
+  assert.ok(roomTaps(pack.rooms[5], pack.words) <= 80, "the room after the surah is no heavier");
 });
 
 test("every Point spot and the pointer are paintings, not emoji (POLISH_PLAN B2)", () => {
@@ -54,22 +54,24 @@ test("every Point spot and the pointer are paintings, not emoji (POLISH_PLAN B2)
 
 test("a save from before Al-Fatiha was split keeps its progress; a new one plays both rooms", () => {
   const old = (v, rooms) => parseSave(JSON.stringify({ v, rooms, cards: {}, intro: true })).save;
-  assert.deepEqual(old(2, { fatiha: 1 }).rooms, { fatiha: 1, "fatiha-2": 1 });
-  assert.deepEqual(old(2, { fatiha: 1, "near-far": 1 }).rooms, { fatiha: 1, "fatiha-2": 1, "near-far": 1 });
+  assert.deepEqual(old(2, { fatiha: 1 }).rooms, { fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "fatiha-2b": 1, "fatiha-2c": 1 });
+  assert.deepEqual(old(2, { fatiha: 1, "near-far": 1 }).rooms, { ...{ fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "fatiha-2b": 1, "fatiha-2c": 1 }, "near-far": 1 });
   assert.deepEqual(old(2, {}).rooms, {}, "nothing finished stays nothing");
-  assert.deepEqual(old(3, { fatiha: 1 }).rooms, { fatiha: 1 }, "a v3 save with only the first room still has the second to play");
+  // v3 to v5: the surah was two rooms (1:1–1:4, then 1:5–1:7); each is now shorter rooms (core/room-splits.js)
+  assert.deepEqual(old(3, { fatiha: 1 }).rooms, { fatiha: 1, "fatiha-1b": 1 }, "a v3 save with only the first room still has 1:5–1:7 to play");
+  assert.deepEqual(old(5, { fatiha: 1, "fatiha-2": 1 }).rooms, { fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "fatiha-2b": 1, "fatiha-2c": 1 });
   assert.equal(parseSave(serializeSave(old(2, { fatiha: 1 }))).save.v, SAVE_VERSION);
 });
 
 test("v1 saves load with no checkpoint; a bad checkpoint is dropped, not the save", () => {
   const v1 = parseSave(JSON.stringify({ v: 1, rooms: { fatiha: 1 }, cards: {}, intro: true })).save;
   assert.equal(v1.at, null);
-  assert.deepEqual(v1.rooms, { fatiha: 1, "fatiha-2": 1 }, "the whole surah was one room before v3");
+  assert.deepEqual(v1.rooms, { fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "fatiha-2b": 1, "fatiha-2c": 1 }, "the whole surah was one room before v3");
   for (const bad of [{ r: "x", s: 5, n: 3 }, { r: "BAD ID", s: 0, n: 3 }, { s: 1, n: 2 }, "nope"]) {
     const p = parseSave(JSON.stringify({ v: 2, rooms: { fatiha: 1 }, cards: {}, intro: true, at: bad }));
     assert.equal(p.blocked, false);
     assert.equal(p.save.at, null, JSON.stringify(bad));
-    assert.deepEqual(p.save.rooms, { fatiha: 1, "fatiha-2": 1 });
+    assert.deepEqual(p.save.rooms, { fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "fatiha-2b": 1, "fatiha-2c": 1 });
   }
   const odd = parseSave(JSON.stringify({ v: 2, at: { r: "x", s: 1, n: 2, res: { "w:a": 7, "w:b": 1 }, met: ["w:a", 3] } })).save.at;
   assert.deepEqual(odd.results, { "w:b": "hinted" });
@@ -79,7 +81,8 @@ test("v1 saves load with no checkpoint; a bad checkpoint is dropped, not the sav
 test("tap counts match autoplay runs", () => {
   const taps = Object.fromEntries(pack.rooms.map((r) => [r.title.en, roomTaps(r, pack.words)]));
   // measured 2026-11-05 by playing each room in the browser with every answer right first time
-  assert.deepEqual([taps["Together Verbs"], taps["Town & People"], taps["Faith Words"], taps["Lamp & Box"], taps["Near & Far"]], [178, 167, 116, 69, 55]);
+  // 2026-11-23: long rooms are played in parts and the Last Check asks at most 8 words, so the counts are lower
+  assert.deepEqual([taps["Together Verbs"], taps["Town & People"], taps["Town & People, part 2"], taps["Faith Words"], taps["Lamp & Box"], taps["Near & Far"]], [158, 43, 115, 100, 28, 55]);
 });
 
 test("no stretch of a room between rest stops runs past about REST_EVERY taps", () => {
@@ -170,8 +173,10 @@ test("milestones: only what this room's finish reached, each once", async () => 
   const { reached, newMilestones } = await import("../game/core/milestones.js");
   const upTo = (id) => Object.fromEntries(pack.rooms.slice(0, pack.rooms.findIndex((r) => r.id === id) + 1).map((r) => [r.id, 1]));
   assert.deepEqual(newMilestones(pack, {}, { fatiha: 1 }), [], "half the surah is not the milestone");
-  assert.deepEqual(newMilestones(pack, { fatiha: 1 }, { fatiha: 1, "fatiha-2": 1 }), ["fatiha"]);
-  assert.deepEqual(newMilestones(pack, { fatiha: 1, "fatiha-2": 1 }, { fatiha: 1, "fatiha-2": 1 }), [], "a replay reaches nothing new");
+  const four = { fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "fatiha-2b": 1 };
+  assert.deepEqual(newMilestones(pack, { fatiha: 1 }, four), [], "four of the five rooms is not the milestone");
+  assert.deepEqual(newMilestones(pack, four, { fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "fatiha-2b": 1, "fatiha-2c": 1 }), ["fatiha"]);
+  assert.deepEqual(newMilestones(pack, { fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "fatiha-2b": 1, "fatiha-2c": 1 }, { fatiha: 1, "fatiha-1b": 1, "fatiha-2": 1, "fatiha-2b": 1, "fatiha-2c": 1 }), [], "a replay reaches nothing new");
   const wing1Last = pack.rooms.filter((r) => r.wing === 1).at(-1).id;
   const beforeLast = upTo(pack.rooms[pack.rooms.findIndex((r) => r.id === wing1Last) - 1].id);
   assert.deepEqual(newMilestones(pack, beforeLast, upTo(wing1Last)), ["wing-1"]);

@@ -1,6 +1,9 @@
 // E2 Lamp & Box: a place word appears; tap where the lamp goes. Ghost circles mark the places; depth is shown by
 // overlap (behind = partly hidden by the crate, in front = over it, inside = sunk below the rim).
-import { h, ar, dots, wait, wobble } from "../kit.js";
+import { tipSaid } from "../tips.js";
+import { icon } from "../icons.js";
+import { h, ar, dots, wait, wobble, arSay, pic } from "../kit.js";
+import { sign } from "../signs.js";
 
 // x/y = lamp centre in % of the scene; gy = ghost circle height if it differs (kept apart so tap targets don't
 // overlap); z = drawn behind/in front of the crate; s = scale for depth.
@@ -20,9 +23,11 @@ const ZONES = {
 export function run(ctx, step) {
   return new Promise((done) => {
     const used = [...new Set(step.items.map((it) => it.zone))];
-    const lamp = h("div", { class: "lamp-obj", "aria-hidden": "true" }, "🪔");
-    const home = () => { lamp.className = "lamp-obj"; lamp.style.left = "9%"; lamp.style.top = "12%"; lamp.style.setProperty("--s", "1"); };
-    const ghosts = new Map(used.map((z) => [z, h("button", { class: "ghost", "aria-label": z, "data-tip": "ghost", style: `left:${ZONES[z].x}%;top:${ZONES[z].gy ?? ZONES[z].y}%` })]));
+    const lamp = h("div", { class: "lamp-obj", "aria-hidden": "true" }, sign("ui:lamp", "").startsWith("img:") ? pic(sign("ui:lamp", "")) : icon("lamp"));
+    // the lamp moves by transform only (--x / --y are % of the scene; styles: .lamp-obj)
+    const moveTo = (x, y) => { lamp.style.setProperty("--x", String(x)); lamp.style.setProperty("--y", String(y)); };
+    const home = () => { lamp.className = "lamp-obj"; moveTo(9, 12); lamp.style.setProperty("--s", "1"); };
+    const ghosts = new Map(used.map((z, n) => [z, h("button", { class: "ghost", "aria-label": `${tipSaid("ghost")} ${n + 1}`, "data-tip": "ghost", style: `left:${ZONES[z].x}%;top:${ZONES[z].gy ?? ZONES[z].y}%` })]));
     const scene = h("div", { class: "place-scene" },
       h("div", { class: "crate small", style: "left:12%;top:40%;width:20%;height:26%" }),
       h("div", { class: "table" }), h("div", { class: "leg", style: "left:52%" }), h("div", { class: "leg", style: "left:79%" }),
@@ -38,8 +43,7 @@ export function run(ctx, step) {
     const flyTo = (z) => {
       const zone = ZONES[z];
       lamp.className = `lamp-obj ${zone.z ?? ""} ${zone.orbit ? "orbiting" : ""}`;
-      lamp.style.left = `${zone.x}%`;
-      lamp.style.top = `${zone.y}%`;
+      moveTo(zone.x, zone.y);
       lamp.style.setProperty("--s", String(zone.s ?? 1));
     };
     for (const [z, g] of ghosts) {
@@ -59,7 +63,7 @@ export function run(ctx, step) {
       if (i >= step.items.length) return done();
       const item = step.items[i];
       ctx.item([item.w]);
-      prompt.replaceChildren(ar(ctx.words[item.w].ar, "word"));
+      prompt.replaceChildren(arSay(ctx.words[item.w], "word"));
       ctx.target(ghosts.get(item.zone));
       const d = dots(i, step.items.length);
       progress.replaceWith(d);

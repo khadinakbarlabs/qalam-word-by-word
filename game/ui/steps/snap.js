@@ -1,10 +1,16 @@
 // E3 Snap Pieces: the pictures show the meaning wanted (book + their → "their book"); click the piece that makes it.
 // Front pieces snap onto the right of the word (Arabic reads right to left), end pieces onto the left.
-import { h, ar, pic, cap, dots, wait, wobble } from "../kit.js";
+import { h, ar, pic, cap, sayLine, dots, wait, wobble } from "../kit.js";
+import { t as say } from "../../i18n.js";
 
 export function run(ctx, step) {
   return new Promise((done) => {
     const isEnd = (id) => ctx.words[id].ar.startsWith("ـ");
+    // the picture legend says where each kind of piece goes, so the helper line stays one sentence
+    const key = (cls, mark, k) => h("li", {}, h("span", { class: `chip demo ${cls}`, "aria-hidden": "true" }, mark), h("span", { "data-t": k }, say(k)));
+    const legend = () => h("ul", { class: "legend" },
+      step.chips.some((id) => !isEnd(id)) ? key("front", "▮", "legendFront") : null,
+      step.chips.some(isEnd) ? key("end", "▮", "legendEnd") : null);
     let t = 0;
     const show = () => {
       if (t >= step.tasks.length) return done();
@@ -21,7 +27,8 @@ export function run(ctx, step) {
       };
       const chips = step.chips.map((id) => {
         const w = ctx.words[id];
-        const b = h("button", { class: `chip ${isEnd(id) ? "end" : "front"}`, "aria-label": w.ar, "data-tip": isEnd(id) ? "endPiece" : "frontPiece" }, ar(w.ar, "chip-ar"), pic(w.pic, w.medal), cap(w.g));
+        const b = h("button", { class: `chip ${isEnd(id) ? "end" : "front"}`, "aria-label": w.ar, "data-tip": isEnd(id) ? "endPiece" : "frontPiece" }, ar(w.ar, "chip-ar"), sayLine(w.say), pic(w.pic, w.medal), cap(w.g));
+        if (task.want.includes(id)) b.dataset.want = "1"; // every wanted piece is right: Show me never fades one (ui/hint.js)
         b.addEventListener("click", async () => {
           if (!task.want.includes(id) || placed.has(id)) { ctx.miss(); return wobble(b); }
           placed.add(id);
@@ -41,7 +48,7 @@ export function run(ctx, step) {
       render();
       ctx.target(chips[step.chips.indexOf(task.want[0])]);
       ctx.stage.replaceChildren(h("div", { class: "prompt" }, h("div", { class: "target" }, task.show.map((s) => pic(s)))),
-        build, result, h("div", { class: "chips" }, chips), dots(t, step.tasks.length));
+        build, result, h("div", { class: "chips" }, chips), legend(), dots(t, step.tasks.length));
       ctx.firstShow();
     };
     show();

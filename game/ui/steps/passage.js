@@ -4,9 +4,11 @@
 // The passage is split into pages that fit the screen (Khadin: everything fits, phone and desktop): page breaks are
 // measured with every line already lit (meanings and translations showing), so a page never grows past the screen;
 // "Next page ▶" turns the page. When every line is lit, the room says so with the share of the passage's words known.
+import { nextIcon } from "../icons.js";
 import { h, ar, cap, wait, translationBlock } from "../kit.js";
 import { t } from "../../i18n.js";
 import { tipText, explain } from "../tips.js";
+import { whyOf } from "../why.js";
 
 const arabicDigits = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
 
@@ -19,7 +21,7 @@ export function run(ctx, step) {
     // a re-read (finished Reading Room) marks the words whose lamps have gone dim: due for Relight
     const isFaded = (w) => Boolean(ctx.reread) && w.w.some((id) => ctx.faded?.has(id));
     const fadedCount = all.filter(isFaded).length;
-    const next = h("button", { class: "next-btn", hidden: true, "aria-label": t("next"), onclick: () => done() }, "▶");
+    const next = h("button", { class: "next-btn", hidden: true, "aria-label": t("next"), onclick: () => done() }, nextIcon());
     const fadedKey = fadedCount ? "readFaded" : "readBright";
     const finale = h("div", { class: "read-finale", hidden: true },
       h("strong", { "data-t": doneKey }, t(doneKey)),
@@ -27,7 +29,7 @@ export function run(ctx, step) {
         ? h("span", { class: "read-count" }, fadedCount ? `${fadedCount} ` : "", h("span", { "data-t": fadedKey }, t(fadedKey)))
         : h("span", { class: "read-count" }, `${knownCount} / ${all.length} `, h("span", { "data-t": "readKnown" }, t("readKnown"))));
     let lit = 0;
-    const pageBtn = h("button", { class: "next-btn", "aria-label": t("readNextPage"), "data-t-aria": "readNextPage" }, "▶");
+    const pageBtn = h("button", { class: "next-btn", "aria-label": t("readNextPage"), "data-t-aria": "readNextPage" }, nextIcon());
 
     const lines = step.ayat.map((a, k) => {
       const ayahNo = Number(a.ref.split(":")[1]);
@@ -35,7 +37,7 @@ export function run(ctx, step) {
         h("span", { class: "ar-line", lang: "ar", dir: "rtl" }, w.lead ? `${w.lead} ` : "", w.ar,
           w.mark ? h("span", { class: "mark" }, ` ${w.mark}`) : null,
           j === a.words.length - 1 && a.end !== false ? h("span", { class: "num" }, ` ﴿${arabicDigits(ayahNo)}﴾`) : null),
-        h("span", { class: "gl" })), explain({ ...w, why: w.why ?? w.w.map((id) => ctx.words[id]?.why).find(Boolean) })));
+        h("span", { class: "gl" })), explain({ ...w, why: w.why ?? w.w.map(whyOf).find(Boolean) })));
       const say = h("div", { class: "read-say", hidden: true }, translationBlock(a.tr, "read-tr"));
       const label = a.tr?.en ?? a.words.map((w) => w.g.en).join(" ");
       const line = h("button", { class: "read-line", "aria-label": label, "data-tip": "readLine" }, h("span", { class: "ayah" }, tiles));

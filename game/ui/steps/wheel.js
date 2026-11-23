@@ -1,5 +1,6 @@
 // E5 Person Wheel: a pronoun (or a verb form, `ar`, such as فَعَلْنَا "we did") appears in the middle; tap the person
 // it means. People show their painting when the pronoun card has one, with ▲ / ● badges kept.
+import { tipSaid } from "../tips.js";
 import { h, ar, pic, dots, wait, wobble } from "../kit.js";
 
 export const PERSONS = {
@@ -23,7 +24,7 @@ export function run(ctx, step) {
     const ids = step.persons ?? FIRST_RING;
     const people = ids.map((p, k) => {
       const a = (k / ids.length) * 2 * Math.PI - Math.PI / 2;
-      return h("button", { class: "person", "aria-label": p, "data-tip": "person", style: `left:${50 + 39 * Math.cos(a)}%;top:${50 + 39 * Math.sin(a)}%` }, pic(look(ctx, p)));
+      return h("button", { class: "person", "aria-label": tipSaid("person"), "data-tip": "person", style: `left:${50 + 39 * Math.cos(a)}%;top:${50 + 39 * Math.sin(a)}%` }, pic(look(ctx, p)));
     });
     const center = h("div", { class: "wheel-center" });
     const circle = h("div", { class: "circle" }, center, people);

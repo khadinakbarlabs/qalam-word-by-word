@@ -6,6 +6,7 @@
 //   Enter    with nothing focused, presses the visible ▶
 // body.kbd marks keyboard use (any of these keys, Tab or arrows); a pointer press clears it.
 import { hideTips } from "./tips.js";
+import { isPaused } from "../core/clock.js";
 
 const escapes = [];
 
@@ -25,17 +26,26 @@ const liveStage = () => {
 };
 const nothingFocused = () => !document.activeElement || document.activeElement === document.body || !document.activeElement.isConnected;
 
-/** After the stage redraws (a new item), put keyboard focus on its first control so play goes on without a mouse. */
-export function keepFocus(stage) {
+const waiting = (b) => visible(b) && !b.inert && !b.matches(".lit, .right, .given, [aria-disabled=true]");
+
+/** After the stage redraws (a new item), put keyboard focus where play goes on, so no mouse is needed.
+ *  prefer: the control the step is waiting for when nothing is being graded (the next word, the ▶).
+ *  scope: while a question is open, the group its choices sit in: focus goes to the first of them (never straight
+ *  to the answer). Otherwise the first control still waiting for an answer (lit tiles, given words and right
+ *  answers are done). */
+export function keepFocus(stage, prefer = null, scope = null) {
   if (!usingKeyboard()) return;
   if (!nothingFocused() && stage.contains(document.activeElement)) return;
-  // the first control still waiting for an answer (lit tiles and right answers are done)
-  [...stage.querySelectorAll("button")].find((b) => visible(b) && !b.matches(".lit, .right, [aria-disabled=true]"))?.focus();
+  if (prefer?.isConnected && waiting(prefer)) return prefer.focus();
+  const first = (root) => (root?.isConnected ? [...root.querySelectorAll("button")].find(waiting) : null);
+  (first(scope) ?? first(stage))?.focus();
 }
 
 export function installKeys() {
   const KEYBOARD = /^(Tab|Enter|Escape|Arrow\w+|[1-9])$/;
   addEventListener("keydown", (e) => {
+    // nothing moves while YouTube has the game paused (INT-21): no sheet closes, no answer is picked
+    if (isPaused()) return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (KEYBOARD.test(e.key)) document.body.classList.add("kbd");
     if (e.key === "Escape") {
@@ -46,7 +56,8 @@ export function installKeys() {
     if (!stage) return;
     if (/^[1-9]$/.test(e.key)) {
       const choice = [...stage.querySelectorAll(".choice")].filter(visible)[Number(e.key) - 1];
-      if (choice) { choice.focus(); choice.click(); }
+      // a choice the nudge took away keeps its number but takes no key: no wobble, no miss
+      if (choice && !choice.inert && !choice.classList.contains("nudged")) { choice.focus(); choice.click(); }
       return;
     }
     if (e.key === "Enter" && nothingFocused()) {

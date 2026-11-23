@@ -3,13 +3,18 @@
 
 import { WORDS } from "../../authoring/words.js";
 import { AYAT } from "../../authoring/ayat.js";
-import { ROOMS, COMING } from "../../authoring/rooms.js";
+import { ROOMS as WRITTEN_ROOMS, COMING } from "../../authoring/rooms.js";
+import { SPLITS } from "../../authoring/splits.js";
+import { applySplits, maxNewWords } from "./split.mjs";
+import { withPractice, unpractised } from "./practice.mjs";
+import { sayOf, needsSay } from "./translit.mjs";
 import { unitStats } from "./corpus.mjs";
 import { SCENES } from "../../game/core/scenes.js";
 import { ART } from "../../authoring/art.js";
 import { WHY_UR } from "../../authoring/why-ur.js";
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { MEDAL_ONLY, packProblems, tileMedal } from "./checks.mjs";
 
 export const PACK_VERSION = 1;
 // Tanzil's terms: their copyright block goes, unchanged, into every file that carries the Qur'an text. It is read from
@@ -47,12 +52,7 @@ export const translationOf = (ref) => {
 const PERSONS = ["1s", "1p", "2ms", "2mp", "3ms", "3fs", "3mp", "2fs", "2d", "3d", "2fp", "3fp"];
 const FIRST_RING = PERSONS.slice(0, 7);
 const ZONES = ["above", "on", "inside", "below", "between", "behind", "front", "around", "from", "to"];
-// Names and attributes of Allah: calligraphy medallion only, never a picture (VISUAL_GAMES §1 respect rules).
-const MEDAL_ONLY = new Set([
-  "L:اللَّه", "L:رَحْمٰن", "L:رَحِيم", "L:رَبّ", "L:مالِك", "L:عَلِيم", "L:حَكِيم", "L:سَمِيع", "L:بَصِير", "L:عَزِيز",
-  "L:غَفُور", "L:قَدِير", "L:خَبِير", "L:حَلِيم", "L:حَمِيد", "L:تَوّاب", "L:وَكِيل", "L:قَهّار", "L:غَفّار", "L:وَهّاب", "L:لَطِيف",
-  "L:خالِق", "L:رازِق", "L:قادِر", "L:راحِم", "L:جامِع", "L:رافِع", "L:غافِر", "L:واسِع", "L:وارِث", "L:هاد", "L:مُجِيب", "L:مُحِيط", "L:مُحْى", "L:صَمَد", "L:قَيُّوم",
-]);
+// Names and attributes of Allah (calligraphy medallion only, never a picture): MEDAL_ONLY in ./checks.mjs.
 // Prophets, angels and revealed books: never a picture; their names are shown on a parchment scroll (VISUAL_GAMES §1 respect rules).
 const SCROLL_ONLY = new Set([
   "L:رَسُول", "L:نَبِيّ", "L:آدَم", "L:نُوح", "L:إِبْراهِيم", "L:إِسْماعِيل", "L:إِسْحاق", "L:يَعْقُوب", "L:يُوسُف", "L:مُوسَى",
@@ -91,6 +91,17 @@ const growsFrom = (word, letters) => {
   const seeds = letters.map(norm);
   const parts = seeds.map((c, i) => (/[ويىءا]/.test(c) ? `${SOFT}?` : i && c === seeds[i - 1] ? `${c}?` : c));
   return new RegExp(parts.join(".*")).test(norm(word));
+};
+
+/** Size Ladder: do the base word's strong letters come, in order, in the bigger word? (كَبِير → أَكْبَر, عَلِيّ → أَعْلَى;
+ *  not شَرّ → أَظْلَم.) Soft letters and hamza may change or drop, so they are not compared. */
+export const sameFamily = (base, word) => {
+  // a doubled root letter is written twice in one word and once (with a shadda) in the other: شَدِيد / أَشَدّ
+  const strong = (s) => [...s.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, "").replace(/[اأإآٱءؤئويىة]/g, "")].filter((c, i, all) => c !== all[i - 1]);
+  const [need, have] = [strong(base), strong(word)];
+  let at = 0;
+  for (const c of have) if (c === need[at]) at++;
+  return need.length > 0 && at === need.length;
 };
 
 const glossOk = (g) => g && typeof g.en === "string" && g.en.trim() && typeof g.ur === "string" && g.ur.trim();
@@ -148,6 +159,8 @@ export function buildPack({ words, ayat }) {
     if (w.units.some((u) => medalOnly.has(u.normalize("NFC"))) && (w.pic || !w.medal)) err(`${id}: names of Allah use a calligraphy medallion only, no picture`);
     if (w.units.some((u) => scrollOnly.has(u.normalize("NFC"))) && (w.pic || !w.medal?.startsWith("scroll:"))) err(`${id}: prophets and angels use a name scroll only, no picture`);
     if (w.units.some((u) => noPicture.has(u.normalize("NFC"))) && w.pic) err(`${id}: no picture allowed`);
+    // "how to say it" is spelled by rule from the vowel marks (./translit.mjs); a word with none needs a hand-written `say`
+    if (w.ar && needsSay(w.ar) && !w.say) err(`${id}: "${w.ar}" cannot be spelled by rule, so it needs a \`say\` (how to say it in Latin letters)`);
   }
   const word = (id, where) => (WORDS[id] ? id : (err(`${where}: unknown word ${id}`), id));
 
@@ -172,12 +185,14 @@ export function buildPack({ words, ayat }) {
         if (t.given && !t.pic) err(`${ref} word ${i + 1}: given words need a picture`);
         if (t.art && !ART[t.art]) err(`${ref} word ${i + 1}: no painting prompt ${t.art}`);
         (t.w ?? []).forEach((id) => word(id, `${ref} word ${i + 1}`));
+        if (needsSay(d.ar) && !t.say) err(`${ref} word ${i + 1}: "${d.ar}" cannot be spelled by rule, so it needs a \`say\` (how to say it in Latin letters)`);
         for (const pc of t.pieces ?? []) if (!glossOk(pc.g)) err(`${ref} word ${i + 1}: every piece needs both meanings`);
         const first = t.w?.find((id) => WORDS[id] && !WORDS[id].units.every((u) => u.startsWith("A:"))) ?? t.w?.[0];
         return {
           ar: d.ar, lead: d.lead || undefined, mark: d.mark || undefined, g: t.g, w: t.w ?? [], given: Boolean(t.given),
+          say: sayOf(d.ar, t.say),
           // a given word may borrow a painting (`art`: a word's or a "g:" given-word painting); emoji is only the fallback
-          pic: (t.art && artFor(t.art)) || t.pic || withArt(first, WORDS[first]?.pic), medal: t.medal ?? WORDS[first]?.medal, pieces: t.pieces,
+          pic: (t.art && artFor(t.art)) || t.pic || withArt(first, WORDS[first]?.pic), medal: tileMedal(t, WORDS[first]), pieces: t.pieces,
           why: t.art ? whyFor(t.art) ?? undefined : undefined,  // taught words: the game reads the card's own picture line
         };
       }),
@@ -191,6 +206,16 @@ export function buildPack({ words, ayat }) {
     if (!(from >= 1 && to >= from && to <= a.words.length)) { err(`${where}: part ${from}–${to} is outside ${a.ref} (${a.words.length} words)`); return a; }
     // the translation belongs to the whole ayah: it shows once, with the last part
     return { ...a, part, words: a.words.slice(from - 1, to), end: to === a.words.length, tr: to === a.words.length ? a.tr : undefined };
+  };
+
+  // a step item that carries its own Arabic (another shape of its word, or a verb with its partner) ships with its
+  // own "how to say it" line: each word spelled by rule, or the item's hand-written `say`
+  const withSay = (where) => (it) => {
+    if (typeof it.ar !== "string" || !ARABIC_LETTER.test(it.ar)) return it;
+    const parts = it.ar.trim().split(/\s+/);
+    if (!it.say && parts.some(needsSay)) err(`${where}: "${it.ar}" cannot be spelled by rule, so it needs a \`say\` (how to say it in Latin letters)`);
+    const own = typeof it.say === "string" && it.say.trim();
+    return { ...it, say: own || parts.map((p) => sayOf(p)).join(" ") };
   };
 
   const checkStep = (st, where) => {
@@ -230,7 +255,7 @@ export function buildPack({ words, ayat }) {
           if (!segs.has(it.seg)) err(`${where}: unknown segment ${it.seg}`);
           if (it.ar !== undefined && !ARABIC_LETTER.test(it.ar)) err(`${where}: ${it.ar} is not Arabic`);
         }
-        return st;
+        return { ...st, items: st.items.map(withSay(where)) };
       }
       case "roots": {
         for (const sd of st.seeds) if (sd.letters.length !== 3) err(`${where}: root ${sd.id} needs three letters`);
@@ -243,7 +268,13 @@ export function buildPack({ words, ayat }) {
         return st;
       }
       case "ladder":
-        for (const it of st.items) { word(it.w, where); word(it.base, where); if (!RUNGS.includes(it.rung)) err(`${where}: unknown rung ${it.rung}`); }
+        for (const it of st.items) {
+          word(it.w, where); word(it.base, where);
+          if (!RUNGS.includes(it.rung)) err(`${where}: unknown rung ${it.rung}`);
+          // both rungs show the base word's picture, so the base must be the same word family (كَبِير under أَكْبَر).
+          // A "more" word with no family member taught yet stands on its own picture (base = the word itself).
+          if (it.base !== it.w && WORDS[it.w] && WORDS[it.base] && !sameFamily(WORDS[it.base].ar, WORDS[it.w].ar)) err(`${where}: ${it.w} (${WORDS[it.w].ar}) is not from the same root as its base ${it.base} (${WORDS[it.base].ar}); use a base of its own root, or the word itself`);
+        }
         return st;
       case "petals": {
         if (st.root.length !== 3) err(`${where}: a root needs three letters`);
@@ -254,7 +285,7 @@ export function buildPack({ words, ayat }) {
           // the doer petal's picture is a working figure: a name of Allah never goes on it
           if (it.petal === "doer" && WORDS[it.w]?.units.some((u) => medalOnly.has(u.normalize("NFC")))) err(`${where}: ${it.w} is a name of Allah and cannot sit on the doer petal`);
         }
-        return st;
+        return { ...st, items: st.items.map(withSay(where)) };
       }
       case "scene": {
         const def = SCENES[st.scene ?? "signs"];
@@ -278,7 +309,7 @@ export function buildPack({ words, ayat }) {
           word(it.verb, where); word(it.with, where);
           if (!it.ar || !glossOk(it.g)) err(`${where} item ${k + 1}: needs the Arabic pair and English + Urdu meanings`);
           if (!ART[it.art]) err(`${where} item ${k + 1}: no painting prompt ${it.art}`);
-          return { ...it, pic: artFor(it.art) || it.pic, why: whyFor(it.art) ?? undefined };
+          return { ...withSay(where)(it), pic: artFor(it.art) || it.pic, why: whyFor(it.art) ?? undefined };
         }) };
       }
       case "snap":
@@ -301,10 +332,20 @@ export function buildPack({ words, ayat }) {
     return st.items.map((it) => it.w);
   };
 
+  // long rooms are dealt out into shorter ones (authoring/splits.js); the written steps are not changed
+  const split = applySplits(WRITTEN_ROOMS, SPLITS);
+  split.errors.forEach(err);
+  const ROOMS = split.rooms;
+  const canMatch = (id) => Boolean(WORDS[id]?.ar && (WORDS[id].pic || WORDS[id].medal));
+
   const taughtBefore = new Set();
   const known = new Set();
   const rooms = ROOMS.map((room) => {
-    const steps = room.steps.map((st, i) => checkStep(st, `${room.id} step ${i + 1}`)).filter(Boolean);
+    const written = room.steps.map((st, i) => checkStep(st, `${room.id} step ${i + 1}`)).filter(Boolean);
+    // every new word gets a graded question before the Last Check: a Picture Match is added after the step that
+    // introduced any word the written steps only show (./practice.mjs)
+    const steps = withPractice(written, taughtBefore, canMatch);
+    for (const id of unpractised(steps, taughtBefore)) err(`${room.id}: ${id} reaches the Last Check with no practice question`);
     if (!glossOk(room.title)) err(`${room.id}: needs English and Urdu titles`);
     const seen = [...new Set(steps.flatMap(stepWords))];
     // Every word a point/wheel/place/match/snap round asks about must be met first (meet step, ayah, or an earlier room).
@@ -316,6 +357,7 @@ export function buildPack({ words, ayat }) {
     }
     const teaches = seen.filter((id) => !taughtBefore.has(id));
     const reviews = seen.filter((id) => taughtBefore.has(id));
+    if (teaches.length > maxNewWords(room.wing)) err(`${room.id}: teaches ${teaches.length} new words; a Wing ${room.wing} room may teach at most ${maxNewWords(room.wing)} (split it in authoring/splits.js)`);
     teaches.forEach((id) => taughtBefore.add(id));
     // The room's stakes card: how many Qur'an words use something this room teaches for the first time.
     const fresh = new Set(teaches.flatMap((id) => (WORDS[id]?.units ?? []).map(corpusUnit)).filter((u) => u && !known.has(u)));
@@ -330,9 +372,12 @@ export function buildPack({ words, ayat }) {
     v: PACK_VERSION,
     totalQuranWords: words.length,
     words: Object.fromEntries(Object.entries(WORDS).filter(([id]) => usedWords.has(id))
-      .map(([id, w]) => [id, { ar: w.ar, g: w.g, more: w.more, why: w.pic ? whyFor(id) : null, pic: withArt(id, w.pic), emoji: w.pic, medal: w.medal }])
+      .map(([id, w]) => [id, { ar: w.ar, say: w.ar ? sayOf(w.ar, w.say) : undefined, g: w.g, more: w.more, pic: withArt(id, w.pic), medal: w.medal }])
       // game-piece paintings ("ui:past" …) ride along as picture-only entries once they exist
       .concat(Object.keys(ART).filter((k) => k.startsWith("ui:") && artFor(k)).map((k) => [k, { ar: "", g: { en: k, ur: k }, pic: artFor(k) }]))),
+    // "What the picture shows", per word. Only read on a long-press, a flipped card and the Words tab, so it ships in
+    // its own file (content/why.json, core/content.js) and the game fetches it after the first screen is up.
+    why: Object.fromEntries(Object.entries(WORDS).filter(([id, w]) => usedWords.has(id) && w.pic).map(([id]) => [id, whyFor(id)]).filter(([, why]) => why)),
     rooms,
     coming: COMING,
     // shown in Settings in this order (docs/RIGHTS.md keeps the details)
@@ -346,5 +391,8 @@ export function buildPack({ words, ayat }) {
     },
     notice: tanzilNotice(),
   };
+  // Content accuracy (./checks.mjs): every ayah word against the card it takes its picture from, the Names of Allah,
+  // words with one right card, look-alike cards. Only run on a pack that built: a missing id is reported above.
+  if (!errors.length) errors.push(...packProblems({ pack, WORDS, AYAT }));
   return { pack, errors };
 }

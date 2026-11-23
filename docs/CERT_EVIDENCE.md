@@ -1,89 +1,120 @@
 # YouTube Playables certification evidence
 
 - Game: Qalam: Word by Word (placeholder title, PLAN §10.7)
-- Build/version: content pack v1, 64 rooms (Al-Fatiha split in two 2026-11-06; save v3), 910 words, meter 85.5% (`game/`, no build step)
-- Bundle fingerprint: SHA-256 over the sorted file hashes of `game/` = `b0c633114e10e8ad…` (2026-11-05)
-- Evidence date: 2026-11-05
-- Reviewer: Claude (audit) + an independent certification-review agent (read-only)
-- Official requirements last checked: 2026-11-05 (`check_docs.py`: 29 pages; integration, monetization, privacy, stability, trust and safety and revision-history pages marked changed on 2026-10-26; the plugin checklist reflects the 2026-10-16 monetization rewrite)
+- Build/version: content pack v1, 92 rooms in 5 wings, 934 words, meter 85.5%, save schema v6 (`game/`, no build step)
+- Bundle fingerprint: SHA-256 over the sorted file hashes of `game/` = `7eb80b664a39894f…` (2026-11-23, working tree with audit Phases A–D and F; Phase E look-and-feel was still being edited, so this changes again)
+- Evidence date: 2026-11-23
+- Reviewer: Claude (audit Phase F). Static checks, the Node test suite and the headless autoplay were re-run today. **No browser measurements were taken today**: every row marked `STALE_RUNTIME` was last measured on the date in its Evidence column, on an older build, and must be measured again.
+- Official requirements last checked: 2026-11-05 (`check_docs.py`: 29 pages). Not re-checked today.
 
 ## Decision
 
 - Release status: **`NOT_READY`**
-- Blocking failures: D8 scholar sign-off not done; rights review of art and glosses; device matrix and hosted Test Suite not run. (INT-21, I18N-02, DES-16, DES-07/08 and INT-02/04 fixed in Polish Phase 1, 2026-11-05.)
-- Accepted risks: none yet. DES-20: map icons moved to a labelled bottom dock; room back button stays top-left but now reads "◀ Map" (text label), left for the reviewer to judge.
+- Blocking: D8 scholar sign-off not done; rights review of art and glosses; device matrix and hosted Test Suite not run; runtime rows below need a fresh browser pass on this build.
+- Accepted risks: none yet. DES-20 (map dock and room header icons) is left for the reviewer to judge.
+
+## What was run on 2026-11-23
+
+| Check | Command | Result |
+|---|---|---|
+| Static audit | `python3 -I ~/plugins/youtube-playables-builder-claude/scripts/audit_playable.py game` | `PASS_STATIC`: 972 files, 12.781 MiB raw, 0 failures, 16 warnings (all reviewed, below) |
+| Unit and content tests | `node --test tests/*.test.mjs` | 214 tests, 214 pass |
+| Headless autoplay, English | `python3 scripts/autoplay.py --rooms 4` | exit 0: phone 390×844, desktop 1280×800, short-wide 844×390 each finished 4 rooms (72 s), no console error, failed request or stuck screen, no fit warning |
+| Headless autoplay, Urdu | `python3 scripts/autoplay.py --rooms 4 --lang ur-PK` | exit 0: the same 3 viewports finished 4 rooms. Fit warning (not an error): the ayah step runs 45–60 px past the screen in Urdu in 4 rooms (`how_ayah`); the same with the Urdu font loaded up front, so it is a layout matter for Phase E, not the lazy font |
+| Boot page list | `node scripts/modulepreload.mjs --check` | up to date (72 modules) |
+
+The 16 static warnings, all expected:
+
+- 12 × `SRC_ABSOLUTE_URL`: text only, never fetched. The Tanzil notice (its terms require it in every file carrying the text: `TANZIL-NOTICE.txt`, `content/pack.json`, `content/wing-1…5.json`) and the two OFL font licence files.
+- 3 × `SRC_NETWORK_API` (`core/content.js`, `core/net.js`, `main.js`): `fetch` of relative packaged files only (`content/*.json`).
+- 1 × `SRC_LOCAL_PERSISTENCE` (`playables-bridge.js`): `localStorage` is used only when the SDK has no `loadData` (local preview). Inside Playables every save goes through `ytgame.game.saveData`.
 
 ## Requirement evidence
 
-| ID | Requirement | Status | Device/viewport | Reproduction | Evidence | Source date |
-|---|---|---|---|---|---|---|
-| INT-01 | SDK before game code | PASS_STATIC | — | `index.html` script order | `game/index.html:8` | 2026-06-16 |
-| INT-02 | firstFrameReady on a loading screen that says so | PASS_RUNTIME | desktop | loading screen shows lamp + "Loading…" in EN and UR; `firstFrameReady()` after the next paint | `game/main.js` `loadingScreen()`, `boot()` | 2026-06-16 |
-| INT-03/04 | gameReady only when interactable | PASS_RUNTIME | desktop | pack.json blocked: error text in EN and UR + focused Retry, `gameReady()` called; Retry recovers to the map | `game/main.js` `bootError()`, `start()` | 2026-06-16 |
-| DES-07/08 | no doubled or ignored input | PASS_RUNTIME | desktop | real double-click in Picture Match advances exactly one item; stage is `inert` after each right answer until the next item | `ui/room.js` ctx `hit()/item()/target()`, `ui/relight.js` `answered` | 2026-03-04 |
-| INT-07/09 | save after progress; load before save | PASS_STATIC | — | bridge gates saves on `loadSettled` | `game/playables-bridge.js:43-65` | 2026-06-16 |
-| INT-10 | older saves parse | PASS_STATIC | — | `parseSave` + tests | `game/core/save.js`, `tests/m1.test.mjs` | 2026-06-16 |
-| INT-12/23 | autosave at milestones; save on pause | PASS_RUNTIME | desktop, 1280×360 | place saved every 3 steps, at rest stops, on pause and on leaving; leave at step 9, reload, room resumes at step 10 | `game/core/save.js` `at`, `ui/room.js` checkpoint, `main.js` `enterRoom` | 2026-06-16 |
-| INT-13–17 | audio rules | PASS_RUNTIME | desktop | Optional sound effects (Web Audio, no files). Browser check with a counting AudioContext: notes play on right answers; `onAudioEnabledChange(false)` suspends the context and no notes play; YouTube pause suspends it; Settings → Sound off silences it | `ui/sound.js`, `main.js` boot, `ui/pause.js` | 2026-11-05 |
-| INT-21 | pause stops everything | PASS_RUNTIME | desktop | while paused a real click is ignored and a pending wait stays frozen through 2 s, then finishes after resume; tests cover the clock | `core/clock.js`, `ui/pause.js`, `tests/clock.test.mjs` | 2026-06-16 |
-| INT-22 | no Page Visibility API | PASS_STATIC | — | grep: none | — | 2026-06-16 |
-| I18N-02 | no `navigator.language` | PASS_STATIC | — | static audit 0 FAIL; no-SDK fallback is `"en"` | `game/playables-bridge.js` `getLanguage()` | 2026-06-16 |
-| I18N-03 | English supported | PASS_RUNTIME | desktop | default language | — | 2026-06-16 |
-| DES-01/04 | 9:32–32:9, state kept on resize | PASS_RUNTIME | 360×1280, 1280×360, 320×320 | map + ayah step screenshots | browser check 2026-11-05 | 2026-03-04 |
-| DES-05/06 | touch and mouse | PASS_STATIC | — | all actions are `<button>`; tooltips long-press | `game/ui/tips.js` | 2026-03-04 |
-| DES-09/10 | keyboard; Esc closes dialogs | PASS_RUNTIME | desktop | real keys: Tab to doors, Enter opens Settings (focus inside, map inert), Esc closes and returns focus; Enter/1–4 answer an ayah word | `game/ui/keys.js`, `ui/settings.js`, `ui/guide.js` | 2026-03-04 |
-| DES-16 | end of content communicated | PASS_RUNTIME | desktop, 320×320, 375×812 | all-done save: end plaque on the path + "Every room is lit." bubble, EN and UR | `game/ui/map.js` `allDone` | 2026-03-04 |
-| DES-17–19, 21 | no share, links, agreements, quit | PASS_STATIC | — | grep + screens | — | 2026-03-04 |
-| DES-20 | no icons confusable with YouTube's | MANUAL_REVIEW | desktop, 375×812 | map: Guide and Settings in a labelled bottom dock; rooms: "◀ Map" and "👆 Show me" are labelled | `ui/map.js` dock, `ui/room.js` header | 2026-03-04 |
-| PRV-02 | no external calls | PASS_RUNTIME | desktop | resource list: only `youtube.com/game_api/v1` | browser check 2026-11-05 | 2026-06-15 |
-| PRV-04–07 | no QR, clipboard, personal data, login | PASS_STATIC | — | grep + screens | — | 2026-06-15 |
-| PERF-01/02 | transfer before gameReady | PASS_RUNTIME | desktop | 823 KB raw (≈ 0.3 MiB gzipped) | resource timing | 2026-06-16 |
-| PERF-06 | files < 512 KiB | PASS_STATIC | — | pack split by wing (`core/content.js`): largest file `content/pack.json` 251 KB; wing files 37–149 KB; test fails any content file ≥ 512 KiB. Wing fetched on first room of that wing; blocked fetch shows a message and the next tap retries (browser-checked) | static audit, `tests/session.test.mjs` | 2026-11-05 |
-| PERF-07/08 | save size | PASS_RUNTIME | — | finished save 27.8 KB | browser check | 2026-06-16 |
-| PERF-09 | interactive < 5 s | PASS_RUNTIME | desktop, local | map at 0.74 s | browser check | 2026-06-16 |
-| PERF-11 | heap ≤ 512 MB | PASS_RUNTIME | desktop | 7 MB | `performance.memory` | 2026-06-16 |
-| PERF-14/15 | browsers and YouTube apps | UNVERIFIED | — | — | — | 2026-06-16 |
-| PERF-16–19 | relative paths, ASCII names, ≤ 8000 files | PASS_STATIC | — | 923 files | static audit | 2026-06-16 |
-| TRUST-02/03 | general 13+ | MANUAL_REVIEW | — | design is 13+; listing not written | — | 2026-08-26 |
-| TRUST-06/08 | rights cleared | UNVERIFIED | — | rights ledger missing | POLISH_PLAN 4.2 | 2026-08-26 |
-| A11Y-01 | WCAG AA best effort | MANUAL_REVIEW | desktop, 390×844 | Esc, dialog focus, keyboard play and AA contrast done (Phase 3); not every step type contrast-scanned | `ui/keys.js`, `styles.css` | 2026-08-26 |
+| ID | Requirement | Status | Reproduction | Evidence |
+|---|---|---|---|---|
+| INT-01 | SDK before game code | PASS_STATIC | SDK script is the first script and the first fetch of the page; a test fails if anything moves in front of it | `game/index.html:8`, `tests/boot.test.mjs` |
+| INT-02 | firstFrameReady on a loading screen that says so | PASS_STATIC + autoplay | loading screen (lamp + "Loading…" in EN and UR), `firstFrameReady()` after the next paint | `game/main.js` `loadingScreen()`, `boot()` |
+| INT-03/04 | gameReady only when interactable | PASS_STATIC, STALE_RUNTIME | `gameReady()` is sent from the map, the intro, or a boot-error screen with a focused Try again; last browser check 2026-11-05 | `game/main.js` `begin()`, `bootScreen()` |
+| DES-07/08 | no doubled or ignored input | STALE_RUNTIME | stage is `inert` after a right answer; door lock while a room loads (Phase A) | `ui/room.js`, `core/boot.js` `createScreens`, `tests/reliability.test.mjs` |
+| INT-07/09 | save after progress; load before save | PASS_STATIC | the bridge refuses `saveData` until `loadData` succeeded; a failed or unreadable load blocks saves | `game/playables-bridge.js`, `tests/reliability.test.mjs` |
+| INT-10 | older saves parse | PASS_STATIC | `parseSave` migrates v1–v5 to v6; a newer save is never overwritten | `game/core/save.js`, `tests/m1.test.mjs`, `tests/reliability.test.mjs` |
+| INT-12/23 | autosave at milestones; save on pause | PASS_STATIC, STALE_RUNTIME | one save queue (`core/saver.js`): room won, checkpoints, every 4 answers, on pause and on leaving a screen; failed writes retried | `game/main.js` `persist()`, `tests/reliability.test.mjs` |
+| INT-13–17 | audio rules | STALE_RUNTIME | Web Audio effects only, no files; silent while YouTube audio is off or the game is paused; last browser check 2026-11-05 | `ui/sound.js`, `main.js` `boot()` |
+| INT-21 | pause stops everything | PASS_STATIC, STALE_RUNTIME | game clock freezes timers and input; idle picture preloading also runs on the game clock where `requestIdleCallback` is missing | `core/clock.js`, `ui/pause.js`, `tests/clock.test.mjs` |
+| INT-22 | no Page Visibility API | PASS_STATIC | static audit: none | — |
+| I18N-02 | no `navigator.language` | PASS_STATIC | language comes from `getLanguage()` (2 s limit, English on no answer) or the player's saved choice | `game/playables-bridge.js`, `main.js` `playerLang` |
+| I18N-03 | English supported | PASS (autoplay) | default language; Urdu also autoplayed | autoplay runs above |
+| DES-01/04 | 9:32–32:9, state kept on resize | STALE_RUNTIME | autoplay today covers 390×844, 1280×800, 844×390 for the first 4 rooms; extreme ratios last checked 2026-11-05 | `ui/fit.js`, autoplay |
+| DES-05/06 | touch and mouse | PASS_STATIC | all actions are `<button>`; long-press tips. Game surface now has no text selection, no long-press callout, `touch-action: manipulation` (no double-tap zoom) and `overscroll-behavior: none`; scrolling lists keep scrolling | `game/index.html` inline style, `tests/boot.test.mjs` |
+| DES-09/10 | keyboard; Esc closes dialogs | STALE_RUNTIME | last real-key check 2026-11-05 | `game/ui/keys.js` |
+| DES-16 | end of content communicated | STALE_RUNTIME | end plaque on the map; last check 2026-11-05 at 64 rooms | `game/ui/map.js` |
+| DES-17–19, 21 | no share, links, agreements, quit | PASS_STATIC | static audit + grep | — |
+| DES-20 | no icons confusable with YouTube's | MANUAL_REVIEW | icons are being repainted in Phase E; judge after it lands | `ui/icons.js` |
+| PRV-02 | no external calls | PASS_STATIC | the only non-relative URL the page loads is `youtube.com/game_api/v1`; a test checks every `href`/`src` of `index.html`. Runtime resource list last checked 2026-11-05 | `tests/boot.test.mjs` |
+| PRV-04–07 | no QR, clipboard, personal data, login | PASS_STATIC | static audit + grep | — |
+| PERF-01/02 | transfer before gameReady | PASS_STATIC (estimate) | see the table below; not measured on a hosted build | file sizes |
+| PERF-06 | files < 512 KiB | PASS_STATIC | largest file 233 KB (Urdu font), largest content file 194 KB (`content/wing-5.json`) | static audit, `tests/session.test.mjs` |
+| PERF-07/08 | save size | STALE_RUNTIME | 27.8 KB for a finished save at 64 rooms (2026-06); expect about 40 KB at 92 rooms, far under 3 MiB; re-measure | — |
+| PERF-09 | interactive < 5 s | STALE_RUNTIME | 0.74 s local (2026-06); re-measure with the modulepreload list | — |
+| PERF-11 | heap ≤ 512 MB | STALE_RUNTIME | 7 MB on the map (2026-06) | — |
+| PERF-14/15 | browsers and YouTube apps | UNVERIFIED | needs real devices | — |
+| PERF-16–19 | relative paths, ASCII names, ≤ 8000 files | PASS_STATIC | 972 files | static audit |
+| TRUST-02/03 | general 13+ | MANUAL_REVIEW | design is 13+; listing not written | — |
+| TRUST-06/08 | rights cleared | UNVERIFIED | see `docs/RIGHTS.md` | — |
+| A11Y-01 | WCAG AA best effort | MANUAL_REVIEW | contrast and sizes are being reworked in Phase E; scan again after it lands | — |
 
 ## Bundle and performance
 
-| Metric | Required | Recommended | Measured | Method | Status |
+| Metric | Required | Recommended | Measured 2026-11-23 | Method | Status |
 |---|---:|---:|---:|---|---|
-| Initial transfer through `gameReady()` | <30 MiB | <15 MiB | 823 KB raw, ≈ 0.3 MiB gzipped | resource timing, local server | PASS_RUNTIME |
-| Total hosted bundle | <250 MiB | minimal | 12.4 MiB | static audit | PASS_STATIC |
-| Largest individual file | <30 MiB | <512 KiB | 251 KB (`content/pack.json`) | static audit | PASS_STATIC |
-| Serialized save | <3 MiB | <500 KiB | 27.8 KB (all rooms) | localStorage size | PASS_RUNTIME |
-| Peak JS heap | ≤512 MB | lower | 7 MB on map | `performance.memory` | PASS_RUNTIME |
-| Interactable time | — | <5 s | 0.74 s local | `performance.now()` at map | PASS_RUNTIME |
+| Initial transfer through `gameReady()` (English) | <30 MiB | <15 MiB | about 671 KB raw, about 266 KB gzipped, plus the first screen's pictures (3 intro paintings, or the map's door pictures; about 10–20 KB each) | sum of file sizes: `index.html`, 2 stylesheets, 73 modules (341 KB raw), `content/pack.json` (168 KB), Qur'an font (61 KB) | PASS_STATIC (estimate) |
+| The same in Urdu | <30 MiB | <15 MiB | the above + 233 KB (Urdu font, now fetched only when Urdu is the language) | file size | PASS_STATIC (estimate) |
+| Total hosted bundle | <250 MiB | minimal | 12.781 MiB (884 pictures = 11.33 MiB) | static audit | PASS_STATIC |
+| File count | ≤8000 | — | 972 | static audit | PASS_STATIC |
+| Largest individual file | <30 MiB | <512 KiB | 233 KB `fonts/NotoNastaliqUrdu.woff2`; then `content/wing-5.json` 194 KB, `content/pack.json` 168 KB, `content/why.json` 151 KB | file sizes | PASS_STATIC |
+| Serialized save | <3 MiB | <500 KiB | not re-measured (27.8 KB at 64 rooms) | — | STALE_RUNTIME |
+| Peak JS heap | ≤512 MB | lower | not re-measured (7 MB) | — | STALE_RUNTIME |
+| Interactable time | — | <5 s | not re-measured (0.74 s local) | — | STALE_RUNTIME |
+
+Speed changes in Phase F (2026-11-23):
+
+- `index.html` lists every module of `main.js`'s import graph as `<link rel="modulepreload">` (72 links, written by `scripts/modulepreload.mjs`, checked by a test), so the modules load together and not one import level at a time.
+- The Qur'an font is preloaded; the Urdu font is fetched only once Urdu is the game's language (from YouTube or the player's choice). The fit pass runs again when a late font arrives.
+- After a room's file is in, its pictures are fetched in idle time (at most 40, 4 at a time) while the player is still on the intro or the map.
+- A picture that fails to load is asked for once more; after a second failure its place is a plain tile and the caption beside it shows even with captions off.
+- `content/why.json` (151 KB) and the wing files stay out of the boot path (fetched after the first screen, and per wing).
 
 ## Platform matrix
 
 | Surface | Version/device | Result |
 |---|---|---|
-| Desktop web (Chromium, app browser) | 2026-11-05 | PASS_RUNTIME (all 63 rooms autoplayed this week) |
-| Mobile web | — | UNVERIFIED |
+| Desktop Chromium, headless (autoplay) | 2026-11-23, first 4 rooms, 3 viewports, EN and UR | PASS (headless), with the Urdu ayah-step fit warning above |
+| Desktop web, full play-through of all 92 rooms | — | not run on this build (owner's final sweep) |
+| Mobile web (Android Chrome, iOS Safari) | — | UNVERIFIED: needs a real device. Check there: no text selection or callout on long-press, no double-tap zoom, no pull-to-refresh, lists still scroll |
+| Firefox, Safari desktop | — | UNVERIFIED |
 | YouTube Android | — | PORTAL_REQUIRED |
 | YouTube iOS | — | PORTAL_REQUIRED |
 
 ## Manual review
 
-- Rights ledger complete: no (POLISH_PLAN 4.2)
+- Rights ledger complete: no (`docs/RIGHTS.md`; English translation choice and two emails still open)
 - Originality/duplicate comparison: not done
 - General 13+ audience confirmed: by design; listing pending
 - Metadata and thumbnails match build: not written
 - Accessibility tags accurate: not chosen
-- No personal data, login, analytics, external services, QR or links: yes
-- No extra agreements, share prompts, duplicate YouTube controls or quit button: yes, except the DES-20 corner-icon risk
-- Completion, tutorial, pause and error states: completion and pause fail (above)
+- No personal data, login, analytics, external services, QR or links: yes (static)
+- No extra agreements, share prompts, duplicate YouTube controls or quit button: yes, with DES-20 left to the reviewer
+- Completion, tutorial, pause and error states: implemented (Phases A and D); need one fresh browser pass on this build
 
 ## Hosted Test Suite
 
-PORTAL_REQUIRED. Not run.
+PORTAL_REQUIRED. Not run. A Test Suite pass is not certification.
 
 ## Remaining unverified items
 
-- Real devices (Android, iOS, Safari, Firefox), the Hosted Test Suite, ingested-build transfer size.
-- Scholar sign-off on all meanings, pictures and translations (PLAN D8). Full-ayah translations are now Abdullah Yusuf Ali (EN) and Maulana Muhammad Junagarhi (UR), credited in Settings; US copyright status of Yusuf Ali and the editions of both Tanzil files are still open (docs/RIGHTS.md).
+- Everything marked `STALE_RUNTIME`: one browser pass on the final build (SDK call order and timing, pause, audio, keyboard, extreme aspect ratios, save size at 92 rooms, heap, time to interactive).
+- Real devices (Android, iOS, Safari, Firefox), the hosted Test Suite, the ingested build's transfer size.
+- Whether the idle picture preload is a cache hit on YouTube's hosting (it depends on the host's cache headers; with `no-store`, as on the local QA server, pictures are simply fetched twice).
+- Scholar sign-off on all meanings, pictures and translations (PLAN D8); rights items in `docs/RIGHTS.md`.
+- Phase F items not done here (they live in files Phase E was editing): the Guide "Words" tab still builds every card at once, and the always-running `box-shadow` pulse and the `drop-shadow` filter on every picture are still in `styles.css`.

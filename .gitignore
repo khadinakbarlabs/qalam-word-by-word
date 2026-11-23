@@ -5,3 +5,4 @@ qa/autoplay-out/
 node_modules/
 .DS_Store
 .claude/
+__pycache__/

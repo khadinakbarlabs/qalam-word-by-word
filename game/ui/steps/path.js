@@ -1,7 +1,8 @@
 // E3 "Same Verb, New Path" (connector swap): a verb the player knows meets a partner word (ضَرَبَ + فِي) and the
 // pair takes a new meaning (travel). The partner word glows; tap the picture of the new meaning. Then the change is
 // shown: the verb alone → the verb with its partner. Items carry their own meaning picture (`pic`, from `art`).
-import { h, ar, pic, cap, options, dots, wait, wobble } from "../kit.js";
+import { h, ar, arSay, pic, cap, dots, wait, wobble, said } from "../kit.js";
+import { pickItems } from "../../core/options.js";
 import { t, lang } from "../../i18n.js";
 import { tipText, explain } from "../tips.js";
 
@@ -20,15 +21,15 @@ export function run(ctx, step) {
       const join = h("div", { class: "press-mould", "data-tip": "partner" },
         h("span", { class: "m-pattern", lang: "ar", dir: "rtl" }, h("span", { class: "m-add" }, partner.ar)),
         h("span", { class: "cap", "data-t": "partnerCap" }, t("partnerCap")));
-      const out = h("div", { class: "press-out" }, ar(it.ar, "word"), h("span", { class: "press-q", "aria-hidden": "true" }, "?"));
+      const out = h("div", { class: "press-out" }, arSay(it, "word"), h("span", { class: "press-q", "aria-hidden": "true" }, "?"));
       const row = h("div", { class: "press-row", dir: lang() === "ur" ? "rtl" : "ltr" }, card, arrow(), join, arrow(), out);
-      const grid = h("div", { class: "grid4" }, options(meanings, i, 4, i).map((m) => {
+      const grid = h("div", { class: "grid4" }, pickItems(meanings, i, 4, `path|${i}`).map((m) => {
         const k = meanings.indexOf(m);
-        const b = tipText(h("button", { class: "choice", "aria-label": m.g.en }, pic(m.pic), cap(m.g)), explain(m));
+        const b = tipText(h("button", { class: "choice", "aria-label": said(m.g) }, pic(m.pic), cap(m.g)), explain(m));
         b.addEventListener("click", async () => {
           if (k !== i) { ctx.miss(); return wobble(b); }
           ctx.hit(); b.classList.add("right"); i++;
-          out.replaceChildren(ar(it.ar, "word"), pic(it.pic));
+          out.replaceChildren(arSay(it, "word"), pic(it.pic));
           out.classList.add("grown");
           const side = (p, a, g) => h("span", { class: "shift-side" }, pic(p), ar(a, "opt-ar"), cap(g));
           grid.replaceWith(h("div", { class: "press-shift", dir: lang() === "ur" ? "rtl" : "ltr" },

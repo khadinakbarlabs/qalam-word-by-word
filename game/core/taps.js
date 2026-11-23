@@ -1,6 +1,8 @@
 // Room length (pure). taps: how many taps a room needs when every answer is right first time (no hints, no misses);
 // the counts follow the step modules in game/ui/steps/ and match autoplay tap counts. Long rooms get rest stops at
 // step boundaries, so no stretch between two saves runs much past REST_EVERY taps (docs/POLISH_PLAN.md finding 9).
+import { CHECK_CAP } from "./mastery.js";
+
 export const REST_EVERY = 120;
 
 const ITEMS = (s) => s.items?.length ?? 0;
@@ -24,7 +26,8 @@ export function partTaps(room, words) {
   const m = masteryWords(room, words);
   const parts = room.steps.map(stepTaps);
   parts[0] += room.stakes?.words ? 1 : 0;
-  parts.push((m.length >= 3 ? m.length * 2 + 1 : 0) + 1);
+  // the Last Check asks at most CHECK_CAP words, each from both sides (core/mastery.js)
+  parts.push((m.length >= 3 ? Math.min(m.length, CHECK_CAP) * 2 + 1 : 0) + 1);
   return parts;
 }
 

@@ -1,7 +1,8 @@
 // E4 Root Garden: a word appears; tap the pot whose three letter-seeds it grows from. Each right answer adds a leaf
 // (the word) to that pot's plant, so a whole root family (رَحْمٰن · رَحِيم · رَحْمَة) ends up growing together.
 // Names of Allah are taught this way: calligraphy and their root family, never a picture.
-import { h, ar, pic, dots, wait, wobble } from "../kit.js";
+import { icon } from "../icons.js";
+import { h, ar, pic, dots, wait, wobble, arSay } from "../kit.js";
 import { sign } from "../signs.js";
 
 export function run(ctx, step) {
@@ -14,7 +15,7 @@ export function run(ctx, step) {
         leafBox,
         h("span", { class: "sprout", "aria-hidden": "true" }, pic(sign("ui:pot", "🌱"))),
         h("span", { class: "seeds", lang: "ar", dir: "rtl" }, s.letters.map((l) => h("span", { class: "seed" }, l))),
-        h("span", { class: "pot-base", "aria-hidden": "true" }, "🪴"));
+        h("span", { class: "pot-base", "aria-hidden": "true" }, icon("pot")));
       return [s.id, pot];
     }));
     const prompt = h("div", { class: "prompt" });
@@ -36,7 +37,7 @@ export function run(ctx, step) {
       if (i >= step.items.length) return done();
       const item = step.items[i];
       ctx.item([item.w]);
-      prompt.replaceChildren(ar(ctx.words[item.w].ar, "word"));
+      prompt.replaceChildren(arSay(ctx.words[item.w], "word"));
       ctx.target(pots.get(item.seed));
       const d = dots(i, step.items.length);
       progress.replaceWith(d);

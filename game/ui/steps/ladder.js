@@ -1,10 +1,12 @@
 // E1 Size Ladder: a describing word appears; tap its rung. The low rung is the plain word (كَبِير big), the high rung
 // is the "-er / -est" mould أَفْعَل (أَكْبَر bigger, biggest). Both rungs show the same picture, the high one larger.
-import { h, ar, pic, dots, wait, wobble } from "../kit.js";
+import { tipSaid } from "../tips.js";
+import { icon } from "../icons.js";
+import { h, ar, pic, dots, wait, wobble, arSay } from "../kit.js";
 
 export function run(ctx, step) {
   return new Promise((done) => {
-    const rung = (id) => h("button", { class: `rung rung-${id}`, "aria-label": id, "data-tip": id === "more" ? "rungMore" : "rungBase" });
+    const rung = (id) => h("button", { class: `rung rung-${id}`, "aria-label": tipSaid(id === "more" ? "rungMore" : "rungBase"), "data-tip": id === "more" ? "rungMore" : "rungBase" });
     const rungs = { more: rung("more"), base: rung("base") };
     const prompt = h("div", { class: "prompt" });
     let progress = dots(0, step.items.length);
@@ -25,9 +27,9 @@ export function run(ctx, step) {
       const item = step.items[i];
       const base = ctx.words[item.base];
       ctx.item([item.w]);
-      prompt.replaceChildren(ar(ctx.words[item.w].ar, "word"));
+      prompt.replaceChildren(arSay(ctx.words[item.w], "word"));
       rungs.base.replaceChildren(pic(base.pic, base.medal));
-      rungs.more.replaceChildren(pic(base.pic, base.medal), h("span", { class: "up", "aria-hidden": "true" }, "⬆"));
+      rungs.more.replaceChildren(pic(base.pic, base.medal), h("span", { class: "up", "aria-hidden": "true" }, icon("up")));
       ctx.target(rungs[item.rung]);
       const d = dots(i, step.items.length);
       progress.replaceWith(d);

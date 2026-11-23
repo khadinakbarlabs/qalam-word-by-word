@@ -6,7 +6,99 @@
     <meta name="color-scheme" content="light">
     <title>Qalam: Word by Word</title>
     <script src="https://www.youtube.com/game_api/v1"></script>
+    <link rel="icon" href="data:,">
+    <link rel="preload" href="./fonts/AmiriQuran.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./feel.css">
+    <style>
+      /* Boot and platform rules (audit Phase F). Kept here so they apply with the first paint.
+         1. The Urdu font file (233 KB) is only fetched once Urdu is the game's language: main.js then puts
+            "urdu-font" on <html>. Until then Urdu text (the two-language loading screen, the language buttons)
+            uses the device's own Arabic-script font. */
+      :root:not(.urdu-font) { --urdu: system-ui, "Segoe UI", "Geeza Pro", "Noto Naskh Arabic", serif; }
+      /* 2. A game surface, not a document: no text selection, no long-press menu, no double-tap zoom, no pull to
+            refresh or scroll chaining. Lists that scroll (map, guide, settings) still scroll. */
+      html, body { overscroll-behavior: none; touch-action: manipulation; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+      html { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; } /* inherited by every element */
+      /* 3. A picture that could not be loaded (ui/pic-retry.js): a plain tile, and its caption always shows. */
+      .pic.pic-missing { background: #e3d5bb66; border-radius: 12px; box-shadow: inset 0 0 0 2px #e3d5bb; }
+      .pic.pic-missing .pic-img { visibility: hidden; }
+      body.nocap .pic.pic-missing ~ .cap { visibility: visible !important; }
+    </style>
+    <!-- modulepreload:start (written by scripts/modulepreload.mjs) -->
+    <link rel="modulepreload" href="./core/async.js">
+    <link rel="modulepreload" href="./core/boot.js">
+    <link rel="modulepreload" href="./core/chips.js">
+    <link rel="modulepreload" href="./core/clock.js">
+    <link rel="modulepreload" href="./core/confusable.js">
+    <link rel="modulepreload" href="./core/content.js">
+    <link rel="modulepreload" href="./core/face.js">
+    <link rel="modulepreload" href="./core/mastery.js">
+    <link rel="modulepreload" href="./core/milestones.js">
+    <link rel="modulepreload" href="./core/net.js">
+    <link rel="modulepreload" href="./core/oops.js">
+    <link rel="modulepreload" href="./core/options.js">
+    <link rel="modulepreload" href="./core/pictures.js">
+    <link rel="modulepreload" href="./core/practice.js">
+    <link rel="modulepreload" href="./core/progress.js">
+    <link rel="modulepreload" href="./core/reading.js">
+    <link rel="modulepreload" href="./core/recall.js">
+    <link rel="modulepreload" href="./core/relight.js">
+    <link rel="modulepreload" href="./core/report.js">
+    <link rel="modulepreload" href="./core/room-splits.js">
+    <link rel="modulepreload" href="./core/room.js">
+    <link rel="modulepreload" href="./core/save.js">
+    <link rel="modulepreload" href="./core/saver.js">
+    <link rel="modulepreload" href="./core/scenes.js">
+    <link rel="modulepreload" href="./core/srs.js">
+    <link rel="modulepreload" href="./core/taps.js">
+    <link rel="modulepreload" href="./core/warmup.js">
+    <link rel="modulepreload" href="./core/wings.js">
+    <link rel="modulepreload" href="./i18n.js">
+    <link rel="modulepreload" href="./playables-bridge.js">
+    <link rel="modulepreload" href="./ui/count-up.js">
+    <link rel="modulepreload" href="./ui/fit.js">
+    <link rel="modulepreload" href="./ui/guide.js">
+    <link rel="modulepreload" href="./ui/hint.js">
+    <link rel="modulepreload" href="./ui/icons.js">
+    <link rel="modulepreload" href="./ui/intro.js">
+    <link rel="modulepreload" href="./ui/keys.js">
+    <link rel="modulepreload" href="./ui/kit.js">
+    <link rel="modulepreload" href="./ui/map.js">
+    <link rel="modulepreload" href="./ui/milestone.js">
+    <link rel="modulepreload" href="./ui/notice.js">
+    <link rel="modulepreload" href="./ui/oops.js">
+    <link rel="modulepreload" href="./ui/pause.js">
+    <link rel="modulepreload" href="./ui/pic-retry.js">
+    <link rel="modulepreload" href="./ui/relight.js">
+    <link rel="modulepreload" href="./ui/room.js">
+    <link rel="modulepreload" href="./ui/settings.js">
+    <link rel="modulepreload" href="./ui/signs.js">
+    <link rel="modulepreload" href="./ui/sound.js">
+    <link rel="modulepreload" href="./ui/steps/ayah.js">
+    <link rel="modulepreload" href="./ui/steps/grow.js">
+    <link rel="modulepreload" href="./ui/steps/ladder.js">
+    <link rel="modulepreload" href="./ui/steps/mastery.js">
+    <link rel="modulepreload" href="./ui/steps/match.js">
+    <link rel="modulepreload" href="./ui/steps/meet.js">
+    <link rel="modulepreload" href="./ui/steps/passage.js">
+    <link rel="modulepreload" href="./ui/steps/path.js">
+    <link rel="modulepreload" href="./ui/steps/petals.js">
+    <link rel="modulepreload" href="./ui/steps/place.js">
+    <link rel="modulepreload" href="./ui/steps/point.js">
+    <link rel="modulepreload" href="./ui/steps/roots.js">
+    <link rel="modulepreload" href="./ui/steps/scene.js">
+    <link rel="modulepreload" href="./ui/steps/snap.js">
+    <link rel="modulepreload" href="./ui/steps/story.js">
+    <link rel="modulepreload" href="./ui/steps/tellapart.js">
+    <link rel="modulepreload" href="./ui/steps/timeline.js">
+    <link rel="modulepreload" href="./ui/steps/warmup.js">
+    <link rel="modulepreload" href="./ui/steps/wheel.js">
+    <link rel="modulepreload" href="./ui/strip.js">
+    <link rel="modulepreload" href="./ui/tips.js">
+    <link rel="modulepreload" href="./ui/why-line.js">
+    <link rel="modulepreload" href="./ui/why.js">
+    <!-- modulepreload:end -->
     <script type="module" src="./main.js"></script>
   </head>
   <body>

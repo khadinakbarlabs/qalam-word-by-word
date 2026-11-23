@@ -44,3 +44,10 @@ export function setPaused(on) {
 }
 
 export const isPaused = () => paused;
+
+/** Run `fn` after `ms` of real time, paused or not. Only for what must not wait for resume: a cloud save's time limit
+ *  and its retry, because a pause is often the end of the session. Returns a function that cancels it. */
+export function realLater(fn, ms) {
+  const handle = setTimeout(fn, Math.max(0, ms));
+  return () => clearTimeout(handle);
+}

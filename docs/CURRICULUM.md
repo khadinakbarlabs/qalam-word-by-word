@@ -113,6 +113,23 @@ Five acts mirror the book's proven order (little words → nouns → sound verbs
 
 Each act ≈ 5 chapters → ~25 chapters. Each chapter ≈ 20–30 new lemmas, 8–15 real ayat, ~5-minute sessions, one Reading Room at the act end.
 
+### Rooms as built (updated 2026-11-23, save v6)
+
+Rooms are kept short so a first-time player is never given a wall of new words. The content of each room is as written in `authoring/rooms.js`; long rooms are dealt out into shorter ones by `authoring/splits.js` at build time, and the build fails if a room goes over the budget.
+
+| Wing | Rooms | New words | Most new words in one room | Budget | Meter at the end |
+|---|---|---|---|---|---|
+| 1 Entrance Hall | 24 (Al-Fatiha is 5 of them, in ayah order: 1:1 · 1:2–1:4 · 1:5 · 1:6 · 1:7) | 131 | 8 | 8 | 47.1% |
+| 2 Garden Courtyard | 20 | 259 | 18 | 20 | 65.6% |
+| 3 Scribes' Room | 18 | 202 | 17 | 20 | 73.3% |
+| 4 Old Tower | 8 | 123 | 20 | 20 | 79.1% |
+| 5 Lamp Room | 22 | 195 | 19 | 20 | 85.5% |
+| **All** | **92** | **910** | | | **85.5%** |
+
+- Every new word gets at least one graded practice question before the room's Last Check. Where the written room only showed a word, the build adds a short Picture Match after the step that introduced it (`scripts/lib/practice.mjs`); the build fails on a word it cannot practise.
+- Room ids are part of the save. A room that is cut keeps its id for the first part; old id → new ids is recorded by hand in `game/core/room-splits.js`, and a save from before v6 with the old room finished has every part finished.
+- The meter is the share of the Qur'an's words the player has **met** (finished rooms). It is labelled that way on the map, the done screen and in the Guide's "My progress", next to the count of words remembered now.
+
 ### Chapter recipe (same every time — one loop)
 1. **Meet** — 1 short ayah where only the chapter's new piece is unknown; Qalam points at it.
 2. **Decode** — 4–8 ayat; player decodes each new word (meaning chips or Root Lens).

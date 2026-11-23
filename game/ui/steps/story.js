@@ -1,12 +1,13 @@
 // Story Strip: the room's words tell a little wordless story, one painted panel after another. Tap the glowing
 // panel to light it and see its word; the next panel then glows. Never graded: it is the room's closing scene.
+import { nextIcon } from "../icons.js";
 import { h, ar, pic, cap } from "../kit.js";
 import { t, lang } from "../../i18n.js";
 import { tipText, explain } from "../tips.js";
 
 export function run(ctx, step) {
   return new Promise((done) => {
-    const next = h("button", { class: "next-btn", hidden: true, "aria-label": t("next"), onclick: () => done() }, "▶");
+    const next = h("button", { class: "next-btn", hidden: true, "aria-label": t("next"), onclick: () => done() }, nextIcon());
     const panels = step.panels.map((p, k) => {
       const w = ctx.words[p.w];
       const b = h("button", { class: "story-panel", "aria-label": p.ar ?? w.ar, "data-tip": "story" },

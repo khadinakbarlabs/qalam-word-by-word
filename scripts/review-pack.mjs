@@ -7,6 +7,8 @@ import { WORDS } from "../authoring/words.js";
 
 const root = new URL("../", import.meta.url);
 const pack = JSON.parse(readFileSync(new URL("game/content/pack.json", root), "utf8"));
+// what each picture shows ships in its own file (game/core/content.js)
+const why = JSON.parse(readFileSync(new URL("game/content/why.json", root), "utf8")).words;
 
 const g = (x) => ({ en: x?.en ?? "", ur: x?.ur ?? "" });
 // "img:art/x.webp", sometimes followed by a ▲ he-word / ● she-word badge
@@ -28,7 +30,7 @@ const order = (roomId) => { const k = pack.rooms.findIndex((r) => r.id === roomI
 const words = Object.entries(pack.words)
   .filter(([id]) => id.startsWith("w:"))
   .map(([id, w]) => ({
-    id, ar: w.ar, g: g(w.g), more: w.more ? g(w.more) : undefined, why: w.why ? g(w.why) : undefined,
+    id, ar: w.ar, g: g(w.g), more: w.more ? g(w.more) : undefined, why: why[id] ? g(why[id]) : undefined,
     look: look(w.pic, w.medal), units: (WORDS[id]?.units ?? []).filter((u) => !u.startsWith("K:")).map((u) => u.replace(/^[LAS]:/, "")),
     room: firstRoom.get(id) ?? null,
   }))

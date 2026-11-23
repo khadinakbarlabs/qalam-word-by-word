@@ -1,7 +1,8 @@
 <!doctype html>
 <!-- QA only (not shipped): loads ../game/index.html with a recording ytgame stub in place of the real SDK.
      Flags: ?fresh=1 clears the fake cloud save · ?corrupt=1 stores unreadable data · ?future=1 stores a v99 save
-            ?failLoad=1 makes loadData reject · ?lang=ur-PK · ?qa=1 exposes window.__qw (current hint target) -->
+            ?failLoad=1 makes loadData reject · ?hangLoad=1 makes loadData never answer · ?failSave=N makes the first
+            N saveData calls reject · ?lang=ur-PK · ?qa=1 exposes window.__qw (current hint target) -->
 <html><head><meta charset="utf-8"><title>Harness</title></head><body>
 <script>
 (async () => {
@@ -11,7 +12,7 @@
   if (params.has("future")) localStorage.setItem("qa-save", JSON.stringify({ v: 99, rooms: { fatiha: 1 } }));
   const html = await (await fetch("../game/index.html", { cache: "no-store" })).text();
   const stub = `<script>(${stubFactory.toString()})(${JSON.stringify({
-    failLoad: params.has("failLoad"), lang: params.get("lang") || "en-US", qa: params.has("qa"),
+    failLoad: params.has("failLoad"), hangLoad: params.has("hangLoad"), failSave: Number(params.get("failSave")) || 0, lang: params.get("lang") || "en-US", qa: params.has("qa"),
   })});<\/script>`;
   const page = html
     .replace('<script src="https://www.youtube.com/game_api/v1"><' + '/script>', () => stub)
@@ -37,8 +38,8 @@ function stubFactory(opts) {
     game: {
       firstFrameReady: () => rec("firstFrameReady"),
       gameReady: () => rec("gameReady"),
-      loadData: async () => { rec("loadData"); if (opts.failLoad) throw new Error("API_UNAVAILABLE"); return localStorage.getItem("qa-save") || ""; },
-      saveData: async (s) => { rec("saveData", s.length); localStorage.setItem("qa-save", s); },
+      loadData: async () => { rec("loadData"); if (opts.failLoad) throw new Error("API_UNAVAILABLE"); if (opts.hangLoad) return new Promise(() => {}); return localStorage.getItem("qa-save") || ""; },
+      saveData: async (s) => { rec("saveData", s.length); if (opts.failSave-- > 0) throw new Error("API_UNAVAILABLE"); localStorage.setItem("qa-save", s); },
     },
     system: {
       getLanguage: async () => { rec("getLanguage"); return opts.lang; },

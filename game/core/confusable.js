@@ -1,7 +1,7 @@
 // Confusable words (pure). Answer chips used to be picked by list position, so a wrong chip was rarely a real mix-up.
 // Now the chips for a word include the words most easily mistaken for it: the same letters with other marks, one letter
 // apart, or the same root family. A wrong pick then gets a reason ("those two look alike") instead of a bare "no".
-// No Math.random: the choice depends only on the word, the pool and a seed, so QA stays repeatable.
+// The options themselves are picked in core/options.js (no Math.random: QA stays repeatable).
 
 const MARKS = /[ؐ-ًؚ-ٰٟۖ-ۭـ]/g;
 const SOFT = /[وياىئؤءةه]/g;
@@ -72,14 +72,14 @@ export function confusablesFor(words, id, pool) {
 /** The reason key for a wrong pick, or "plain" when the two words have nothing in common. */
 export const whyNot = (words, answerId, pickedId) => `why_${reason(words[answerId], words[pickedId]) ?? "plain"}`;
 
-/** n answer ids for `answerId`: the answer, up to two look-alikes / root cousins, then others from the pool in a stable
- *  order shifted by `seed`; the whole list is rotated by the seed so the answer does not always sit in one place. */
-export function pickOptions(words, pool, answerId, n, seed = 0) {
-  const others = pool.filter((id) => id !== answerId);
-  const cousins = confusablesFor(words, answerId, others).slice(0, Math.min(2, n - 1));
-  const rest = others.filter((id) => !cousins.includes(id));
-  const fill = Array.from({ length: Math.max(0, Math.min(n - 1 - cousins.length, rest.length)) }, (_, k) => rest[(seed + k * 2) % rest.length]);
-  const picked = [...new Set([answerId, ...cousins, ...fill])];
-  const turn = seed % picked.length;
-  return picked.slice(turn).concat(picked.slice(0, turn));
+/** The word a compound ayah tile is really about: of its parts ("the" + "Most Gracious", "in" + "name"), the one
+ *  with the most letters. Look-alikes and the why-not line are worked out for it, not for the one-letter prefix.
+ *  Ties go to the later part (prefixes come first). Null when the tile has no word ids. */
+export function mainId(words, ids) {
+  let best = null;
+  for (const id of ids ?? []) {
+    if (!words[id]?.ar) continue;
+    if (best === null || skeleton(words[id].ar).length >= skeleton(words[best].ar).length) best = id;
+  }
+  return best ?? ids?.[0] ?? null;
 }

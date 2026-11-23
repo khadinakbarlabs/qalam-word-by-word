@@ -1,6 +1,8 @@
 #!/usr/bin/env node
-// Build game/content/pack.json (+ one wing-N.json of room steps per wing, game/core/content.js) from authoring/ + the
-// corpus. Refuses to write if anything fails validation.
+// Build game/content/pack.json (+ one wing-N.json of room steps per wing and why.json, the picture lines:
+// game/core/content.js) from authoring/ + the corpus. Refuses to write if anything fails validation: the pack's own
+// rules (scripts/lib/pack.mjs) and the content-accuracy checks (scripts/lib/checks.mjs: each ayah word against the
+// card it takes its picture from, Names of Allah, words with one right card, look-alike cards, missing ids).
 // Usage: node scripts/build-pack.mjs
 
 import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
@@ -16,10 +18,10 @@ if (errors.length) {
 }
 const dir = join(ROOT, "game/content");
 await mkdir(dir, { recursive: true });
-const { base, wings } = splitPack(pack);
+const { base, wings, why } = splitPack(pack);
 // drop wing files from an older build (a wing that no longer exists must not ship)
 for (const f of await readdir(dir)) if (/^wing-\d+\.json$/.test(f)) await rm(join(dir, f));
-const files = [["pack.json", base], ...Object.entries(wings).map(([w, steps]) => [`wing-${w}.json`, steps])];
+const files = [["pack.json", base], ...Object.entries(wings).map(([w, steps]) => [`wing-${w}.json`, steps]), ["why.json", why]];
 for (const [name, data] of files) {
   const json = JSON.stringify(data);
   await writeFile(join(dir, name), `${json}\n`);
